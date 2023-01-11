@@ -1,0 +1,246 @@
+#VRML_SIM R2022b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/lights/protos/CeilingLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.12577821568808165 0.8804431530844167 0.45716484406075336 0.8071583944978193
+  position -0.6915100278560411 -0.36483795282963377 0.6236285609441987
+  follow "Crazyflie"
+}
+TexturedBackground {
+}
+Crazyflie {
+  translation 0 0 0.015
+  controller "main"
+  supervisor TRUE
+}
+CeilingLight {
+  translation 0 0 6
+  name "ceiling light 1"
+  pointLightIntensity 7
+}
+CeilingLight {
+  translation 3 -3 6
+  name "ceiling light 2"
+  pointLightIntensity 7
+}
+CeilingLight {
+  translation 3 3 6
+  name "ceiling light 3"
+  pointLightIntensity 7
+}
+CeilingLight {
+  translation -3 -3 6
+  name "ceiling light 4"
+  pointLightIntensity 7
+}
+CeilingLight {
+  translation -3 3 6
+  name "ceiling light 5"
+  pointLightIntensity 7
+}
+Floor {
+  tileSize 0.64 0.64
+  appearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "./textures_epfl_lis/floor_concrete.jpg"
+      ]
+    }
+    roughness 1
+    metalness 0
+  }
+}
+DEF WALL_LEFT Solid {
+  translation 0 5 3
+  rotation 1 0 0 1.57
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/wall_left.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+        textureTransform TextureTransform {
+        }
+      }
+      geometry DEF DOOR_WALL_SHAPE Plane {
+        size 10 6
+      }
+      castShadows FALSE
+    }
+  ]
+  name "wall-left"
+  boundingObject USE DOOR_WALL_SHAPE
+}
+DEF WALL_FRONT Solid {
+  translation 5 0 3
+  rotation 0.5773502691896258 -0.5773502691896258 -0.5773502691896258 2.093
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/wall_front.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+        textureTransform TextureTransform {
+        }
+      }
+      geometry DEF DOOR_WALL_SHAPE Plane {
+        size 10 6
+      }
+      castShadows FALSE
+    }
+  ]
+  name "wall-front"
+  boundingObject USE DOOR_WALL_SHAPE
+}
+DEF WALL_RIGHT Solid {
+  translation 0 -5 3
+  rotation 0 0.7071067811865475 0.7071067811865475 3.141
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/wall_right.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+        textureTransform TextureTransform {
+        }
+      }
+      geometry DEF DOOR_WALL_SHAPE Plane {
+        size 10 6
+      }
+      castShadows FALSE
+    }
+  ]
+  name "wall-right"
+  boundingObject USE DOOR_WALL_SHAPE
+}
+DEF WALL_BACK Solid {
+  translation -5 0 3
+  rotation 0.5773502691896258 0.5773502691896258 0.5773502691896258 2.094
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/wall_front.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+        textureTransform TextureTransform {
+        }
+      }
+      geometry DEF DOOR_WALL_SHAPE Plane {
+        size 10 6
+      }
+      castShadows FALSE
+    }
+  ]
+  name "wall-back"
+  boundingObject USE DOOR_WALL_SHAPE
+}
+DEF CEILING Solid {
+  translation 0 0 6
+  rotation 0 -1 0 3.141
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/ceiling.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+        textureTransform TextureTransform {
+        }
+      }
+      geometry DEF DOOR_WALL_SHAPE Plane {
+        size 10 10
+      }
+      castShadows FALSE
+    }
+  ]
+  name "wall-up"
+  boundingObject USE DOOR_WALL_SHAPE
+}
+DEF CHECKERBOARD_A4_25mm_8x6 Solid {
+  translation 5 0 0.5
+  children [
+    DEF CHECKERBOARD_LOGO Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/checkerboard_A4_25mm_8x6.png"
+          ]
+        }
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.01 0.297 0.21
+      }
+    }
+  ]
+  name "checkerboard"
+}
+DEF OBSTACLE_CYLINDER1 Solid {
+  translation 1 0 0.74
+  children [
+    DEF BOX_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/obstacle_cylinder.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+      }
+      geometry Cylinder {
+        radius 0.2
+        height 1.48
+      }
+    }
+  ]
+  name "obstacle-C1"
+  boundingObject USE BOX_SHAPE
+}
+DEF OBSTACLE_BOX1 Solid {
+  translation 3 0 0.75
+  children [
+    DEF BOX_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/obstacle_box.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.31 0.31 1.48
+      }
+    }
+  ]
+  name "obstacle-B1"
+  boundingObject USE BOX_SHAPE
+}
