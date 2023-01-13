@@ -4,14 +4,21 @@
    contain the root `toctree` directive.
 
 crazy-practical documentation!
-===========================================
+==============================
 This project is a part of the Aerial Robotics course at EPFL.
 The main purpose of this project is to practice the flight control and navigation of a quadrotor including space exploration, obstacle avoidance, etc.
-This documentation shows the project arrangement, and step-by-step software implementation.
+This documentation shows the project description, step-by-step software implementation, simulation leaderboard, and real-world competetion.
 
 .. rubric:: Demo video
 
-Add a gif about the real-world flight video of the best group from last year
+If you want to see a real-world example of this project, check out this fascinating video from previous year.
+
+.. image:: demo_2022.gif
+  :width: 650
+  :alt: demo video from last year
+
+Can't wait to try out your idea?
+Follow the contents below to check how fast your algorithm can achieve.
 
 .. rubric:: Table of contents
 
