@@ -3,13 +3,10 @@ Examples
 
 Basic exploration
 -----------------
-Search all area to find the landing box.
+Search all area (e.g., line search) to find the landing box.
 
 Obstacle avoidance
 ------------------
 
-pointcloud mapping
+Create a world map
 ------------------
-
-Reinforcement learning
-----------------------
