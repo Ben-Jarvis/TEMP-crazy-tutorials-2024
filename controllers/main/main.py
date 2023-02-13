@@ -169,6 +169,7 @@ if __name__ == '__main__':
         control_commands = drone.action_from_keyboard()
         # control_commands = my_controller.step_control(sensor_data)
         # control_commands = example.obstacle_avoidance(sensor_data)
+        # map = example.occupancy_map(sensor_data)
         # ---- end --- #
 
         # Update the drone status in simulation
