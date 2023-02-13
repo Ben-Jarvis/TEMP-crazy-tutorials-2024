@@ -182,8 +182,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="-76.120148"
-     inkscape:cy="302.71969"
+     inkscape:cx="188.69133"
+     inkscape:cy="184.63286"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -191,10 +191,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="2560"
-     inkscape:window-height="1371"
-     inkscape:window-x="1440"
-     inkscape:window-y="497"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata5">
@@ -290,7 +290,7 @@
          x="58.863895"
          y="142.27136"
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="tspan913">    camera_image (for future use)</tspan></text>
+         id="tspan913">    camera_image (not used in project)</tspan></text>
     <rect
        style="opacity:1;fill:#19a500;fill-opacity:0.10891089;stroke:#000000;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect821-9"
