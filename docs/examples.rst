@@ -1,13 +1,13 @@
 Examples
 ========
 
-Here are some basic algorithms which may be helpful to drone exploration.
+Here are some basic algorithms which may be helpful to the crazy-practical project.
 
 Obstacle avoidance
 ------------------
-This is a simple obstacle avoidance algorithm based on the distance sensors.
-For example, if the front distance is less than 0.2m, the drone will move left when left distance is larger than the right distance.
-The drone will move right when right distance is larger than the left distance.
+This is a simple obstacle avoidance algorithm based on distance sensors.
+For example, if the front distance is less than 0.2m, the drone will move left when the left distance is larger than the right distance.
+The drone will move right when the right distance is larger than the left distance.
 However, if the front distance is larger than 0.2m, the drone will move forward.
 The code for this algorithm is::
 
@@ -16,7 +16,7 @@ The code for this algorithm is::
     def obstacle_avoidance(sensor_data):
         global on_ground, height_desired
 
-        # Take off with incremental height until height is above 0.5
+        # Take off with incremental height until the height is above 0.5
         if on_ground and sensor_data['altitude'] < 0.5:
             height_desired += 0.01
             control_command = [0.0, 0.0, 0.0, height_desired]
@@ -35,17 +35,64 @@ The code for this algorithm is::
 
         return control_command
 
-This example can be found in 'example.py' file.
-You can run this example by uncommenting 'control_commands = example.obstacle_avoidance(sensor_data)' in the 'main.py' file.
-Simulation results of this algorithm is shown in the following animation.
+This example can be found in the 'example.py' file.
+You can run this example by uncommenting 'control_commands = example.obstacle_avoidance(sensor_data)' in 'main.py' file.
+Simulation results of this algorithm are shown in the following animation.
 
 .. image:: example_obstacle_avoidance.gif
   :width: 650
-  :alt: demo video from last year
+  :alt: example of obstacle avoidance
 
-Basic exploration
------------------
-Search all area (e.g., line search) to find the landing box.
+Coverage path planning
+----------------------
+Given the setpoint position sets, the drone can explore an area autonomously. A basic example for this exploration control can be found in the 'example.py' file, which has the following code::
+
+    # Coverage path planning
+    setpoints = [[0.0, 2.0], [2.0, 2.0], [2.0, -2.0], [4.0, -2.0], [4.0, 2.0]]
+    index_current_setpoint = 0
+    def path_planning(sensor_data):
+        global on_ground, height_desired, index_current_setpoint, setpoints
+
+        # Take off with incremental height until the height is above 0.5
+        if on_ground and sensor_data['altitude'] < 0.5:
+            height_desired += 0.01
+            control_command = [0.0, 0.0, 0.0, height_desired]
+            return control_command
+        else:
+            on_ground = False
+
+        # Hover at the final setpoint
+        if index_current_setpoint == len(setpoints):
+            control_command = [0.0, 0.0, 0.0, height_desired]
+            return control_command
+
+        # Get the goal position and drone position
+        x_goal, y_goal = setpoints[index_current_setpoint]
+        x_drone, y_drone = sensor_data['x_global'], sensor_data['y_global']
+        distance_drone_to_goal = np.linalg.norm([x_goal - x_drone, y_goal- y_drone])
+
+        # When the drone reaches the goal setpoint, e.g., distance < 0.1m
+        if distance_drone_to_goal < 0.1:
+            # Select the next setpoint as the goal position
+            index_current_setpoint += 1
+            # Hover at the final setpoint
+            if index_current_setpoint == len(setpoints):
+                control_command = [0.0, 0.0, 0.0, height_desired]
+                return control_command
+
+        # Calculate the control command based on the current goal setpoint
+        x_goal, y_goal = setpoints[index_current_setpoint]
+        x_drone, y_drone = sensor_data['x_global'], sensor_data['y_global']
+        v_x, v_y = x_goal - x_drone, y_goal - y_drone
+        control_command = [v_x, v_y, 0.0, height_desired]
+        return control_command
+
+You can run this example by uncommenting 'control_commands = example.path_planning(sensor_data)' in the 'main.py' file.
+Simulation results of this algorithm are shown in the following animation.
+
+.. image:: example_coverage_path_planning.gif
+  :width: 650
+  :alt: example of coverage path planning
 
 Create a world map
 ------------------
@@ -57,6 +104,7 @@ At the end of the loop, we normalize the occupancy map to be between -1 and 1.
 This resembles confidence about the occupancy of each cell and is more robust than just always filling in the last measurement.
 
 The code for this algorithm is::
+
     global map, t
     pos_x = sensor_data['x_global']
     pos_y = sensor_data['y_global']

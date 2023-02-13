@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Global variables
 on_ground = True
 height_desired = 0.0
 
@@ -28,11 +29,11 @@ def obstacle_avoidance(sensor_data):
 
     return control_command
 
-# Grid based coverage path planning
-setpoints = [[1.0, 2.0], [2.0, -2,0]]
+# Coverage path planning
+setpoints = [[0.0, 2.0], [2.0, 2.0], [2.0, -2.0], [4.0, -2.0], [4.0, 2.0]]
 index_current_setpoint = 0
-def path_planning_with_grid(sensor_data):
-    global on_ground, height_desired
+def path_planning(sensor_data):
+    global on_ground, height_desired, index_current_setpoint, setpoints
 
     # Take off with incremental height until height is above 0.5
     if on_ground and sensor_data['altitude'] < 0.5:
@@ -41,10 +42,32 @@ def path_planning_with_grid(sensor_data):
         return control_command
     else:
         on_ground = False
-    
+
+    # Hover at the final setpoint
+    if index_current_setpoint == len(setpoints):
+        control_command = [0.0, 0.0, 0.0, height_desired]
+        return control_command
+
+    # Get the goal position and drone position
+    x_goal, y_goal = setpoints[index_current_setpoint]
+    x_drone, y_drone = sensor_data['x_global'], sensor_data['y_global']
+    distance_drone_to_goal = np.linalg.norm([x_goal - x_drone, y_goal- y_drone])
+
+    # When the drone reaches the goal setpoint, e.g., distance < 0.1m
+    if distance_drone_to_goal < 0.1:
+        # Select the next setpoint as the goal position
+        index_current_setpoint += 1
+        # Hover at the final setpoint
+        if index_current_setpoint == len(setpoints):
+            control_command = [0.0, 0.0, 0.0, height_desired]
+            return control_command
+
     # Calculate the control command based on current goal setpoint
     x_goal, y_goal = setpoints[index_current_setpoint]
     x_drone, y_drone = sensor_data['x_global'], sensor_data['y_global']
+    v_x, v_y = x_goal - x_drone, y_goal - y_drone
+    control_command = [v_x, v_y, 0.0, height_desired]
+    return control_command
     
 # Occupancy map based on distance sensor
 min_x, max_x = -5.2, 5.2 # meter
