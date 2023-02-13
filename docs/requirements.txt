@@ -1,5 +1,0 @@
-# https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html
-# Run 'make html' in this folder
-sphinx==5.3.0
-sphinx_rtd_theme==1.1.1
-nbsphinx==0.8.11
