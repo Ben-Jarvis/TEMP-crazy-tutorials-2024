@@ -43,6 +43,8 @@ class CrazyflieInDroneDome(Supervisor):
         self.range_back.enable(self.timestep)
         self.range_right = self.getDevice("range_right")
         self.range_right.enable(self.timestep)
+        self.laser_down = self.getDevice("laser_down")
+        self.laser_down.enable(self.timestep)
 
         # Crazyflie velocity PID controller
         self.PID_CF = pid_velocity_fixed_height_controller()
@@ -119,6 +121,7 @@ class CrazyflieInDroneDome(Supervisor):
         data['range_left']  = self.range_left.getValue() / 1000.0
         data['range_back']  = self.range_back.getValue() / 1000.0
         data['range_right'] = self.range_right.getValue() / 1000.0
+        data['range_down'] = self.laser_down.getValue() / 1000.0
 
         # Yaw rate
         data['yaw_rate'] = self.gyro.getValues()[2]
@@ -139,7 +142,7 @@ class CrazyflieInDroneDome(Supervisor):
 
         # Low-level PID velocity control with fixed height
         motorPower = self.PID_CF.pid(dt, control_commands, sensor_data['roll'], sensor_data['pitch'],
-                                                    sensor_data['yaw_rate'], sensor_data['altitude'],
+                                                    sensor_data['yaw_rate'], sensor_data['range_down'],
                                                     sensor_data['v_forward'], sensor_data['v_left'])
         
         # Update motor command

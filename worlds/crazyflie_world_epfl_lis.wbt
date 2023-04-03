@@ -1,4 +1,4 @@
-#VRML_SIM R2022b utf8
+#VRML_SIM R2023a utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/Floor.proto"
@@ -15,9 +15,23 @@ Viewpoint {
 TexturedBackground {
 }
 Crazyflie {
-  translation 0 0 0.015
+  translation 0 0 0.315
   controller "main"
   supervisor TRUE
+  extensionSlot [
+    DistanceSensor {
+      translation -0.0106777 -0.00872367 0.013
+      rotation -0.23981088349186744 0.9407345429597554 0.23981088349186744 1.63185
+      name "laser_down"
+      lookupTable [
+        0 0 0
+        0.1 100 0.001
+        3 3000 0.001
+      ]
+      type "laser"
+      aperture 0.005
+    }
+  ]
 }
 CeilingLight {
   translation 0 0 6
@@ -202,9 +216,9 @@ DEF CHECKERBOARD_A4_25mm_8x6 Solid {
   name "checkerboard"
 }
 DEF OBSTACLE_CYLINDER1 Solid {
-  translation 1 0 0.74
+  translation 1.75 0.82 0.74
   children [
-    DEF BOX_SHAPE Shape {
+    DEF CYLINDER_SHAPE Shape {
       appearance PBRAppearance {
         baseColorMap ImageTexture {
           url [
@@ -215,16 +229,49 @@ DEF OBSTACLE_CYLINDER1 Solid {
         metalness 0
       }
       geometry Cylinder {
-        radius 0.2
         height 1.48
+        radius 0.2
       }
     }
   ]
   name "obstacle-C1"
-  boundingObject USE BOX_SHAPE
+  boundingObject USE CYLINDER_SHAPE
 }
+DEF OBSTACLE_CYLINDER2 Solid {
+  translation 0.66 -0.98 0.74
+  children [
+    USE CYLINDER_SHAPE
+  ]
+  name "obstacle-C2"
+  boundingObject USE CYLINDER_SHAPE
+}
+DEF OBSTACLE_CYLINDER3 Solid {
+  translation 3.02 -1.49 0.74
+  children [
+    USE CYLINDER_SHAPE
+  ]
+  name "obstacle-C3"
+  boundingObject USE CYLINDER_SHAPE
+}
+DEF OBSTACLE_CYLINDER4 Solid {
+  translation 0.68 1.94 0.74
+  children [
+    USE CYLINDER_SHAPE
+  ]
+  name "obstacle-C4"
+  boundingObject USE CYLINDER_SHAPE
+}
+DEF OBSTACLE_CYLINDER5 Solid {
+  translation -0.5 -1.94 0.74
+  children [
+    USE CYLINDER_SHAPE
+  ]
+  name "obstacle-C5"
+  boundingObject USE CYLINDER_SHAPE
+}
+
 DEF OBSTACLE_BOX1 Solid {
-  translation 3 0 0.75
+  translation 3 1.36 0.75
   children [
     DEF BOX_SHAPE Shape {
       appearance PBRAppearance {
@@ -242,5 +289,59 @@ DEF OBSTACLE_BOX1 Solid {
     }
   ]
   name "obstacle-B1"
+  boundingObject USE BOX_SHAPE
+}
+DEF OBSTACLE_BOX2 Solid {
+  translation 3 0.09 0.75
+  children [
+    USE BOX_SHAPE
+  ]
+  name "obstacle-B2"
+  boundingObject USE BOX_SHAPE
+}
+DEF OBSTACLE_BOX3 Solid {
+  translation 3 2.39 0.75
+  children [
+    USE BOX_SHAPE
+  ]
+  name "obstacle-B3"
+  boundingObject USE BOX_SHAPE
+}
+DEF OBSTACLE_BOX4 Solid {
+  translation 0.67 0.2 0.75
+  children [
+    USE BOX_SHAPE
+  ]
+  name "obstacle-B4"
+  boundingObject USE BOX_SHAPE
+}
+DEF OBSTACLE_BOX5 Solid {
+  translation -0.53 -0.32 0.75
+  children [
+    USE BOX_SHAPE
+  ]
+  name "obstacle-B5"
+  boundingObject USE BOX_SHAPE
+}
+
+DEF START_BOX Solid {
+  translation 0 0 0.015
+  children [
+    DEF BOX_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/obstacle_box.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.31 0.31 0.1
+      }
+    }
+  ]
+  name "start-B"
   boundingObject USE BOX_SHAPE
 }
