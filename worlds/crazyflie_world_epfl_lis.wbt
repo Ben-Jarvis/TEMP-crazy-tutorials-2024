@@ -1,9 +1,10 @@
 #VRML_SIM R2023a utf8
 
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/Floor.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/lights/protos/CeilingLight.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/lights/protos/CeilingLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/RectangleArena.proto"
 
 WorldInfo {
 }
@@ -34,31 +35,32 @@ Crazyflie {
   ]
 }
 CeilingLight {
-  translation 0 0 6
+  translation 3 0 6
   name "ceiling light 1"
   pointLightIntensity 7
 }
 CeilingLight {
-  translation 3 -3 6
+  translation 6 -3 6
   name "ceiling light 2"
   pointLightIntensity 7
 }
 CeilingLight {
-  translation 3 3 6
+  translation 6 3 6
   name "ceiling light 3"
   pointLightIntensity 7
 }
 CeilingLight {
-  translation -3 -3 6
+  translation 0 -3 6
   name "ceiling light 4"
   pointLightIntensity 7
 }
 CeilingLight {
-  translation -3 3 6
+  translation 0 3 6
   name "ceiling light 5"
   pointLightIntensity 7
 }
 Floor {
+  translation 3 0 0
   tileSize 0.64 0.64
   appearance PBRAppearance {
     baseColorMap ImageTexture {
@@ -71,7 +73,7 @@ Floor {
   }
 }
 DEF WALL_LEFT Solid {
-  translation 0 5 3
+  translation 3 5 3
   rotation 1 0 0 1.57
   children [
     Shape {
@@ -96,7 +98,7 @@ DEF WALL_LEFT Solid {
   boundingObject USE DOOR_WALL_SHAPE
 }
 DEF WALL_FRONT Solid {
-  translation 5 0 3
+  translation 8 0 3
   rotation 0.5773502691896258 -0.5773502691896258 -0.5773502691896258 2.093
   children [
     Shape {
@@ -121,7 +123,7 @@ DEF WALL_FRONT Solid {
   boundingObject USE DOOR_WALL_SHAPE
 }
 DEF WALL_RIGHT Solid {
-  translation 0 -5 3
+  translation 3 -5 3
   rotation 0 0.7071067811865475 0.7071067811865475 3.141
   children [
     Shape {
@@ -146,7 +148,7 @@ DEF WALL_RIGHT Solid {
   boundingObject USE DOOR_WALL_SHAPE
 }
 DEF WALL_BACK Solid {
-  translation -5 0 3
+  translation -2 0 3
   rotation 0.5773502691896258 0.5773502691896258 0.5773502691896258 2.094
   children [
     Shape {
@@ -171,7 +173,7 @@ DEF WALL_BACK Solid {
   boundingObject USE DOOR_WALL_SHAPE
 }
 DEF CEILING Solid {
-  translation 0 0 6
+  translation 3 0 6
   rotation 0 -1 0 3.141
   children [
     Shape {
@@ -196,7 +198,7 @@ DEF CEILING Solid {
   boundingObject USE DOOR_WALL_SHAPE
 }
 DEF CHECKERBOARD_A4_25mm_8x6 Solid {
-  translation 5 0 0.5
+  translation 8 0 0.5
   children [
     DEF CHECKERBOARD_LOGO Shape {
       appearance PBRAppearance {
@@ -324,10 +326,10 @@ DEF OBSTACLE_BOX5 Solid {
   boundingObject USE BOX_SHAPE
 }
 
-DEF START_BOX Solid {
-  translation 0 0 0.015
+DEF TAKE_OFF_PAD Solid {
+  translation 0.5 1.0 0.015
   children [
-    DEF BOX_SHAPE Shape {
+    DEF PAD_SHAPE Shape {
       appearance PBRAppearance {
         baseColorMap ImageTexture {
           url [
@@ -342,6 +344,36 @@ DEF START_BOX Solid {
       }
     }
   ]
-  name "start-B"
-  boundingObject USE BOX_SHAPE
+  name "take_off_pad"
+  boundingObject USE PAD_SHAPE
+}
+
+DEF LANDING_PAD Solid {
+  translation 4.5 1.0 0.015
+  children [
+    USE PAD_SHAPE
+  ]
+  name "landing_pad"
+  boundingObject USE PAD_SHAPE
+}
+
+DEF FLIGHT_AREA Solid {
+  translation 2.5 1.5 0.001
+  children [
+    DEF FLIGHT_AREA_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/flight_area.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 5 3 0.001
+      }
+    }
+  ]
+  name "flight_area"
 }
