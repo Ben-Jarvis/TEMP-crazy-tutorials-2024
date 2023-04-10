@@ -5,6 +5,12 @@ from controller import Supervisor, Keyboard
 from pid_control import pid_velocity_fixed_height_controller
 from my_control import MyController
 import example
+import time, random
+
+# Set 'True' to enable random positions of obstacles and the drone
+enable_random_environment = False
+# Set seed to replicate the random environment
+# random.seed(3000)
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -63,6 +69,63 @@ class CrazyflieInDroneDome(Supervisor):
         # Simulation step update
         super().step(self.timestep)
 
+        if not enable_random_environment:
+            return
+
+        # Set random initial position of the drone
+        init_x_drone, init_y_drone = random.uniform(0.3, 1.2), random.uniform(0.3, 2.7)
+        drone = super().getSelf()
+        translation_field = drone.getField('translation')
+        translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.2])
+
+        # Set random initial position of the take-off pad
+        take_off_pad = super().getFromDef('TAKE_OFF_PAD')
+        translation_field = take_off_pad.getField('translation')
+        translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
+
+        # Set random initial position of the landing pad
+        init_x_landing_pad, init_y_landing_pad = random.uniform(3.8, 4.7), random.uniform(0.3, 2.7)
+        landing_pad = super().getFromDef('LANDING_PAD')
+        translation_field = landing_pad.getField('translation')
+        translation_field.setSFVec3f([init_x_landing_pad, init_y_landing_pad, 0.05])
+
+        # Set random initial positions of obstacles
+        existed_points = []
+        existed_points.append([init_x_drone, init_y_drone])
+        existed_points.append([init_x_landing_pad, init_y_landing_pad])
+        for i in range(1, 6):
+            find_appropriate_random_position = False
+            while not find_appropriate_random_position:
+                # Generate new random position
+                new_init_x_obs, new_init_y_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7)
+                min_distance = 1000
+                for point in existed_points:
+                    distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs])
+                    if distance < min_distance:
+                        min_distance = distance
+                if min_distance > 0.8:
+                    find_appropriate_random_position = True
+            obstacle = super().getFromDef('OBSTACLE_CYLINDER' + str(i))
+            translation_field = obstacle.getField('translation')
+            translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 0.74])
+            existed_points.append([new_init_x_obs, new_init_y_obs])
+        for i in range(1, 6):
+            find_appropriate_random_position = False
+            while not find_appropriate_random_position:
+                # Generate new random position
+                new_init_x_obs, new_init_y_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7)
+                min_distance = 1000
+                for point in existed_points:
+                    distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs])
+                    if distance < min_distance:
+                        min_distance = distance
+                if min_distance > 0.8:
+                    find_appropriate_random_position = True
+            obstacle = super().getFromDef('OBSTACLE_BOX' + str(i))
+            translation_field = obstacle.getField('translation')
+            translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 0.75])
+            existed_points.append([new_init_x_obs, new_init_y_obs])
+
     def wait_keyboard(self):
         while self.keyboard.getKey() != ord('Y'):
             super().step(self.timestep)
@@ -71,7 +134,7 @@ class CrazyflieInDroneDome(Supervisor):
         forward_velocity = 0.0
         left_velocity = 0.0
         yaw_rate = 0.0
-        altitude = 1.0
+        altitude = 0.8
         key = self.keyboard.getKey()
         while key > 0:
             if key == ord('W'):

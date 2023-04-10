@@ -4,19 +4,20 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/lights/protos/CeilingLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/RectangleArena.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.12577821568808165 0.8804431530844167 0.45716484406075336 0.8071583944978193
-  position -0.6915100278560411 -0.36483795282963377 0.6236285609441987
-  follow "Crazyflie"
+  orientation 0.11291009828935804 0.9589140511916114 0.2602597781670832 0.2652724174914502
+  position -4.387141999103698 1.220190148650561 2.1213671825757063
+  follow "crazyflie"
 }
 TexturedBackground {
 }
 Crazyflie {
-  translation 0 0 0.315
+  translation 0.9660470000000083 0.8372480000000008 0.2048876245861512
+  rotation 1.4432514312069223e-13 -7.094951043479413e-14 1 0.004202810932212425
+  name "crazyflie"
   controller "main"
   supervisor TRUE
   extensionSlot [
@@ -240,7 +241,7 @@ DEF OBSTACLE_CYLINDER1 Solid {
   boundingObject USE CYLINDER_SHAPE
 }
 DEF OBSTACLE_CYLINDER2 Solid {
-  translation 0.66 -0.98 0.74
+  translation 1.73 2.5 0.74
   children [
     USE CYLINDER_SHAPE
   ]
@@ -248,7 +249,7 @@ DEF OBSTACLE_CYLINDER2 Solid {
   boundingObject USE CYLINDER_SHAPE
 }
 DEF OBSTACLE_CYLINDER3 Solid {
-  translation 3.02 -1.49 0.74
+  translation 4.46 2.11 0.74
   children [
     USE CYLINDER_SHAPE
   ]
@@ -264,16 +265,15 @@ DEF OBSTACLE_CYLINDER4 Solid {
   boundingObject USE CYLINDER_SHAPE
 }
 DEF OBSTACLE_CYLINDER5 Solid {
-  translation -0.5 -1.94 0.74
+  translation 3.59 0.36 0.74
   children [
     USE CYLINDER_SHAPE
   ]
   name "obstacle-C5"
   boundingObject USE CYLINDER_SHAPE
 }
-
 DEF OBSTACLE_BOX1 Solid {
-  translation 3 1.36 0.75
+  translation 3.73 1.54 0.75
   children [
     DEF BOX_SHAPE Shape {
       appearance PBRAppearance {
@@ -294,7 +294,7 @@ DEF OBSTACLE_BOX1 Solid {
   boundingObject USE BOX_SHAPE
 }
 DEF OBSTACLE_BOX2 Solid {
-  translation 3 0.09 0.75
+  translation 2.86 1.15 0.75
   children [
     USE BOX_SHAPE
   ]
@@ -310,7 +310,7 @@ DEF OBSTACLE_BOX3 Solid {
   boundingObject USE BOX_SHAPE
 }
 DEF OBSTACLE_BOX4 Solid {
-  translation 0.67 0.2 0.75
+  translation 0.86 0.24 0.75
   children [
     USE BOX_SHAPE
   ]
@@ -318,16 +318,15 @@ DEF OBSTACLE_BOX4 Solid {
   boundingObject USE BOX_SHAPE
 }
 DEF OBSTACLE_BOX5 Solid {
-  translation -0.53 -0.32 0.75
+  translation 2.03 1.64 0.75
   children [
     USE BOX_SHAPE
   ]
   name "obstacle-B5"
   boundingObject USE BOX_SHAPE
 }
-
 DEF TAKE_OFF_PAD Solid {
-  translation 0.5 1.0 0.015
+  translation 0.9660470000000083 0.8372480000000008 0.05
   children [
     DEF PAD_SHAPE Shape {
       appearance PBRAppearance {
@@ -347,16 +346,14 @@ DEF TAKE_OFF_PAD Solid {
   name "take_off_pad"
   boundingObject USE PAD_SHAPE
 }
-
 DEF LANDING_PAD Solid {
-  translation 4.5 1.0 0.015
+  translation 4.5 1 0.05
   children [
     USE PAD_SHAPE
   ]
   name "landing_pad"
   boundingObject USE PAD_SHAPE
 }
-
 DEF FLIGHT_AREA Solid {
   translation 2.5 1.5 0.001
   children [
