@@ -218,7 +218,7 @@ DEF CHECKERBOARD_A4_25mm_8x6 Solid {
   ]
   name "checkerboard"
 }
-DEF OBSTACLE_CYLINDER1 Solid {
+DEF OBSTACLE1 Solid {
   translation 1.75 0.82 0.74
   children [
     DEF CYLINDER_SHAPE Shape {
@@ -240,7 +240,7 @@ DEF OBSTACLE_CYLINDER1 Solid {
   name "obstacle-C1"
   boundingObject USE CYLINDER_SHAPE
 }
-DEF OBSTACLE_CYLINDER2 Solid {
+DEF OBSTACLE2 Solid {
   translation 1.73 2.5 0.74
   children [
     USE CYLINDER_SHAPE
@@ -248,7 +248,7 @@ DEF OBSTACLE_CYLINDER2 Solid {
   name "obstacle-C2"
   boundingObject USE CYLINDER_SHAPE
 }
-DEF OBSTACLE_CYLINDER3 Solid {
+DEF OBSTACLE3 Solid {
   translation 4.46 2.11 0.74
   children [
     USE CYLINDER_SHAPE
@@ -256,7 +256,7 @@ DEF OBSTACLE_CYLINDER3 Solid {
   name "obstacle-C3"
   boundingObject USE CYLINDER_SHAPE
 }
-DEF OBSTACLE_CYLINDER4 Solid {
+DEF OBSTACLE4 Solid {
   translation 0.68 1.94 0.74
   children [
     USE CYLINDER_SHAPE
@@ -264,7 +264,7 @@ DEF OBSTACLE_CYLINDER4 Solid {
   name "obstacle-C4"
   boundingObject USE CYLINDER_SHAPE
 }
-DEF OBSTACLE_CYLINDER5 Solid {
+DEF OBSTACLE5 Solid {
   translation 3.59 0.36 0.74
   children [
     USE CYLINDER_SHAPE
@@ -272,7 +272,7 @@ DEF OBSTACLE_CYLINDER5 Solid {
   name "obstacle-C5"
   boundingObject USE CYLINDER_SHAPE
 }
-DEF OBSTACLE_BOX1 Solid {
+DEF OBSTACLE6 Solid {
   translation 3.73 1.54 0.75
   children [
     DEF BOX_SHAPE Shape {
@@ -293,7 +293,7 @@ DEF OBSTACLE_BOX1 Solid {
   name "obstacle-B1"
   boundingObject USE BOX_SHAPE
 }
-DEF OBSTACLE_BOX2 Solid {
+DEF OBSTACLE7 Solid {
   translation 2.86 1.15 0.75
   children [
     USE BOX_SHAPE
@@ -301,7 +301,7 @@ DEF OBSTACLE_BOX2 Solid {
   name "obstacle-B2"
   boundingObject USE BOX_SHAPE
 }
-DEF OBSTACLE_BOX3 Solid {
+DEF OBSTACLE8 Solid {
   translation 3 2.39 0.75
   children [
     USE BOX_SHAPE
@@ -309,7 +309,7 @@ DEF OBSTACLE_BOX3 Solid {
   name "obstacle-B3"
   boundingObject USE BOX_SHAPE
 }
-DEF OBSTACLE_BOX4 Solid {
+DEF OBSTACLE9 Solid {
   translation 0.86 0.24 0.75
   children [
     USE BOX_SHAPE
@@ -317,7 +317,7 @@ DEF OBSTACLE_BOX4 Solid {
   name "obstacle-B4"
   boundingObject USE BOX_SHAPE
 }
-DEF OBSTACLE_BOX5 Solid {
+DEF OBSTACLE10 Solid {
   translation 2.03 1.64 0.75
   children [
     USE BOX_SHAPE

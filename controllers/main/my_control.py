@@ -7,18 +7,17 @@ import numpy as np
 class MyController():
     def __init__(self):
         self.on_ground = True
-        self.height_desired = 0.0
+        self.height_desired = 0.5
 
     # Don't change the method name of 'step_control'
     def step_control(self, sensor_data):
-
-        # Take off with incremental height until height is above 0.5
-        if self.on_ground and sensor_data['altitude'] < 0.5:
-            self.height_desired += 0.01
+        # Take off
+        if self.on_ground and sensor_data['range_down'] < 0.49:
             control_command = [0.0, 0.0, 0.0, self.height_desired]
             return control_command
-        # Maintain the desired height when the drone is in the air
+        # Land
         else:
-            control_command = [0.0, 0.0, 0.0, self.height_desired] 
-            on_ground = False
+            self.height_desired -= 0.005
+            control_command = [0.0, 0.0, 0.0, self.height_desired]
+            self.on_ground = False
             return control_command

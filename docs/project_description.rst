@@ -1,10 +1,10 @@
 Project description
 ===================
 
-In this project, all students have to perform the following task in the simulator based on `Webots <https://cyberbotics.com/>`_,
-which provides the same sensor readings and control outputs as those in the real world.
-The leaderboard page will display the simulation performance of all students' algorithms based on the uploaded code.
-In the last three weeks, all students will compete as groups to achieve the same task on the real drone.
+In this project, you will learn how to program a Crazyflie to find and precisely land on a platform with the help of minimal sensory information.
+Additionally, you will use sensor readings to avoid the obstacles present in the environment.
+In the first three weeks, all students have to individually perform the following task in Webots simulator.
+In the last three weeks. all students will compete as groups to achieve the same task on the real drone.
 
 Task overview
 -------------
@@ -13,9 +13,22 @@ Task overview
   :width: 650
   :alt: objective figure
 
-In this practical, you will learn how to program a Crazyflie to find and precisely land on a platform with the help of minimal sensory information.
-Additionally, you will use sensor readings to avoid the obstacles present in the environment.
-After finding and landing on the landing pad, the drone needs to fly back and land on the take-off pad.
+The arena for the final demonstration is shown in the figure above. The task you are required to complete in this arena is composed of multiple phases:
+
+- The drone takes off from a take-off pad placed within the starting region.
+- Thanks to the optic-flow sensor and a downward-range finder the drone can track its movements and find the landing pad in the landing zone.
+- Once the landing pad is found, the drone has to precisely land on it.
+- Upon successful landing, the drone takes off, flies back and lands on the take-off pad.
+- In the whole arena, there can be a few obstacles of previously unknown dimensions which can be detected with the multiranger deck. Your developed algorithm should allow the drone to avoid any collisions.
+
+Please note that the center position of the take-off pad is randomly assigned but known beforehand.
+The left-down point of the arena serves as the origin, with the positive x direction to the right and the positive y direction upwards.
+
+Here is a real-world test example of this project from last year:
+
+.. image:: demo_2022.gif
+  :width: 650
+  :alt: demo video from last year
 
 System scheme
 -------------

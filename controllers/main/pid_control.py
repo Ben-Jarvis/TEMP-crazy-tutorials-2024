@@ -10,13 +10,14 @@ class pid_velocity_fixed_height_controller():
         self.pastAltError = 0
         self.pastPitchError = 0
         self.pastRollError = 0
+        self.altIntegrator = 0
         self.last_time = 0.0
 
     def pid(self, dt, action, actual_roll, actual_pitch, actual_yaw_rate,
             actual_alt, actual_vx, actual_vy):
         # Velocity PID control (converted from Crazyflie c code)
         gains = {"kp_att_y": 1, "kd_att_y": 0.5, "kp_att_rp": 0.5, "kd_att_rp": 0.1,
-                "kp_vel_xy": 2, "kd_vel_xy": 0.5, "kp_z": 10, "ki_z": 50, "kd_z": 5}
+                "kp_vel_xy": 2, "kd_vel_xy": 0.5, "kp_z": 10, "ki_z": 5, "kd_z": 5}
 
         # Actions
         desired_vx, desired_vy, desired_yaw_rate, desired_alt = action[0], action[1], action[2], action[3]
@@ -34,7 +35,8 @@ class pid_velocity_fixed_height_controller():
         # Altitude PID control
         altError = desired_alt - actual_alt
         altDeriv = (altError - self.pastAltError) / dt
-        altCommand = gains["kp_z"] * np.clip(altError, -1, 1) + gains["kd_z"] * altDeriv + gains["ki_z"]
+        self.altIntegrator += altError * dt
+        altCommand = gains["kp_z"] * altError + gains["kd_z"] * altDeriv + gains["ki_z"] * np.clip(self.altIntegrator, -2, 2) + 48
         self.pastAltError = altError
 
         # Attitude PID control

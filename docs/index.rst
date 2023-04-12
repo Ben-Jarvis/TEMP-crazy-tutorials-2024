@@ -5,20 +5,9 @@
 
 crazy-practical documentation!
 ==============================
-This project is a part of the Aerial Robotics course at EPFL.
-The main purpose of this project is to practice the flight control and navigation of a quadrotor including space exploration, obstacle avoidance, etc.
-This documentation shows the project description, step-by-step software implementation, simulation leaderboard, and real-world competition.
-
-.. rubric:: Demo video
-
-If you want to see a real-world example of this project, check out this fascinating video from last year.
-
-.. image:: demo_2022.gif
-  :width: 650
-  :alt: demo video from last year
-
-Can't wait to try out your idea?
-Follow the contents below to check how fast your algorithm can achieve.
+This project is part of the Aerial Robotics course at EPFL.
+The primary goal of this project is to practice the flight control and navigation of a quadrotor through cluttered environments using onboard sensors.
+This documentation shows the project description, step-by-step software implementation, example code, simulation leaderboard, and real-world competition.
 
 .. rubric:: Table of contents
 

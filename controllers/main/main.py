@@ -93,37 +93,23 @@ class CrazyflieInDroneDome(Supervisor):
         existed_points = []
         existed_points.append([init_x_drone, init_y_drone])
         existed_points.append([init_x_landing_pad, init_y_landing_pad])
-        for i in range(1, 6):
+        for i in range(1, 11):
             find_appropriate_random_position = False
             while not find_appropriate_random_position:
                 # Generate new random position
                 new_init_x_obs, new_init_y_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7)
                 min_distance = 1000
+                # Calculate the min distance to existed obstacles and pads
                 for point in existed_points:
                     distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs])
                     if distance < min_distance:
                         min_distance = distance
                 if min_distance > 0.8:
                     find_appropriate_random_position = True
-            obstacle = super().getFromDef('OBSTACLE_CYLINDER' + str(i))
+            # Accept position that is 0.8m far away from existed obstacles and pads
+            obstacle = super().getFromDef('OBSTACLE' + str(i))
             translation_field = obstacle.getField('translation')
             translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 0.74])
-            existed_points.append([new_init_x_obs, new_init_y_obs])
-        for i in range(1, 6):
-            find_appropriate_random_position = False
-            while not find_appropriate_random_position:
-                # Generate new random position
-                new_init_x_obs, new_init_y_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7)
-                min_distance = 1000
-                for point in existed_points:
-                    distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs])
-                    if distance < min_distance:
-                        min_distance = distance
-                if min_distance > 0.8:
-                    find_appropriate_random_position = True
-            obstacle = super().getFromDef('OBSTACLE_BOX' + str(i))
-            translation_field = obstacle.getField('translation')
-            translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 0.75])
             existed_points.append([new_init_x_obs, new_init_y_obs])
 
     def wait_keyboard(self):
@@ -134,7 +120,7 @@ class CrazyflieInDroneDome(Supervisor):
         forward_velocity = 0.0
         left_velocity = 0.0
         yaw_rate = 0.0
-        altitude = 0.8
+        altitude = 0.5
         key = self.keyboard.getKey()
         while key > 0:
             if key == ord('W'):
@@ -238,6 +224,8 @@ if __name__ == '__main__':
         # control_commands = example.path_planning(sensor_data)
         # map = example.occupancy_map(sensor_data)
         # ---- end --- #
+
+        # print(sensor_data['range_down'])
 
         # Update the drone status in simulation
         drone.step(control_commands, sensor_data)
