@@ -145,12 +145,12 @@ class CrazyflieInDroneDome(Supervisor):
 
         # Time interval
         dt = self.getTime() - self.sensor_read_last_time
+        data['t'] = self.getTime()
         self.sensor_read_last_time = self.getTime()
 
         # Position
         data['x_global'] = self.gps.getValues()[0]
         data['y_global'] = self.gps.getValues()[1]
-        data['altitude'] = self.gps.getValues()[2]
 
         # Attitude
         data['roll'] = self.imu.getRollPitchYaw()[0]
@@ -211,7 +211,7 @@ if __name__ == '__main__':
     my_controller = MyController()
 
     # Simulation loops
-    for t in range(100000):
+    for step in range(100000):
 
         # Read sensor data including []
         sensor_data = drone.read_sensors()
@@ -231,8 +231,3 @@ if __name__ == '__main__':
         drone.step(control_commands, sensor_data)
 
         # Grading function based on drone states and world information
-        # take off and fly through obstacle area
-        # land on the landing platform
-        # take off and fly through again
-        # land on the starting platform
-        # flight time

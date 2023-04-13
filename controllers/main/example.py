@@ -4,15 +4,14 @@ import matplotlib.pyplot as plt
 
 # Global variables
 on_ground = True
-height_desired = 0.0
+height_desired = 0.5
 
 # Obstacle avoidance with range sensors
 def obstacle_avoidance(sensor_data):
     global on_ground, height_desired
 
-    # Take off with incremental height until height is above 0.5
-    if on_ground and sensor_data['altitude'] < 0.5:
-        height_desired += 0.01
+    # Take off
+    if on_ground and sensor_data['range_down'] < 0.49:
         control_command = [0.0, 0.0, 0.0, height_desired]
         return control_command
     else:
@@ -30,14 +29,13 @@ def obstacle_avoidance(sensor_data):
     return control_command
 
 # Coverage path planning
-setpoints = [[0.0, 2.0], [2.0, 2.0], [2.0, -2.0], [4.0, -2.0], [4.0, 2.0]]
+setpoints = [[-0.0, 0.0], [-0.0, -2.0], [-0.5, -2.0], [-0.5, 0.0]]
 index_current_setpoint = 0
 def path_planning(sensor_data):
     global on_ground, height_desired, index_current_setpoint, setpoints
 
-    # Take off with incremental height until height is above 0.5
-    if on_ground and sensor_data['altitude'] < 0.5:
-        height_desired += 0.01
+    # Take off
+    if on_ground and sensor_data['range_down'] < 0.49:
         control_command = [0.0, 0.0, 0.0, height_desired]
         return control_command
     else:
@@ -70,8 +68,8 @@ def path_planning(sensor_data):
     return control_command
     
 # Occupancy map based on distance sensor
-min_x, max_x = -5.2, 5.2 # meter
-min_y, max_y = -5.2, 5.2 # meter
+min_x, max_x = 0, 5.0 # meter
+min_y, max_y = 0, 5.0 # meter
 range_max = 2.0 # meter, maximum range of distance sensor
 res_pos = 0.2 # meter
 conf = 0.2 # certainty given by each measurement

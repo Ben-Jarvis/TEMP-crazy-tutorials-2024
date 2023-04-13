@@ -11,14 +11,16 @@ The drone will move right when the right distance is larger than the left distan
 However, if the front distance is larger than 0.2m, the drone will move forward.
 The code for this algorithm is::
 
+    # Global variables
     on_ground = True
-    height_desired = 0.0
+    height_desired = 0.5
+
+    # Obstacle avoidance with range sensors
     def obstacle_avoidance(sensor_data):
         global on_ground, height_desired
 
-        # Take off with incremental height until the height is above 0.5
-        if on_ground and sensor_data['altitude'] < 0.5:
-            height_desired += 0.01
+        # Take off
+        if on_ground and sensor_data['range_down'] < 0.49:
             control_command = [0.0, 0.0, 0.0, height_desired]
             return control_command
         else:
@@ -48,14 +50,13 @@ Coverage path planning
 Given the setpoint position sets, the drone can explore an area autonomously. A basic example for this exploration control can be found in the 'example.py' file, which has the following code::
 
     # Coverage path planning
-    setpoints = [[0.0, 2.0], [2.0, 2.0], [2.0, -2.0], [4.0, -2.0], [4.0, 2.0]]
+    setpoints = [[-0.0, 0.0], [-0.0, -2.0], [-0.5, -2.0], [-0.5, 0.0]]
     index_current_setpoint = 0
     def path_planning(sensor_data):
         global on_ground, height_desired, index_current_setpoint, setpoints
 
-        # Take off with incremental height until the height is above 0.5
-        if on_ground and sensor_data['altitude'] < 0.5:
-            height_desired += 0.01
+        # Take off
+        if on_ground and sensor_data['range_down'] < 0.49:
             control_command = [0.0, 0.0, 0.0, height_desired]
             return control_command
         else:
@@ -80,7 +81,7 @@ Given the setpoint position sets, the drone can explore an area autonomously. A 
                 control_command = [0.0, 0.0, 0.0, height_desired]
                 return control_command
 
-        # Calculate the control command based on the current goal setpoint
+        # Calculate the control command based on current goal setpoint
         x_goal, y_goal = setpoints[index_current_setpoint]
         x_drone, y_drone = sensor_data['x_global'], sensor_data['y_global']
         v_x, v_y = x_goal - x_drone, y_goal - y_drone
@@ -150,6 +151,7 @@ The code for this algorithm is::
 This example can be found in 'example.py' file.
 You can run this example by uncommenting 'map = example.occupancy_map(sensor_data)' in the 'main.py' file.
 Simulation results of this algorithm is shown in the following animation.
+If the grid map is not shown automatically, you can open the 'map.png' file and see the animation.
 
 .. image:: example_occupancy_map.gif
   :width: 650

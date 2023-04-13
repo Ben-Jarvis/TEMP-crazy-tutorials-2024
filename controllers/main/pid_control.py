@@ -1,5 +1,4 @@
 # Low-level PID control of velocity and attitude
-# Converted from Crazyflie-firmware c code
 import numpy as np
 import time
 
@@ -15,7 +14,7 @@ class pid_velocity_fixed_height_controller():
 
     def pid(self, dt, action, actual_roll, actual_pitch, actual_yaw_rate,
             actual_alt, actual_vx, actual_vy):
-        # Velocity PID control (converted from Crazyflie c code)
+
         gains = {"kp_att_y": 1, "kd_att_y": 0.5, "kp_att_rp": 0.5, "kd_att_rp": 0.1,
                 "kp_vel_xy": 2, "kd_vel_xy": 0.5, "kp_z": 10, "ki_z": 5, "kd_z": 5}
 

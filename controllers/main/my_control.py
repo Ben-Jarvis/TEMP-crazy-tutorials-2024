@@ -1,6 +1,11 @@
 # You can change anything in this file except the file name of 'my_control.py',
 # the class name of 'MyController', and the method name of 'step_control'.
 
+# Available sensor data includes data['t'], data['x_global'], data['y_global'],
+# data['roll'], data['pitch'], data['yaw'], data['v_forward'], data['v_left'],
+# data['range_front'], data['range_left'], data['range_back'],
+# data['range_right'], data['range_down'], data['yaw_rate'].
+
 import numpy as np
 
 # Don't change the class name of 'MyController'

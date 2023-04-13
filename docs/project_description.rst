@@ -4,7 +4,7 @@ Project description
 In this project, you will learn how to program a Crazyflie to find and precisely land on a platform with the help of minimal sensory information.
 Additionally, you will use sensor readings to avoid the obstacles present in the environment.
 In the first three weeks, all students have to individually perform the following task in Webots simulator.
-In the last three weeks. all students will compete as groups to achieve the same task on the real drone.
+In the last three weeks, all students will compete as groups to achieve the same task on the real drone.
 
 Task overview
 -------------
@@ -13,7 +13,7 @@ Task overview
   :width: 650
   :alt: objective figure
 
-The arena for the final demonstration is shown in the figure above. The task you are required to complete in this arena is composed of multiple phases:
+The arena for the competition is shown in the figure above. The task you are required to complete in this arena is composed of multiple phases:
 
 - The drone takes off from a take-off pad placed within the starting region.
 - Thanks to the optic-flow sensor and a downward-range finder the drone can track its movements and find the landing pad in the landing zone.
@@ -46,7 +46,7 @@ Performance metrics
 - **Grade 4.5**: Find the landing pad and land on it
 - **Grade 5.0**: Take off again and explore again
 - **Grade 5.5**: Find and land on the take-off pad
-- **Grade 5.5 + 0.5 * (1 - (t_i – min(t)) / (max(t) – min(t)) )**: Based on the flight time relative to the other completed runs (the faster, the better)
+- **Grade 5.5 + f(t)**: For students who complete the full task, the grading will be based on the time taken to complete the task. The top 25% of students will receive a grade of f(t)=0.5, the next 25% will receive a grade of f(t)=0.375, the next 25% will receive a grade of f(t)=0.25, and the bottom 25% will receive a grade of f(t)=0.125.
 - **Final_grade = 0.7 * sim_grade + 0.3 * hardware_grade**: Simulation and hardware tasks are graded based on the same metrics as shown above. The final grade is a weighted average of the simulation and hardware grades.
 
 Project schedule
@@ -56,10 +56,10 @@ The following table provides the arrangement of the crazy-practical project.
 ==========================  =======================================================
 **Week**                    **Notes**
 | Week 8, April 18          | Project introduction, Simulation installation, Q&A
-| Week 9, April 25          | VIO example in Webots, Simulation development, Q&A
+| Week 9, April 25          | Simulation development, Q&A
 | Week 10, May 2            | Simulation development, Q&A
                             | Select the hardware group in Moodle before May 9
-| Week 11, May 9            | Hardware introduction, drone software installation
+| Week 11, May 9            | Hardware introduction, pick up your drone by group
                             | Simulation due 23:59 CET, submit the code in Moodle
 | Week 12, May 16           | Hardware development, Q&A
 | Week 13, May 23           | Hardware development, Q&A
