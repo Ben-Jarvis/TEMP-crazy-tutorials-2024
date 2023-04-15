@@ -44,7 +44,7 @@ The simulation starts with the `main.py <https://github.com/dronecourse-epfl/cra
 
 To run your algorithm instead of the keyboard control, you can comment 'control_commands = drone.action_from_keyboard()' and uncomment 'control_commands = my_controller(sensor_data)' in the 'main.py' file.
 
-All you need to do is to create your algorithms in the 'my_control.py' file which you should submit for getting simulation grades.
+All you need to do is to create your algorithms in the 'my_control.py' file which you should submit for getting simulation grades. Details on how to submit can be found in the section “Leaderboard”.
 
 To test your method with random positions of both the pads and obstacles, set 'enable_random_environment = True' in the main.py file.
 

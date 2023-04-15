@@ -22,7 +22,7 @@ The arena for the competition is shown in the figure above. The task you are req
 - In the whole arena, there can be a few obstacles of previously unknown dimensions which can be detected with the multiranger deck. Your developed algorithm should allow the drone to avoid any collisions.
 
 Please note that the center position of the take-off pad is randomly assigned but known beforehand.
-The left-down point of the arena serves as the origin, with the positive x direction to the right and the positive y direction upwards.
+In the figure above, the origin is indicated, along with the axes of the X and Y directions.
 
 Here is a real-world test example of this project from last year:
 
@@ -46,7 +46,7 @@ Performance metrics
 - **Grade 4.5**: Find the landing pad and land on it
 - **Grade 5.0**: Take off again and explore again
 - **Grade 5.5**: Find and land on the take-off pad
-- **Grade 5.5 + f(t)**: For students who complete the full task, the grading will be based on the time taken to complete the task. The top 25% of students will receive a grade of f(t)=0.5, the next 25% will receive a grade of f(t)=0.375, the next 25% will receive a grade of f(t)=0.25, and the bottom 25% will receive a grade of f(t)=0.125.
+- **Grade 5.5 + f(t)**: For students who complete the full task, the grading will be based on the time taken to complete the task. The top 25% of students will receive a grade of f(t)=0.5, the next 50% will receive a grade of f(t)=0.25, and the bottom 25% will receive a grade of f(t)=0.
 - **Final_grade = 0.7 * sim_grade + 0.3 * hardware_grade**: Simulation and hardware tasks are graded based on the same metrics as shown above. The final grade is a weighted average of the simulation and hardware grades.
 
 Project schedule
@@ -66,4 +66,4 @@ The following table provides the arrangement of the crazy-practical project.
 | Week 14, May 30           | Hardware demonstrations, hand in the drones
 ==========================  =======================================================
 
-For more details on the task, submission, schedule and grading, please refer to the `moodle <https://moodle.epfl.ch/course/view.php?id=15799>`_ page of the course.
+Any questions about the task, submission, schedule and grading, please contact Shushuai Li (shushuai.li@epfl.ch).
