@@ -33,7 +33,7 @@ Here is a real-world test example of this project from last year:
 System scheme
 -------------
 The data flow diagram for both the simulation and the real quadrotor is shown below.
-Though they have the same types of sensory inputs and control outputs, your algorithm in simulation should be tuned in order to control the real drone.
+Though they have the same types of sensory inputs and control outputs, your algorithm in simulation should be tuned in the real world in order to control the real drone.
 
 .. image:: sim2real.svg
   :width: 650

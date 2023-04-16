@@ -38,7 +38,7 @@ The code for this algorithm is::
         return control_command
 
 This example can be found in the 'example.py' file.
-You can run this example by uncommenting 'control_commands = example.obstacle_avoidance(sensor_data)' in 'main.py' file.
+You can run this by uncommenting 'control_commands = example.obstacle_avoidance(sensor_data)' in 'main.py' file.
 Simulation results of this algorithm are shown in the following animation.
 
 .. image:: example_obstacle_avoidance.gif
@@ -88,7 +88,7 @@ Given the setpoint position sets, the drone can explore an area autonomously. A 
         control_command = [v_x, v_y, 0.0, height_desired]
         return control_command
 
-You can run this example by uncommenting 'control_commands = example.path_planning(sensor_data)' in the 'main.py' file.
+You can run this by uncommenting 'control_commands = example.path_planning(sensor_data)' in the 'main.py' file.
 Simulation results of this algorithm are shown in the following animation.
 
 .. image:: example_coverage_path_planning.gif
@@ -148,7 +148,7 @@ The code for this algorithm is::
 
     return map
 
-This example can be found in 'example.py' file.
+This code can be found in 'example.py' file.
 You can run this example by uncommenting 'map = example.occupancy_map(sensor_data)' in the 'main.py' file.
 Simulation results of this algorithm is shown in the following animation.
 If the grid map is not shown automatically, you can open the 'map.png' file and see the animation.
