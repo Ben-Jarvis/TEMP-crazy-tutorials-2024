@@ -42,7 +42,7 @@ Controller switch
 -----------------
 The simulation starts with the `main.py <https://github.com/dronecourse-epfl/crazy-practical2023/blob/main/controllers/main/main.py>`_ file.
 
-To run your algorithm instead of the keyboard control, you can comment 'control_commands = drone.action_from_keyboard()' and uncomment 'control_commands = my_controller(sensor_data)' in the 'main.py' file.
+To run your algorithm instead of the keyboard control, you can comment 'control_commands = drone.action_from_keyboard()' and uncomment 'control_commands = my_controller.step_control(sensor_data)' in the 'main.py' file.
 
 All you need to do is to create your algorithms in the 'my_control.py' file which you should submit for getting simulation grades. Details on how to submit can be found in the section “Leaderboard”.
 
