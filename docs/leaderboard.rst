@@ -9,11 +9,13 @@ Please ensure that the zip file you submit contains all files in the controllers
 
 **Notice April 25**: 1. your code will be evaluated on five randomly generated environments; 2. please save your code before the submission deadline on Moodle to avoid any potential last-minute system crashes; 3. avoid flying the drone outside of the 3x5m arena in simulation, as the real drone may not be able to localize itself accurately without textures.
 
-Leaderboard update at 13:34 April 25
+Leaderboard update at 15:46 April 26
 
-================== ============= ============ ========== ===========
-Name               Grade 4.0-5.5 Flight time  Collisions Final Grade
-================== ============= ============ ========== ===========
-submission_AR      4.5           not finished 1          to be added
-dronestoievski     5.5           88s          0          to be added
-================== ============= ============ ========== ===========
+=================== =============== =========== ========== ===========
+Name                Grade 4.0-5.5   Flight time Collisions Final Grade
+=================== =============== =========== ========== ===========
+Yasta               5.5             87.9s       0          to be added
+dronestoievski      5.5             88.3s       0          to be added
+Polenta             4.5             not finish  7          to be added
+leviosa             4.0             not finish  1          to be added
+=================== =============== =========== ========== ===========
