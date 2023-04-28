@@ -11,13 +11,12 @@ Please ensure that the zip file you submit contains all files in the controllers
 
 Leaderboard update at 20:22 April 27
 
-=================== =============== =========== ========== ===========
-Name                Grade 4.0-5.5   Flight time Collisions Final Grade
-=================== =============== =========== ========== ===========
-Yasta               5.5             87.91s      0          to be added
-Tobledrone          5.5             98.08s      0          to be added
-dronestoievski      4.0             300.00s     5          to be added
-Polenta             4.0             300.00s     18         to be added
-leviosa             4.0             300.00s     41         to be added
-my_control.py       0.0             300.00s     17         to be added
-=================== =============== =========== ========== ===========
+============== ========== ========= ========= ======== ===========
+Name           Best Grade Best Time Avg Grade Avg Time Final Grade
+============== ========== ========= ========= ======== ===========
+Tobledrone     5.50       66.03s    4.50      143.84s 
+Yasta          5.50       81.51s    4.30      160.30s 
+dronestoievski 4.50       180.00s   4.20      180.00s 
+Polenta        4.00       180.00s   4.00      180.00s 
+leviosa        4.00       180.00s   3.80      180.00s 
+============== ========== ========= ========= ======== ===========
