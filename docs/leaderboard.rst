@@ -9,7 +9,9 @@ Please ensure that the zip file you submit contains all files in the controllers
 
 **Notice April 25**: 1. your code will be evaluated on five randomly generated environments; 2. please save your code before the submission deadline on Moodle to avoid any potential last-minute system crashes; 3. avoid flying the drone outside of the 3x5m arena in simulation, as the real drone may not be able to localize itself accurately without textures.
 
-Leaderboard update at 20:22 April 27
+**Notice May 2**: 1. There may be some obstacles outside the 3x5m arena; 2. Flying the drone higher above the obstacles is not allowed.
+
+Leaderboard update at 23:30 April 28, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
 
 ============== ========== ========= ========= ======== ===========
 Name           Best Grade Best Time Avg Grade Avg Time Final Grade

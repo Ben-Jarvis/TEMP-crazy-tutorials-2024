@@ -1,0 +1,34 @@
+grading: 4.5, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.5, 180.00
+dronestoievski 4.50       180.00s   4.20      180.00s 
+
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+Polenta        4.00       180.00s   4.00      180.00s 
+
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 5.5, 81.51
+grading: 4.0, 180.00
+Yasta          5.50       81.51s    4.30      160.30s 
+
+grading: 3.5, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 3.5, 180.00
+leviosa        4.00       180.00s   3.80      180.00s 
+
+grading: 4.0, 180.00
+grading: 5.5, 66.03
+grading: 5.5, 113.16
+grading: 3.5, 180.00
+grading: 4.0, 180.00
+Tobledrone     5.50       66.03s    4.50      143.84s 
