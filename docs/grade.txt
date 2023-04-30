@@ -40,9 +40,9 @@ grading: 4.0, 180.00
 grading: 3.5, 180.00
 leviosa        4.00       180.00s   3.80      180.00s 
 
-grading: 3.5, 180.00
-grading: 3.5, 180.00
-grading: 3.5, 180.00
-grading: 3.5, 180.00
-grading: 3.5, 180.00
-Tobledrone     3.50       180.00s   3.50      180.00s 
+grading: 5.5, 36.99
+grading: 4.0, 180.00
+grading: 5.5, 43.46
+grading: 5.5, 38.05
+grading: 4.0, 180.00
+Tobledrone     5.50       36.99s    4.90      95.70s

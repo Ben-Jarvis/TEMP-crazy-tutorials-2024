@@ -53,17 +53,18 @@ Project schedule
 ----------------
 The following table provides the arrangement of the crazy-practical project.
 
-==========================  =======================================================
+==========================  ========================================================
 **Week**                    **Notes**
 | Week 8, April 18          | Project introduction, Simulation installation, Q&A
 | Week 9, April 25          | Simulation development, Q&A
 | Week 10, May 2            | Simulation development, Q&A
-                            | Select the hardware group in Moodle before May 9
+                            | Simulation due 23:59 May 8, submit code in Moodle
+                            | Select the hardware group in Moodle before 15:00 May 9
 | Week 11, May 9            | Hardware introduction, pick up your drone by group
-                            | Simulation due 23:59 CET, submit the code in Moodle
+                            | Hardware development, Q&A
 | Week 12, May 16           | Hardware development, Q&A
 | Week 13, May 23           | Hardware development, Q&A
 | Week 14, May 30           | Hardware demonstrations, hand in the drones
-==========================  =======================================================
+==========================  ========================================================
 
 Any questions about the task, submission, schedule and grading, please contact Shushuai Li (shushuai.li@epfl.ch).
