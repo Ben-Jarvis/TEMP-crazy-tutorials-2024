@@ -11,14 +11,16 @@ Please ensure that the zip file you submit contains all files in the controllers
 
 **Notice May 2**: 1. There may be some obstacles outside the 3x5m arena; 2. Flying the drone higher above the obstacles is not allowed.
 
-Leaderboard update at 23:30 April 28, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
+Leaderboard update at 18:22 April 30, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
 
 ============== ========== ========= ========= ======== ===========
 Name           Best Grade Best Time Avg Grade Avg Time Final Grade
 ============== ========== ========= ========= ======== ===========
-Tobledrone     5.50       66.03s    4.50      143.84s 
+Polenta        5.50       43.89s    4.90      111.89s 
 Yasta          5.50       81.51s    4.30      160.30s 
+Fantastic      5.50       136.88s   4.40      171.38s 
 dronestoievski 4.50       180.00s   4.20      180.00s 
-Polenta        4.00       180.00s   4.00      180.00s 
+xXOptimousse_P 5.00       180.00s   4.10      180.00s 
 leviosa        4.00       180.00s   3.80      180.00s 
+Tobledrone     3.50       180.00s   3.50      180.00s 
 ============== ========== ========= ========= ======== ===========
