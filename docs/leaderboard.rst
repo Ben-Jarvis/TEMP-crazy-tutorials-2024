@@ -11,13 +11,13 @@ Please ensure that the zip file you submit contains all files in the controllers
 
 **Notice May 2**: 1. Simulation code submission deadline is **Monday May 8th at 23:59**; 2. There may be some obstacles outside the 3x5m arena; 3. Flying the drone higher above the obstacles is not allowed; 4. Flying below 0.1m for exploration is allowed, but it may cause instability in real drones.
 
-Leaderboard update at 18:22 April 30, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
+Leaderboard update at 13:57 May 2, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
 
 ============== ========== ========= ========= ======== ===========
 Name           Best Grade Best Time Avg Grade Avg Time Final Grade
 ============== ========== ========= ========= ======== ===========
+Tobledrone     5.50       30.29s    5.20      67.31s  
 Polenta        5.50       43.89s    4.90      111.89s 
-Tobledrone     5.50       32.57s    4.50      121.77s 
 xXOptimousse_P 5.50       74.28s    4.30      158.86s 
 Yasta          5.50       81.51s    4.30      160.30s 
 Fantastic      5.50       136.88s   4.40      171.38s 
