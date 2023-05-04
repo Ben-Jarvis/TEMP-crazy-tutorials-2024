@@ -5,19 +5,19 @@ grading: 4.0, 180.00
 grading: 4.5, 180.00
 dronestoievski 4.50       180.00s   4.20      180.00s 
 
+grading: 4.5, 180.00
 grading: 4.0, 180.00
 grading: 4.0, 180.00
 grading: 4.0, 180.00
 grading: 4.0, 180.00
-grading: 4.0, 180.00
-Aguardente     4.00       180.00s   4.00      180.00s 
+Aguardente     4.50       180.00s   4.10      180.00s 
 
-grading: 4.0, 180.00
-grading: 5.5, 89.56
-grading: 4.0, 180.00
-grading: 4.0, 180.00
-grading: 4.0, 180.00
-Palsambl3u     5.50       89.56s    4.30      161.91s 
+grading: 5.5, 95.63
+grading: 5.5, 102.80
+grading: 5.5, 90.42
+grading: 5.5, 119.56
+grading: 5.5, 82.34
+Palsambl3u     5.50       82.34s    5.50      98.15s  
 
 grading: 4.0, 180.00
 grading: 5.0, 180.00
@@ -26,6 +26,13 @@ grading: 4.0, 180.00
 grading: 5.0, 180.00
 ah             5.00       180.00s   4.40      180.00s 
 
+grading: 3.5, 180.00
+grading: 4.0, 180.00
+grading: 3.5, 180.00
+grading: 3.5, 180.00
+grading: 4.0, 180.00
+loulou         4.00       180.00s   3.70      180.00s 
+
 grading: 4.0, 180.00
 grading: 5.5, 99.30
 grading: 4.0, 180.00
@@ -33,12 +40,12 @@ grading: 5.5, 56.27
 grading: 5.5, 43.89
 Polenta        5.50       43.89s    4.90      111.89s 
 
-grading: 5.0, 180.00
-grading: 5.5, 56.36
 grading: 4.0, 180.00
-grading: 5.5, 104.15
-grading: 5.5, 116.16
-Yasta_4        5.50       56.36s    5.10      127.33s 
+grading: 4.5, 180.00
+grading: 5.5, 126.79
+grading: 5.5, 120.25
+grading: 5.0, 180.00
+Yasta_5        5.50       120.25s   4.90      157.41s 
 
 grading: 3.5, 180.00
 grading: 5.5, 74.28
@@ -61,19 +68,33 @@ grading: 4.0, 180.00
 grading: 4.0, 180.00
 dronalist      4.00       180.00s   3.90      180.00s 
 
-grading: 5.5, 86.76
-grading: 4.0, 180.00
-grading: 5.5, 72.77
-grading: 4.0, 180.00
+grading: 4.5, 180.00
+grading: 4.5, 180.00
 grading: 3.5, 180.00
-main2MAI       5.50       72.77s    4.50      139.91s 
+grading: 5.5, 101.18
+grading: 3.5, 180.00
+le_H           5.50       101.18s   4.30      164.24s 
 
 grading: 4.0, 180.00
-grading: 4.5, 180.00
 grading: 4.0, 180.00
 grading: 3.5, 180.00
-grading: 3.5, 180.00
-leviosa        4.50       180.00s   3.90      180.00s 
+grading: 4.5, 180.00
+grading: 5.0, 180.00
+CALAMAR_3MAI   5.00       180.00s   4.20      180.00s 
+
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+leviosaV2      4.00       180.00s   4.00      180.00s 
+
+grading: 5.5, 62.93
+grading: 5.5, 36.10
+grading: 5.5, 52.34
+grading: 5.5, 43.76
+grading: 4.5, 180.00
+Game_of_Drones 5.50       36.10s    5.30      75.03s  
 
 grading: 4.0, 180.00
 grading: 4.0, 180.00
@@ -82,12 +103,26 @@ grading: 4.0, 180.00
 grading: 3.5, 180.00
 pingu          4.00       180.00s   3.80      180.00s 
 
-grading: 5.5, 98.67
-grading: 3.5, 180.00
-grading: 3.5, 180.00
+grading: 4.5, 180.00
+grading: 5.5, 78.70
 grading: 4.0, 180.00
 grading: 4.0, 180.00
-alibimontana   5.50       98.67s    4.10      163.73s 
+grading: 4.0, 180.00
+LIM            5.50       78.70s    4.40      159.74s 
+
+grading: 4.5, 180.00
+grading: 4.5, 180.00
+grading: 4.5, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+MachineTeacher 4.50       180.00s   4.30      180.00s 
+
+grading: 3.5, 180.00
+grading: 5.5, 91.51
+grading: 4.5, 180.00
+grading: 4.5, 180.00
+grading: 3.5, 180.00
+goneCracy      5.50       91.51s    4.30      162.30s 
 
 grading: 5.5, 74.94
 grading: 4.0, 180.00
@@ -124,9 +159,30 @@ grading: 5.5, 178.27
 grading: 4.0, 180.00
 Poulpe         5.50       113.88s   4.70      166.43s 
 
-grading: 5.5, 84.78
-grading: 3.5, 180.00
-grading: 3.5, 180.00
 grading: 3.5, 180.00
 grading: 4.0, 180.00
-notgood        5.50       84.78s    4.00      160.96s 
+grading: 4.0, 180.00
+grading: 5.5, 105.86
+grading: 5.0, 180.00
+notgood        5.50       105.86s   4.40      165.17s 
+
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 3.5, 180.00
+grading: 4.0, 180.00
+Nickname2      4.00       180.00s   3.90      180.00s 
+
+grading: 3.5, 180.00
+grading: 4.5, 180.00
+grading: 5.5, 123.12
+grading: 4.0, 180.00
+grading: 3.5, 180.00
+vincent_v2     5.50       123.12s   4.20      168.62s 
+
+grading: 4.0, 180.00
+grading: 4.0, 180.00
+grading: 3.5, 180.00
+grading: 3.5, 180.00
+grading: 3.5, 180.00
+RL-agent       4.00       180.00s   3.70      180.00s
