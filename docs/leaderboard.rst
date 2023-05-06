@@ -57,6 +57,8 @@ CALAMAR_V2     4.00       180.00s   3.80      180.00s
 pingu          4.00       180.00s   3.80      180.00s 
 Aguardente_tri 3.50       180.00s   3.50      180.00s 
 crazy-practica 3.50       180.00s   3.50      180.00s 
-Zzzz           ModuleNotFoundError: No module named 'statemachine'
-MisterBrakmar  Simulation stuck (algorithm cannot find solution?)
 ============== ========== ========= ========= ======== ===========
+
+Zzzz: ModuleNotFoundError: No module named 'statemachine'
+
+MisterBrakmar: Simulation stuck (algorithm cannot find solution?)
