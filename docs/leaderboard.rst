@@ -11,39 +11,52 @@ Please ensure that the zip file you submit contains all files in the controllers
 
 **Notice May 2**: 1. Simulation code submission deadline is **Monday May 8th at 23:59**; 2. There may be some obstacles outside the 3x5m arena; 3. Flying the drone higher above the obstacles is not allowed; 4. Flying below 0.1m for exploration is allowed, but it may cause instability in real drones.
 
-Leaderboard update at 13:33 May 5, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
+Leaderboard update at 18:31 May 6, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
 
 ============== ========== ========= ========= ======== ===========
 Name           Best Grade Best Time Avg Grade Avg Time Final Grade
 ============== ========== ========= ========= ======== ===========
-goneCracy      5.50       60.16s    5.50      74.64s  
-Game_of_Drones 5.50       36.10s    5.30      75.03s  
-Tobledrone     5.50       37.75s    4.90      97.03s  
+Tobledrone     5.50       30.29s    5.20      67.31s  
+Game_of_Drones 5.50       41.09s    5.10      84.42s  
 Palsambl3u     5.50       82.34s    5.50      98.15s  
-notgood        5.50       65.51s    5.20      105.41s 
+MachineTeacher 5.50       37.19s    4.80      98.15s  
+cemes          5.50       48.84s    4.90      106.73s 
 Polenta        5.50       43.89s    4.90      111.89s 
-dronestoievski 5.50       32.93s    4.60      122.74s 
-vincent_v3     5.50       46.70s    4.50      130.87s 
-crazy_slow     5.50       54.85s    4.70      137.50s 
+CrazyFrog_bipb 5.50       66.36s    4.90      118.14s 
+dronestoievski 5.50       54.19s    4.80      132.71s 
+dans_le_retro  5.50       43.30s    5.10      133.73s 
+CrazyMAN       5.50       51.88s    4.70      133.97s 
 starman        5.50       72.30s    4.50      139.38s 
-Yasta_6        5.50       99.36s    4.80      149.44s 
-MachineTeacher 5.50       32.90s    4.30      150.58s 
+Yasta_7        5.50       99.23s    4.80      148.44s 
+controller_tes 5.50       66.83s    4.12      151.71s 
+RL-agent       5.50       126.42s   5.10      152.10s 
 Fantastic      5.50       57.98s    4.10      155.60s 
-xXOptimousse_P 5.50       74.02s    4.20      158.80s 
-Poulpe         5.50       113.88s   4.70      166.43s 
+vincent_v4     5.50       59.14s    4.20      155.83s 
+goneCracy      5.50       62.60s    4.10      156.52s 
+Coucou         5.50       68.44s    4.30      157.69s 
+XxOptimou_Pray 5.50       74.02s    4.50      158.80s 
+Mokka          5.50       89.83s    4.30      161.97s 
+notgood        5.50       99.03s    4.10      163.81s 
+le_H           5.50       111.14s   4.20      166.23s 
+Controller_Luk 5.50       125.60s   4.20      169.12s 
+Poulpe         5.50       165.10s   4.50      177.02s 
 ah             5.00       180.00s   4.40      180.00s 
-CALAMAR_3MAI   5.00       180.00s   4.20      180.00s 
-maverickv2     5.00       180.00s   4.20      180.00s 
+maverick3      5.00       180.00s   4.30      180.00s 
 dozzo          5.00       180.00s   4.20      180.00s 
-alpha5.20      4.50       180.00s   4.10      180.00s 
-Aguardente     4.00       180.00s   4.00      180.00s 
+EdgesAreMaking 4.50       180.00s   4.10      180.00s 
+loulou         4.50       180.00s   4.00      180.00s 
 leviosaV2      4.00       180.00s   4.00      180.00s 
+my_control     4.00       180.00s   4.00      180.00s 
+FroDrone       4.00       180.00s   3.90      180.00s 
 dronalist      4.00       180.00s   3.90      180.00s 
+rinoago        4.00       180.00s   3.90      180.00s 
+yeha           5.00       180.00s   3.90      180.00s 
 speedy         4.50       180.00s   3.90      180.00s 
-Nickname2      4.00       180.00s   3.90      180.00s 
-le_H           4.50       180.00s   3.80      180.00s 
+Nickname3      4.00       180.00s   3.90      180.00s 
+CALAMAR_V2     4.00       180.00s   3.80      180.00s 
 pingu          4.00       180.00s   3.80      180.00s 
-Mokka          5.00       180.00s   3.80      180.00s 
-loulou         4.00       180.00s   3.70      180.00s 
-RL-agent       4.00       180.00s   3.70      180.00s 
+Aguardente_tri 3.50       180.00s   3.50      180.00s 
+crazy-practica 3.50       180.00s   3.50      180.00s 
+Zzzz           ModuleNotFoundError: No module named 'statemachine'
+MisterBrakmar  Simulation stuck (algorithm cannot find solution?)
 ============== ========== ========= ========= ======== ===========
