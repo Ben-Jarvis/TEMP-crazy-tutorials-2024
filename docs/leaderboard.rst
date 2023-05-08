@@ -11,62 +11,75 @@ Please ensure that the zip file you submit contains all files in the controllers
 
 **Notice May 2**: 1. Simulation code submission deadline is **Monday May 8th at 23:59**; 2. There may be some obstacles outside the 3x5m arena; 3. Flying the drone higher above the obstacles is not allowed; 4. Flying below 0.1m for exploration is allowed, but it may cause instability in real drones.
 
-Leaderboard update at 16:21 May 7, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
+Leaderboard update at 17:06 May 8, detailed grade is at `grade.txt <https://github.com/dronecourse-epfl/crazy-practical-tutorial/blob/main/docs/grade.txt>`_.
 
 ============== ========== ========= ========= ======== ===========
 Name           Best Grade Best Time Avg Grade Avg Time Final Grade
 ============== ========== ========= ========= ======== ===========
-starman        5.50       41.78s    5.50      45.20s  
+dans_le_retroV 5.50       32.57s    5.50      52.85s  
+Transmetalic   5.50       42.08s    5.50      64.09s  
 Tobledrone     5.50       30.29s    5.20      67.31s  
-Yasta_7_ba2a_2 5.50       64.61s    5.50      86.14s  
+Game_of_Drones 5.50       48.48s    5.30      83.09s  
+girouette      5.50       45.41s    5.20      85.66s  
+MachineTeacher 5.50       28.25s    4.90      94.72s  
 Palsambl3u     5.50       82.34s    5.50      98.15s  
-MachineTeacher 5.50       37.19s    4.80      98.15s  
-notgood        5.50       65.51s    5.20      105.41s 
-cemes          5.50       48.84s    4.90      106.73s 
 Polenta        5.50       43.89s    4.90      111.89s 
-dronestoievski 5.50       57.45s    5.10      114.51s 
-CrazyFrog_bipb 5.50       66.36s    4.90      118.14s 
-vincent_v5     5.50       76.20s    4.90      121.32s 
-Game_of_Drones 5.50       41.25s    4.80      126.11s 
+leviosaV4      5.50       76.26s    5.10      115.93s 
+pietro         5.50       73.39s    4.90      118.46s 
+Crazy_froggy\( 5.50       67.12s    4.90      121.63s 
+cemes-v4       5.50       39.11s    4.50      123.90s 
+starman        5.50       41.25s    4.60      127.79s 
 goneCracy      5.50       49.60s    4.40      128.63s 
-dans_le_retro  5.50       43.30s    5.10      133.73s 
-CrazyMAN       5.50       51.88s    4.70      133.97s 
+Yasta_7_ba2a_2 5.50       50.85s    4.70      131.00s 
 maverick       5.50       99.79s    5.00      134.99s 
-xedrion3       5.50       74.42s    4.70      145.01s 
-leviosaV3      5.50       65.04s    4.30      145.08s 
-my_control.py  5.50       92.50s    5.00      147.16s 
+vincent_v6     5.50       71.08s    4.90      136.15s 
+notgood        5.50       62.67s    4.80      136.55s 
+hayabechtanjah 5.50       50.79s    4.60      137.96s 
+vasyvol        5.50       92.30s    4.90      139.00s 
+Nycklar        5.50       71.38s    4.60      141.82s 
+Crazy_pigeon.p 5.50       92.50s    5.00      147.16s 
+Coucou         5.50       73.13s    4.50      147.73s 
 my_F1.py       5.50       90.32s    4.40      148.83s 
-RL-agent       5.50       126.42s   5.10      152.10s 
-Fantastic      5.50       57.98s    4.10      155.60s 
-controller_tes 5.50       66.83s    4.00      157.37s 
-Coucou         5.50       68.44s    4.30      157.69s 
-XxOptimoussexX 5.50       71.02s    4.30      158.20s 
+xedrion4       5.50       94.71s    4.60      156.25s 
+R2\_            5.50       67.25s    4.40      157.45s 
+Hope           5.50       68.08s    4.20      157.62s 
+OpTiMoUzE      5.50       70.52s    4.50      158.10s 
 Mokka          5.50       89.83s    4.30      161.97s 
-le_H           5.50       112.66s   4.30      166.53s 
+blu            5.50       96.69s    4.60      163.34s 
+Frodrone Baggi 5.50       110.06s   4.20      166.01s 
+Ciccio_delloca 5.50       116.09s   4.40      167.22s 
 Controller_Luk 5.50       125.60s   4.20      169.12s 
-Zzzz           5.50       159.46s   4.10      175.89s 
+Feoh           5.50       129.59s   4.00      169.92s 
+Aguardente_qui 5.50       130.61s   4.30      170.12s 
+aeerial.py     5.50       146.65s   4.40      173.33s 
+crazy_crash    5.50       148.27s   4.30      173.65s 
+RL-agent       5.50       159.03s   4.10      175.81s 
 Poulpe         5.50       165.10s   4.50      177.02s 
+Zzzz           5.50       166.78s   4.10      177.36s 
 Patrice_in_the 5.50       169.26s   4.30      177.85s 
-R              5.00       180.00s   5.00      180.00s 
 ah             5.00       180.00s   4.40      180.00s 
-EdgesAreCrazy  5.00       180.00s   4.20      180.00s 
-Aguardente_qua 4.50       180.00s   4.10      180.00s 
-Feoh           5.00       180.00s   4.10      180.00s 
+IAM            4.50       180.00s   4.30      180.00s 
+Fantastic      4.50       180.00s   4.10      180.00s 
+le_H           5.00       180.00s   4.10      180.00s 
+dozzo_3        4.50       180.00s   4.10      180.00s 
 loulou         4.50       180.00s   4.00      180.00s 
-MisterBrakmar2 4.00       180.00s   4.00      180.00s 
-TheGreat       4.00       180.00s   4.00      180.00s 
-Lucky_strike   4.00       180.00s   4.00      180.00s 
-dozzo_2        4.00       180.00s   4.00      180.00s 
-FroDrone       4.00       180.00s   3.90      180.00s 
+crazy_capy     4.00       180.00s   4.00      180.00s 
+navigo         4.00       180.00s   4.00      180.00s 
+TheGreat_final 4.00       180.00s   4.00      180.00s 
 dronalist      4.00       180.00s   3.90      180.00s 
+Lucky_strike   4.00       180.00s   3.90      180.00s 
 rinoago        4.00       180.00s   3.90      180.00s 
+BagueraFly     4.00       180.00s   3.90      180.00s 
 speedy         4.50       180.00s   3.90      180.00s 
+flapflap       4.00       180.00s   3.90      180.00s 
 Nickname3      4.00       180.00s   3.90      180.00s 
 pingu          4.00       180.00s   3.80      180.00s 
-yeha           4.00       180.00s   3.80      180.00s 
 CalamarV3      4.00       180.00s   3.70      180.00s 
-crazy-practica 3.50       180.00s   3.50      180.00s 
 ============== ========== ========= ========= ======== ===========
+
+Error May 8:
+
+MisterBrakmar6: Simulation stuck (algorithm cannot find solution?)
 
 Error May 7:
 
