@@ -18,6 +18,8 @@ This documentation shows the project description, step-by-step software implemen
    simulation_quickstart
    examples
    leaderboard
+   hardware_instruction
+   hardware_quickstart
 
 .. rubric:: Indices and tables
 
