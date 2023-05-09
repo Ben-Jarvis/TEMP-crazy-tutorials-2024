@@ -47,7 +47,7 @@ Performance metrics
 - **Grade 5.0**: Take off again and explore again
 - **Grade 5.5**: Find and land on the take-off pad
 - **Grade 5.5 + f(t)**: For students who complete the full task, the grading will be based on the time taken to complete the task. The top 25% of students will receive a grade of f(t)=0.5, the next 50% will receive a grade of f(t)=0.25, and the bottom 25% will receive a grade of f(t)=0.
-- **Final_grade = 0.7 * sim_grade + 0.3 * hardware_grade**: Simulation and hardware tasks are graded based on the same metrics as shown above. The final grade is a weighted average of the simulation and hardware grades.
+- **Final_grade = 0.7 * sim_grade + 0.3 * hardware_grade**: The final grade is a weighted average of the simulation and hardware grades.
 
 Project schedule
 ----------------

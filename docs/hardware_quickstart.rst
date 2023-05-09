@@ -80,7 +80,7 @@ For example, 'uri = uri_helper.uri_from_env(default='radio://0/10/2M/E7E7E7E701'
 
 Example - log
 -------------
-Now you can test the communication with the drone by running this log example: `log.py <https://github.com/dronecourse-epfl/crazy-practical2023/blob/main/log.py>`_.
+Now you can test the communication with the drone by running this log example: `log.py <https://github.com/dronecourse-epfl/crazy-practical-tutorial/tree/main/docs/log.py>`_.
 For this example you can put the drone on desk as there is no control.
 If the library and radio driver is configured correctly, you should see sensor data printed in your ternimal when running this example (remember changing the uri and activate the virtual env cf).
 Try moving your hand closer and farther away from the multi-ranger sensors and observe the sensor data change.
@@ -90,7 +90,8 @@ To log any other sensor data from the drone, refer to `this page <https://www.bi
 Example - log_and_control
 -------------------------
 This example code will control the drone to fly a figure-eight trajectory, while also logging all sensor data at the same time.
+The example code is at: `log_and_control.py <https://github.com/dronecourse-epfl/crazy-practical-tutorial/tree/main/docs/log_and_control.py>`_
 Please ensure that you place the drone on the ground before testing this example, as the drone is programmed to take off and fly.
 Additionally, it is recommended to take off from a white part of the ground for best performance.
 
-Other more examples can be found at CFLib.
+These two examples are sufficient for finishing the task. Additional examples can be found at `Crazyflie Python library examples <https://github.com/bitcraze/crazyflie-lib-python/tree/master/examples>`_.
