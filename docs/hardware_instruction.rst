@@ -69,4 +69,5 @@ Time          Room MED11518 Room MED-11422
 16:55 - 17:10 group 6       group 14
 17:15 - 17:30 group 7       group 15
 17:35 - 17:50 group 8       group 16
+17:55 - 18:10               group 17
 ============= ============= ==============
