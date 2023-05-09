@@ -47,22 +47,16 @@ Software installation
 For developing the code for the Crazyflie, you will first need to install Python 3.7+ if you don't have it yet.
 Then, you can clone and install the Crazyflie Python Library, to communicate with and control the Crazyflie.
 
-For both Ubuntu and Windows, you can create virtual python environment and install the library by running following commands in your terminal:
+For both Ubuntu and Windows, you can install the library by running following commands in your terminal:
 
 .. code-block:: bash
 
-    pip3 install virtualenv
-    virtualenv cf
-    source cf/bin/activate
     git clone https://github.com/bitcraze/crazyflie-lib-python.git
     cd crazyflie-lib-python
     git checkout tags/0.1.22 -b v0.1.22-branch
     pip3 install -e .
 
 Possible installation issues: 1. In Windows, if pip3 command is not found, then you need to use pip instead; 2. Useful `links <https://www.bitcraze.io/documentation/repository/crazyflie-clients-python/master/installation/install/>`_ to Python and pip issues on Windows.
-
-To deactivate the virtualenv when you are done, type 'deactivate'.
-However, you should have it **active when working** on the project, by simply running 'source cf/bin/activate'.
 
 The next step is to configure the radio driver:
 
@@ -82,7 +76,7 @@ Example - log
 -------------
 Now you can test the communication with the drone by running this log example: `log.py <https://github.com/dronecourse-epfl/crazy-practical-tutorial/tree/main/docs/log.py>`_.
 For this example you can put the drone on desk as there is no control.
-If the library and radio driver is configured correctly, you should see sensor data printed in your ternimal when running this example (remember changing the uri and activate the virtual env cf).
+If the library and radio driver is configured correctly, you should see sensor data printed in your ternimal when running this example (remember changing the uri).
 Try moving your hand closer and farther away from the multi-ranger sensors and observe the sensor data change.
 
 To log any other sensor data from the drone, refer to `this page <https://www.bitcraze.io/documentation/repository/crazyflie-firmware/master/api/logs/#estimator>`_.
