@@ -3,7 +3,6 @@
 import numpy as np
 from controller import Supervisor, Keyboard
 from pid_control import pid_velocity_fixed_height_controller
-from my_control import MyController
 import example
 import time, random
 
@@ -200,7 +199,6 @@ if __name__ == '__main__':
 
     # Initialize the drone
     drone = CrazyflieInDroneDome()
-    my_controller = MyController()
 
     # Simulation loops
     for step in range(100000):
@@ -211,7 +209,6 @@ if __name__ == '__main__':
         # Control commands with [v_forward, v_left, yaw_rate, altitude]
         # ---- Select only one of the following control methods ---- #
         control_commands = drone.action_from_keyboard()
-        # control_commands = my_controller.step_control(sensor_data)
         # control_commands = example.obstacle_avoidance(sensor_data)
         # control_commands = example.path_planning(sensor_data)
         # map = example.occupancy_map(sensor_data)
