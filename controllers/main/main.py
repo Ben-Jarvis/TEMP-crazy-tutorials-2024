@@ -7,11 +7,6 @@ from my_control import MyController
 import example
 import time, random
 
-# Set 'True' to enable random positions of obstacles and the drone
-enable_random_environment = False
-# Set seed to replicate the random environment
-# random.seed(3000)
-
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
     def __init__(self):
@@ -68,9 +63,6 @@ class CrazyflieInDroneDome(Supervisor):
 
         # Simulation step update
         super().step(self.timestep)
-
-        if not enable_random_environment:
-            return
 
         # Set random initial position of the drone
         init_x_drone, init_y_drone = random.uniform(0.3, 1.2), random.uniform(0.3, 2.7)
@@ -225,9 +217,5 @@ if __name__ == '__main__':
         # map = example.occupancy_map(sensor_data)
         # ---- end --- #
 
-        # print(sensor_data['range_down'])
-
         # Update the drone status in simulation
         drone.step(control_commands, sensor_data)
-
-        # Grading function based on drone states and world information
