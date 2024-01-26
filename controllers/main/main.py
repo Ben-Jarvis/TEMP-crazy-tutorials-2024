@@ -50,8 +50,6 @@ class CrazyflieInDroneDome(Supervisor):
 
         # Crazyflie velocity PID controller
         self.PID_CF = pid_velocity_fixed_height_controller()
-        if exp_num == 1:
-            self.PID_CF.set_tuning("off")
         self.PID_update_last_time = self.getTime()
         self.sensor_read_last_time = self.getTime()
         self.step_count = 0
@@ -213,9 +211,10 @@ if __name__ == '__main__':
 
         # Control commands with [v_forward, v_left, yaw_rate, altitude]
         # ---- Select only one of the following control methods ---- #
-        # control_commands = drone.action_from_keyboard()
+        control_commands = drone.action_from_keyboard()
         # control_commands = example.obstacle_avoidance(sensor_data)
-        control_commands = example.path_planning(sensor_data)
+        if exp_num == 1:
+            control_commands = example.path_planning(sensor_data)
         # map = example.occupancy_map(sensor_data)
         # ---- end --- #
 

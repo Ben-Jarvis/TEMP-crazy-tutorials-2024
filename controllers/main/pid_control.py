@@ -1,7 +1,6 @@
 # Low-level PID control of velocity and attitude
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 
 class pid_velocity_fixed_height_controller():
     def __init__(self):
@@ -35,18 +34,17 @@ class pid_velocity_fixed_height_controller():
             actual_alt, actual_vx, actual_vy):
 
         # Bad gains
-        gains = {
+        gains = {"off_alt": 55.0,   "kp_alt": 4.0,        "ki_alt": 0.5,        "kd_alt": 5.0,
                                     "kp_att_rp": 0.5,     "ki_att_rp":0.0,      "kd_att_rp": 0.1,
                                     "kp_att_y": 1.0,      "ki_att_y": 0.0,      "kd_att_y": 0.0, 
-                                    "kp_vel_xy": 1.0,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.2, 
-                "off_alt": 55.0,      "kp_alt": 4.0,        "ki_alt": 0.5,        "kd_alt": 5.0}
+                                    "kp_vel_xy": 1.0,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.2}
         
         # Good gains
         # gains = {
+        #         "off_alt": 55.26,   "kp_alt": 5.0,        "ki_alt": 0.05,       "kd_alt": 4.0,
         #                             "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
         #                             "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
-        #                             "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32, 
-        #         "off_alt": 55.5,    "kp_alt": 5.0,        "ki_alt": 0.05,        "kd_alt": 4}
+        #                             "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
         
         max_att = 0.5 #[rad]
         max_yawrate = 2.0 #[rad/s]
@@ -60,7 +58,7 @@ class pid_velocity_fixed_height_controller():
 
         # Tuning velocity PID
         if self.tuning_level == "velocity":
-            desired_vy = self.tuning(-max_vel,max_vel,3,dt,desired_vy, actual_vy, "velocity [m/s]")
+            desired_vx = self.tuning(-max_vel,max_vel,3,dt,desired_vx, actual_vx, "velocity [m/s]")
 
         # Velocity PID control
         desired_vx = np.clip(desired_vx, -max_vel, max_vel)
@@ -81,7 +79,7 @@ class pid_velocity_fixed_height_controller():
 
         # Tuning altitude PID
         if self.tuning_level == "altitude":
-            desired_alt = self.tuning(0.5,1.5,7,dt,desired_alt, actual_alt, "altitude [m]")
+            desired_alt = self.tuning(0.5,1.5,10,dt,desired_alt, actual_alt, "altitude [m]")
 
         # Altitude PID control
         altError = desired_alt - actual_alt
@@ -93,7 +91,7 @@ class pid_velocity_fixed_height_controller():
 
         # Tuning attitude PID
         if self.tuning_level == "attitude":
-            desired_roll = self.tuning(-max_att,max_att,2.0,dt,desired_roll, actual_roll, "attitude [rad]")
+            desired_pitch = self.tuning(-max_att,max_att,2.0,dt,desired_pitch, actual_pitch, "attitude [rad]")
         elif self.tuning_level == "yawrate":
             desired_yaw_rate = self.tuning(-max_yawrate,max_yawrate,2.0,dt,desired_yaw_rate, actual_yaw_rate, "yawrate [rad/s]")
 
@@ -178,9 +176,9 @@ class pid_velocity_fixed_height_controller():
     def plot(self,ylabel):
         c_actual = "black"
         c_desired = "grey"
-        c_os = "red"
-        c_ss = "blue"
-        c_rt = "green"
+        c_os = [0/255,109/255,143/255]
+        c_ss = [181/255,78/255,44/255]
+        c_rt = [196/255,158/255,69/255]
 
         fig,ax = plt.subplots(1,1,figsize=(7,5))
         ax.plot(self.tuning_ts,self.tuning_desired,label="desired",color=c_desired)
@@ -189,57 +187,62 @@ class pid_velocity_fixed_height_controller():
         # Calculate steadt state error
         des_min = np.min(self.tuning_desired)
         des_max = np.max(self.tuning_desired)
+        std = (des_max - des_min)/2
 
         idx_ss_high = -1
         desired_reverse = self.tuning_desired[::-1]
         idx_ss_low = len(self.tuning_ts) - np.argmin(np.gradient(desired_reverse)) - 2
-        perc_min = (self.tuning_actual[idx_ss_low]-self.tuning_desired[idx_ss_low])/des_min*100
-        perc_max = (self.tuning_actual[idx_ss_high]-self.tuning_desired[idx_ss_high])/des_max*100
-        ax.plot([self.tuning_ts[idx_ss_high],self.tuning_ts[idx_ss_high]],[self.tuning_desired[idx_ss_high],self.tuning_actual[idx_ss_high]],
-                linewidth=3,color=c_ss,label="steady state error")
-        ax.text(x=self.tuning_ts[idx_ss_high],y=self.tuning_actual[idx_ss_high],s=str(int(perc_max))+"%",
-                color=c_ss,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
-        ax.plot([self.tuning_ts[idx_ss_low],self.tuning_ts[idx_ss_low]],[self.tuning_desired[idx_ss_low],self.tuning_actual[idx_ss_low]],
-                linewidth=3,color=c_ss)
-        ax.text(x=self.tuning_ts[idx_ss_low],y=self.tuning_actual[idx_ss_low],s=str(int(perc_min))+"%",
-                color=c_ss,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
+        perc_min = (self.tuning_actual[idx_ss_low]-self.tuning_desired[idx_ss_low])/std*100
+        perc_max = (self.tuning_actual[idx_ss_high]-self.tuning_desired[idx_ss_high])/std*100
+        if (abs(perc_max) >= 1):
+            ax.plot([self.tuning_ts[idx_ss_high],self.tuning_ts[idx_ss_high]],[self.tuning_desired[idx_ss_high],self.tuning_actual[idx_ss_high]],
+                    linewidth=3,color=c_ss,label="steady state error")
+            ax.text(x=self.tuning_ts[idx_ss_high],y=self.tuning_actual[idx_ss_high],s=str(int(abs(perc_max)))+" [%]",
+                    color=c_ss,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
+        if (abs(perc_min) >= 1):
+            ax.plot([self.tuning_ts[idx_ss_low],self.tuning_ts[idx_ss_low]],[self.tuning_desired[idx_ss_low],self.tuning_actual[idx_ss_low]],
+                    linewidth=3,color=c_ss)
+            ax.text(x=self.tuning_ts[idx_ss_low],y=self.tuning_actual[idx_ss_low],s=str(int(abs(perc_min)))+" [%]",
+                    color=c_ss,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
         
-        idx_low = len(self.tuning_actual)-2*idx_ss_low
+        idx_low = len(self.tuning_actual) - 2*(len(self.tuning_actual)-idx_ss_low)
 
         # Calculate overshoot
         actual_cut = self.tuning_actual[idx_ss_low:-1]
         idx_os_high = idx_ss_low + np.argmax(actual_cut)
         actual_cut = self.tuning_actual[idx_low:idx_ss_low]
         idx_os_low = idx_low + np.argmin(actual_cut)
-        perc_min = (self.tuning_actual[idx_ss_low]-self.tuning_desired[idx_ss_low])/des_min*100
-        perc_max = (self.tuning_actual[idx_os_high]-self.tuning_desired[idx_os_high])/des_max*100
-        if self.tuning_desired[idx_os_high] < self.tuning_actual[idx_os_high]:
+        perc_max = (self.tuning_actual[idx_os_high]-self.tuning_desired[idx_os_high])/std*100
+        perc_min = (self.tuning_actual[idx_os_low]-self.tuning_desired[idx_os_low])/std*100
+        if (self.tuning_desired[idx_os_high] < self.tuning_actual[idx_os_high]) & (abs(perc_max) >= 1):
             ax.plot([self.tuning_ts[idx_os_high],self.tuning_ts[idx_os_high]],[self.tuning_desired[idx_os_high],self.tuning_actual[idx_os_high]],
                     linewidth=3,color=c_os,label="overshoot")
-            ax.text(x=self.tuning_ts[idx_os_high],y=self.tuning_actual[idx_os_high],s=str(int(perc_max))+"%",
+            ax.text(x=self.tuning_ts[idx_os_high],y=self.tuning_actual[idx_os_high],s=str(int(abs(perc_max)))+" [%]",
                     color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
-        if self.tuning_desired[idx_os_low] > self.tuning_actual[idx_os_low]:
+        if (self.tuning_desired[idx_os_low] > self.tuning_actual[idx_os_low]) & (abs(perc_max) >= 1):
             ax.plot([self.tuning_ts[idx_os_low],self.tuning_ts[idx_os_low]],[self.tuning_desired[idx_os_low],self.tuning_actual[idx_os_low]],
                     linewidth=3,color=c_os)
-            ax.text(x=self.tuning_ts[idx_os_low],y=self.tuning_actual[idx_os_low],s=str(int(perc_max))+"%",
+            ax.text(x=self.tuning_ts[idx_os_low],y=self.tuning_actual[idx_os_low],s=str(int(abs(perc_min)))+" [%]",
                     color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
             
         # Calculate rise time
+        limit = 0.05
         actual_cut = self.tuning_actual[idx_ss_low:-1]
-        idx_rt_high = idx_ss_low + np.argmin(np.round(abs((actual_cut-des_max)/des_max),2))
+        idx_rt_high = idx_ss_low + np.argmax((des_max-actual_cut)/des_max < limit)
         actual_cut = self.tuning_actual[idx_low:idx_ss_low]
-        idx_rt_low = idx_low + np.argmin(np.round(abs((actual_cut-des_min)/des_min),2))
+        idx_rt_low = idx_low + np.argmax((actual_cut-des_min)/des_min < limit)
+        
         rt_high = self.tuning_ts[idx_rt_high] - self.tuning_ts[idx_ss_low]
         rt_low = self.tuning_ts[idx_rt_low] - self.tuning_ts[idx_low]
-        if self.tuning_desired[idx_rt_high] - self.tuning_actual[idx_rt_high] < self.tuning_actual[idx_rt_high]*0.01:
+        if idx_rt_high > idx_ss_low:
             ax.plot([self.tuning_ts[idx_ss_low],self.tuning_ts[idx_rt_high]],[self.tuning_desired[idx_rt_high],self.tuning_desired[idx_rt_high]],
                     linewidth=3,color=c_rt,label="rise time")
-            ax.text(x=self.tuning_ts[idx_rt_high],y=self.tuning_actual[idx_rt_high],s=str(np.round(rt_high,2))+"s",
-                    color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="top")
-        if self.tuning_desired[idx_rt_low] - self.tuning_actual[idx_rt_low] > self.tuning_actual[idx_rt_low]*0.01:
+            ax.text(x=self.tuning_ts[idx_rt_high],y=self.tuning_actual[idx_rt_high],s=str(np.round(rt_high,1))+"[s]",
+                    color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="bottom")
+        if idx_rt_low > idx_low:
             ax.plot([self.tuning_ts[idx_low],self.tuning_ts[idx_rt_low]],[self.tuning_desired[idx_rt_low],self.tuning_desired[idx_rt_low]],
                     linewidth=3,color=c_rt)
-            ax.text(x=self.tuning_ts[idx_rt_low],y=self.tuning_actual[idx_rt_low],s=str(np.round(rt_low,2))+"s",
+            ax.text(x=self.tuning_ts[idx_rt_low],y=self.tuning_actual[idx_rt_low],s=str(np.round(rt_low,1))+"[s]",
                         color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="bottom")
 
         # Plot the smoothed version of tuning_actual that is used to detect the overshoot

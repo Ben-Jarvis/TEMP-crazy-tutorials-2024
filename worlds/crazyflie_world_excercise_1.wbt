@@ -21,8 +21,8 @@ WorldInfo {
   }
 }
 Viewpoint {
-  orientation -0.09292479494503735 -0.0012064933613238063 0.9956723993654698 3.201100558705276
-  position 6.8298891766877 1.02663147100698 1.6296900198889666
+  orientation 0 0.5 0 0.5
+  position -5.5 1.5 4.5
   near 0.2
   follow "CRAZYFLIE_8"
   followType "Mounted Shot"
