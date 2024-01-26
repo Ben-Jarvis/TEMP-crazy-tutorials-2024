@@ -34,17 +34,19 @@ class pid_velocity_fixed_height_controller():
     def pid(self, dt, action, actual_roll, actual_pitch, actual_yaw_rate,
             actual_alt, actual_vx, actual_vy):
 
-        # gains = {
-        #                             "kp_att_rp": 0.5,     "ki_att_rp":0.0,      "kd_att_rp": 0.1,
-        #                             "kp_att_y": 1.0,      "ki_att_y": 0.0,      "kd_att_y": 0.0, 
-        #                             "kp_vel_xy": 2.0,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.5, 
-        #         "off_alt": 50,      "kp_alt": 5.0,        "ki_alt": 2.0,        "kd_alt": 5.0}
-        
+        # Bad gains
         gains = {
-                                    "kp_att_rp": 1.45,     "ki_att_rp":0.0,      "kd_att_rp": 0.5,
-                                    "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
-                                    "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32, 
-                "off_alt": 56,    "kp_alt": 10.0,        "ki_alt": 0.0,        "kd_alt": 4.0}
+                                    "kp_att_rp": 0.5,     "ki_att_rp":0.0,      "kd_att_rp": 0.1,
+                                    "kp_att_y": 1.0,      "ki_att_y": 0.0,      "kd_att_y": 0.0, 
+                                    "kp_vel_xy": 1.0,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.2, 
+                "off_alt": 55.0,      "kp_alt": 4.0,        "ki_alt": 0.5,        "kd_alt": 5.0}
+        
+        # Good gains
+        # gains = {
+        #                             "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
+        #                             "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
+        #                             "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32, 
+        #         "off_alt": 55.5,    "kp_alt": 5.0,        "ki_alt": 0.05,        "kd_alt": 4}
         
         max_att = 0.5 #[rad]
         max_yawrate = 2.0 #[rad/s]
@@ -79,13 +81,13 @@ class pid_velocity_fixed_height_controller():
 
         # Tuning altitude PID
         if self.tuning_level == "altitude":
-            desired_alt = self.tuning(0.5,1.5,4,dt,desired_alt, actual_alt, "altitude [m]")
+            desired_alt = self.tuning(0.5,1.5,7,dt,desired_alt, actual_alt, "altitude [m]")
 
         # Altitude PID control
         altError = desired_alt - actual_alt
         altDeriv = (altError - self.pastAltError) / dt
         self.intAlt += altError * dt
-        self.intAlt = np.clip(self.intAlt,-3,3)
+        self.intAlt = np.clip(self.intAlt,-2,2)
         altCommand = gains["kp_alt"] * altError + gains["kd_alt"] * altDeriv + gains["ki_alt"] * self.intAlt
         self.pastAltError = altError
 
@@ -119,7 +121,7 @@ class pid_velocity_fixed_height_controller():
         self.pastRollError = rollError
         self.pastYawrateError = yawRateError
         
-        altCommand = np.clip(altCommand,-5,5) + gains["off_alt"]
+        altCommand = np.clip(altCommand,-10,10) + gains["off_alt"]
         rollCommand = np.clip(rollCommand,-1,1)
         pitchCommand = np.clip(pitchCommand,-1,1)
         yawCommand = np.clip(yawCommand,-1,1)

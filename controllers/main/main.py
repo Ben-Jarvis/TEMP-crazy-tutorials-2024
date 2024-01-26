@@ -51,7 +51,7 @@ class CrazyflieInDroneDome(Supervisor):
         # Crazyflie velocity PID controller
         self.PID_CF = pid_velocity_fixed_height_controller()
         if exp_num == 1:
-            self.PID_CF.set_tuning("altitude")
+            self.PID_CF.set_tuning("off")
         self.PID_update_last_time = self.getTime()
         self.sensor_read_last_time = self.getTime()
         self.step_count = 0

@@ -109,3 +109,41 @@ DEF FLIGHT_AREA Solid {
   ]
   name "flight_area"
 }
+DEF SPHERE1 Solid {
+  translation 0 0 1
+  children [
+    DEF SPHERE_MODEL Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 0.988235 0.913725 0.309804
+          transparency 0.5
+        }
+      }
+      geometry Sphere {
+        radius 0.1
+      }
+    }
+  ]
+  name "sphere_1"
+}
+DEF SPHERE2 Solid {
+  translation 0 3 1.25
+  children [
+    USE SPHERE_MODEL
+  ]
+  name "sphere_2"
+}
+DEF SPHERE3 Solid {
+  translation 5 3 1.25
+  children [
+    USE SPHERE_MODEL
+  ]
+  name "sphere_3"
+}
+DEF SPHERE4 Solid {
+  translation 5 0 0.25
+  children [
+    USE SPHERE_MODEL
+  ]
+  name "sphere_4"
+}
