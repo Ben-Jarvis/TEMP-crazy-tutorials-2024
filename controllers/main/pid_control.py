@@ -44,7 +44,7 @@ class pid_velocity_fixed_height_controller():
                                     "kp_att_rp": 1.45,     "ki_att_rp":0.0,      "kd_att_rp": 0.5,
                                     "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
                                     "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32, 
-                "off_alt": 55.4,    "kp_alt": 10.0,        "ki_alt": 0.0,        "kd_alt": 4.0}
+                "off_alt": 56,    "kp_alt": 10.0,        "ki_alt": 0.0,        "kd_alt": 4.0}
         
         max_att = 0.5 #[rad]
         max_yawrate = 2.0 #[rad/s]
@@ -85,8 +85,8 @@ class pid_velocity_fixed_height_controller():
         altError = desired_alt - actual_alt
         altDeriv = (altError - self.pastAltError) / dt
         self.intAlt += altError * dt
-        self.intAlt = np.clip(self.intAlt,-5,5)
-        altCommand = gains["kp_alt"] * altError + gains["kd_alt"] * altDeriv + gains["ki_alt"] * self.intAlt + gains["off_alt"]
+        self.intAlt = np.clip(self.intAlt,-3,3)
+        altCommand = gains["kp_alt"] * altError + gains["kd_alt"] * altDeriv + gains["ki_alt"] * self.intAlt
         self.pastAltError = altError
 
         # Tuning attitude PID
@@ -119,6 +119,7 @@ class pid_velocity_fixed_height_controller():
         self.pastRollError = rollError
         self.pastYawrateError = yawRateError
         
+        altCommand = np.clip(altCommand,-5,5) + gains["off_alt"]
         rollCommand = np.clip(rollCommand,-1,1)
         pitchCommand = np.clip(pitchCommand,-1,1)
         yawCommand = np.clip(yawCommand,-1,1)

@@ -67,7 +67,7 @@ class CrazyflieInDroneDome(Supervisor):
         # Simulation step update
         super().step(self.timestep)
 
-        if exp_num == 1:
+        if exp_num != 1:
             # Set random initial position of the drone
             init_x_drone, init_y_drone = random.uniform(0.3, 1.2), random.uniform(0.3, 2.7)
             drone = super().getSelf()
