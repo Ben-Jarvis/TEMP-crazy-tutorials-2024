@@ -6,6 +6,8 @@ from pid_control import pid_velocity_fixed_height_controller
 import example
 import time, random
 
+exp_num = 1
+
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
     def __init__(self):
@@ -48,6 +50,8 @@ class CrazyflieInDroneDome(Supervisor):
 
         # Crazyflie velocity PID controller
         self.PID_CF = pid_velocity_fixed_height_controller()
+        if exp_num == 1:
+            self.PID_CF.set_tuning("altitude")
         self.PID_update_last_time = self.getTime()
         self.sensor_read_last_time = self.getTime()
         self.step_count = 0
@@ -63,45 +67,46 @@ class CrazyflieInDroneDome(Supervisor):
         # Simulation step update
         super().step(self.timestep)
 
-        # Set random initial position of the drone
-        init_x_drone, init_y_drone = random.uniform(0.3, 1.2), random.uniform(0.3, 2.7)
-        drone = super().getSelf()
-        translation_field = drone.getField('translation')
-        translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.2])
+        if exp_num == 1:
+            # Set random initial position of the drone
+            init_x_drone, init_y_drone = random.uniform(0.3, 1.2), random.uniform(0.3, 2.7)
+            drone = super().getSelf()
+            translation_field = drone.getField('translation')
+            translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.2])
 
-        # Set random initial position of the take-off pad
-        take_off_pad = super().getFromDef('TAKE_OFF_PAD')
-        translation_field = take_off_pad.getField('translation')
-        translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
+            # Set random initial position of the take-off pad
+            take_off_pad = super().getFromDef('TAKE_OFF_PAD')
+            translation_field = take_off_pad.getField('translation')
+            translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
 
-        # Set random initial position of the landing pad
-        init_x_landing_pad, init_y_landing_pad = random.uniform(3.8, 4.7), random.uniform(0.3, 2.7)
-        landing_pad = super().getFromDef('LANDING_PAD')
-        translation_field = landing_pad.getField('translation')
-        translation_field.setSFVec3f([init_x_landing_pad, init_y_landing_pad, 0.05])
+            # Set random initial position of the landing pad
+            init_x_landing_pad, init_y_landing_pad = random.uniform(3.8, 4.7), random.uniform(0.3, 2.7)
+            landing_pad = super().getFromDef('LANDING_PAD')
+            translation_field = landing_pad.getField('translation')
+            translation_field.setSFVec3f([init_x_landing_pad, init_y_landing_pad, 0.05])
 
-        # Set random initial positions of obstacles
-        existed_points = []
-        existed_points.append([init_x_drone, init_y_drone])
-        existed_points.append([init_x_landing_pad, init_y_landing_pad])
-        for i in range(1, 11):
-            find_appropriate_random_position = False
-            while not find_appropriate_random_position:
-                # Generate new random position
-                new_init_x_obs, new_init_y_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7)
-                min_distance = 1000
-                # Calculate the min distance to existed obstacles and pads
-                for point in existed_points:
-                    distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs])
-                    if distance < min_distance:
-                        min_distance = distance
-                if min_distance > 0.8:
-                    find_appropriate_random_position = True
-            # Accept position that is 0.8m far away from existed obstacles and pads
-            obstacle = super().getFromDef('OBSTACLE' + str(i))
-            translation_field = obstacle.getField('translation')
-            translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 0.74])
-            existed_points.append([new_init_x_obs, new_init_y_obs])
+            # Set random initial positions of obstacles
+            existed_points = []
+            existed_points.append([init_x_drone, init_y_drone])
+            existed_points.append([init_x_landing_pad, init_y_landing_pad])
+            for i in range(1, 11):
+                find_appropriate_random_position = False
+                while not find_appropriate_random_position:
+                    # Generate new random position
+                    new_init_x_obs, new_init_y_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7)
+                    min_distance = 1000
+                    # Calculate the min distance to existed obstacles and pads
+                    for point in existed_points:
+                        distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs])
+                        if distance < min_distance:
+                            min_distance = distance
+                    if min_distance > 0.8:
+                        find_appropriate_random_position = True
+                # Accept position that is 0.8m far away from existed obstacles and pads
+                obstacle = super().getFromDef('OBSTACLE' + str(i))
+                translation_field = obstacle.getField('translation')
+                translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 0.74])
+                existed_points.append([new_init_x_obs, new_init_y_obs])
 
     def wait_keyboard(self):
         while self.keyboard.getKey() != ord('Y'):
@@ -111,7 +116,7 @@ class CrazyflieInDroneDome(Supervisor):
         forward_velocity = 0.0
         left_velocity = 0.0
         yaw_rate = 0.0
-        altitude = 0.5
+        altitude = 1.0
         key = self.keyboard.getKey()
         while key > 0:
             if key == ord('W'):
@@ -208,9 +213,9 @@ if __name__ == '__main__':
 
         # Control commands with [v_forward, v_left, yaw_rate, altitude]
         # ---- Select only one of the following control methods ---- #
-        control_commands = drone.action_from_keyboard()
+        # control_commands = drone.action_from_keyboard()
         # control_commands = example.obstacle_avoidance(sensor_data)
-        # control_commands = example.path_planning(sensor_data)
+        control_commands = example.path_planning(sensor_data)
         # map = example.occupancy_map(sensor_data)
         # ---- end --- #
 

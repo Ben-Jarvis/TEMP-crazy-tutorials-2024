@@ -1,10 +1,13 @@
 # Examples of basic methods for simulation competition
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 # Global variables
 on_ground = True
 height_desired = 0.5
+starttime = 0
+endtime = None
 
 # Obstacle avoidance with range sensors
 def obstacle_avoidance(sensor_data):
@@ -29,10 +32,10 @@ def obstacle_avoidance(sensor_data):
     return control_command
 
 # Coverage path planning
-setpoints = [[-0.0, 0.0], [-0.0, -2.0], [-0.5, -2.0], [-0.5, 0.0]]
+setpoints = [[0.0, 0.0], [0.0, 3.0], [5.0, 3.0], [5.0, 0.0], [0.0, 0.0]]
 index_current_setpoint = 0
 def path_planning(sensor_data):
-    global on_ground, height_desired, index_current_setpoint, setpoints
+    global on_ground, height_desired, index_current_setpoint, setpoints, starttime, endtime
 
     # Take off
     if on_ground and sensor_data['range_down'] < 0.49:
@@ -41,9 +44,17 @@ def path_planning(sensor_data):
     else:
         on_ground = False
 
+    # Start timer
+    if index_current_setpoint == 0:
+        starttime = time.time()
+
     # Hover at the final setpoint
     if index_current_setpoint == len(setpoints):
         control_command = [0.0, 0.0, 0.0, height_desired]
+
+        if endtime is None:
+            endtime = time.time()
+            print("Path planing took " + str(np.round(endtime - starttime,1)) + " [s] from start to finish")
         return control_command
 
     # Get the goal position and drone position
