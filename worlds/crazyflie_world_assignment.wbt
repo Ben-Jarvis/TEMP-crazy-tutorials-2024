@@ -21,6 +21,14 @@ Crazyflie {
   controller "main"
   supervisor TRUE
   extensionSlot [
+    DEF CF_CAMERA Camera {
+      width 300
+      height 300
+      near 0.2
+      fieldOfView 1.5
+      projection "planar"
+      name "cf_camera"
+    }
     DistanceSensor {
       translation -0.0106777 -0.00872367 0.013
       rotation -0.23981088349186744 0.9407345429597554 0.23981088349186744 1.63185
@@ -217,6 +225,24 @@ DEF CHECKERBOARD_A4_25mm_8x6 Solid {
     }
   ]
   name "checkerboard"
+}
+DEF GOAL Solid {
+  translation 0 0 1
+  children [
+    DEF GOAL_SHAPE Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 0 0 0
+          emissiveColor 1 0 1
+          transparency 0.2
+        }
+      }
+      geometry Box {
+        size 0.1 0.4 0.4
+      }
+    }
+  ]
+  name "goal"
 }
 DEF OBSTACLE1 Solid {
   translation 1.75 0.82 0.74
