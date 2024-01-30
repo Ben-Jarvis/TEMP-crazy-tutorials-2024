@@ -1,5 +1,5 @@
 Exercise 1: Cascaded PID control
-===================
+==================================
 
 In this exercise, you will learn how to tune a cascaded PID controller for the CrazyFlie (**pid_control.py**). 
 It uses a simplistic version of the controller seen in the lecture:
@@ -29,7 +29,7 @@ If tuned successfully, you will end up with a much better performance, completin
   :alt: if tuned correclty, performance increases significantly
 
 Exercise
--------------
+---------
 The key to a successful tuning is to start from a stable state. First you need to make sure that your drone can keep an altitude.
 Start by opening **pid_control.py** and change the variable **self.tuning_level = "altitude"**.
 This will now send step inputs as an altitude reference to your drone, which it will try to track. 
@@ -63,7 +63,15 @@ If your drone successful tracks altitude, you should tune the cascaded controlle
 - **self.tuning_level = "velocity"**
 
 Once you are happy with your gains, disable tuning (**self.tuning_level = "off"**) and tell an assistant your gains and the time it takes your CrazyFlie to finish the parcour.
-We will keep a score board during the exercise.
+We will keep a live score board during the exercise.
 
-==========================  ========================================================
+Bonus challenge
+---------------
+The references that are sent through the cascaded control architecture are capped to make your drone more stable (e.g. when you request 1 [rad] in roll, it still send a maximum reference of 0.5 [rad]).
+For faster flight, you can increase the maximum reference by adapting **max_velocity**, **max_attitude** and **max_yawrate**.
+If you really want to push your drone to the limit, you can even increase the cap on the motor commands by adapting **max_command_attitude** and **max_command_attitude**.
+
+Our best time is 13.9s. Let the fastest drone win!
+
+====================================================================================
 Any questions about the exercise, please contact Simon Jeger (simon.jeger@epfl.ch).

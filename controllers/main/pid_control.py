@@ -46,9 +46,14 @@ class pid_velocity_fixed_height_controller():
         #                             "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
         #                             "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
         
-        max_att = 0.5 #[rad]
+        # Reference clipping (only for advanced users)
+        max_attitude = 0.5 #[rad]
         max_yawrate = 2.0 #[rad/s]
         max_vel = 1 #[m/s]
+
+        # Command clipping (only for advanced users)
+        max_command_attitude = 1 #[]
+        max_command_altitude = 10 #[]
 
         # Actions
         desired_vx, desired_vy, desired_yaw_rate, desired_alt = action[0], action[1], action[2], action[3]
@@ -91,13 +96,13 @@ class pid_velocity_fixed_height_controller():
 
         # Tuning attitude PID
         if self.tuning_level == "attitude":
-            desired_pitch = self.tuning(-max_att,max_att,2.0,dt,desired_pitch, actual_pitch, "attitude [rad]")
+            desired_pitch = self.tuning(-max_attitude,max_attitude,2.0,dt,desired_pitch, actual_pitch, "attitude [rad]")
         elif self.tuning_level == "yawrate":
             desired_yaw_rate = self.tuning(-max_yawrate,max_yawrate,2.0,dt,desired_yaw_rate, actual_yaw_rate, "yawrate [rad/s]")
 
         # Attitude PID control
-        desired_pitch = np.clip(desired_pitch, -max_att, max_att)
-        desired_roll = np.clip(desired_roll, -max_att, max_att)
+        desired_pitch = np.clip(desired_pitch, -max_attitude, max_attitude)
+        desired_roll = np.clip(desired_roll, -max_attitude, max_attitude)
         desired_yaw_rate = np.clip(desired_yaw_rate, -max_yawrate, max_yawrate)
 
         pitchError = desired_pitch - actual_pitch
@@ -109,8 +114,8 @@ class pid_velocity_fixed_height_controller():
         self.intPitch += pitchError * dt
         self.intRoll += rollError * dt
         self.intYawrate += yawRateError * dt
-        self.intPitch = np.clip(self.intPitch,-max_att/2,max_att/2)
-        self.intRoll = np.clip(self.intRoll,-max_att/2,max_att/2)
+        self.intPitch = np.clip(self.intPitch,-max_attitude/2,max_attitude/2)
+        self.intRoll = np.clip(self.intRoll,-max_attitude/2,max_attitude/2)
         self.intYawrate = np.clip(self.intYawrate,-max_yawrate/2,max_yawrate/2)
         rollCommand = gains["kp_att_rp"] * rollError + gains["kd_att_rp"] * rollDeriv + gains["ki_att_rp"] * self.intPitch
         pitchCommand = -gains["kp_att_rp"] * pitchError - gains["kd_att_rp"] * pitchDeriv + gains["ki_att_rp"] * self.intRoll
@@ -119,10 +124,10 @@ class pid_velocity_fixed_height_controller():
         self.pastRollError = rollError
         self.pastYawrateError = yawRateError
         
-        altCommand = np.clip(altCommand,-10,10) + gains["off_alt"]
-        rollCommand = np.clip(rollCommand,-1,1)
-        pitchCommand = np.clip(pitchCommand,-1,1)
-        yawCommand = np.clip(yawCommand,-1,1)
+        altCommand = np.clip(altCommand,-max_command_altitude,max_command_altitude) + gains["off_alt"]
+        rollCommand = np.clip(rollCommand,-max_command_attitude,max_command_attitude)
+        pitchCommand = np.clip(pitchCommand,-max_command_attitude,max_command_attitude)
+        yawCommand = np.clip(yawCommand,-max_command_attitude,max_command_attitude)
 
         # Motor mixing
         m1 =  altCommand - rollCommand + pitchCommand + yawCommand
