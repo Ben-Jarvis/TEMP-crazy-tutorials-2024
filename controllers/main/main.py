@@ -6,7 +6,7 @@ from pid_control import pid_velocity_fixed_height_controller
 import example
 import time, random
 
-exp_num = 1
+exp_num = 4
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -35,7 +35,7 @@ class CrazyflieInDroneDome(Supervisor):
         self.gps.enable(self.timestep)
         self.gyro = self.getDevice('gyro')
         self.gyro.enable(self.timestep)
-        self.camera = self.getDevice('camera')
+        self.camera = self.getDevice('cf_camera')
         self.camera.enable(self.timestep)
         self.range_front = self.getDevice('range_front')
         self.range_front.enable(self.timestep)
@@ -65,7 +65,14 @@ class CrazyflieInDroneDome(Supervisor):
         # Simulation step update
         super().step(self.timestep)
 
-        if exp_num != 1:
+        # For the assignment, randomise the positions of the drone, obstacles, goal, take-off pad and landing pad 
+        if exp_num == 4:
+
+            # Variables to track progress
+            self.reached_landing_pad = False
+            self.reached_goal_first = False
+            self.reached_goal_second = False
+                
             # Set random initial position of the drone
             init_x_drone, init_y_drone = random.uniform(0.3, 1.2), random.uniform(0.3, 2.7)
             drone = super().getSelf()
@@ -78,15 +85,27 @@ class CrazyflieInDroneDome(Supervisor):
             translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
 
             # Set random initial position of the landing pad
-            init_x_landing_pad, init_y_landing_pad = random.uniform(3.8, 4.7), random.uniform(0.3, 2.7)
+            self.landing_pad_position = [random.uniform(3.8, 4.7), random.uniform(0.3, 2.7)]
             landing_pad = super().getFromDef('LANDING_PAD')
             translation_field = landing_pad.getField('translation')
-            translation_field.setSFVec3f([init_x_landing_pad, init_y_landing_pad, 0.05])
+            translation_field.setSFVec3f([self.landing_pad_position[0], self.landing_pad_position[1], 0.05])
+
+            # Set random initial position of the Goal
+            self.goal_position = [random.uniform(2.3, 2.7), random.uniform(0.3, 2.7), random.uniform(0.8,1.4)]
+            goal = super().getFromDef('GOAL')
+            translation_field = goal.getField('translation')
+            translation_field.setSFVec3f(self.goal_position)
+
+            # TODO: Do this properly using the supervisor
+            self.goal_height = 0.4
+            self.goal_width = 0.4
+            self.goal_depth = 0.1    
 
             # Set random initial positions of obstacles
             existed_points = []
             existed_points.append([init_x_drone, init_y_drone])
-            existed_points.append([init_x_landing_pad, init_y_landing_pad])
+            existed_points.append([self.landing_pad_position[0], self.landing_pad_position[1]])
+            existed_points.append([self.goal_position[0], self.goal_position[1]])
             for i in range(1, 11):
                 find_appropriate_random_position = False
                 while not find_appropriate_random_position:
@@ -110,11 +129,11 @@ class CrazyflieInDroneDome(Supervisor):
         while self.keyboard.getKey() != ord('Y'):
             super().step(self.timestep)
 
-    def action_from_keyboard(self):
+    def action_from_keyboard(self, sensor_data):
         forward_velocity = 0.0
         left_velocity = 0.0
         yaw_rate = 0.0
-        altitude = 1.0
+        altitude = 1
         key = self.keyboard.getKey()
         while key > 0:
             if key == ord('W'):
@@ -171,6 +190,45 @@ class CrazyflieInDroneDome(Supervisor):
 
         return data
 
+    # Create a function to detect if the drone has reached the landing pad, if it has set the GOAL object to be transparent
+    def check_landing_pad(self, sensor_data):
+        
+        drone_position = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['range_down']]
+
+        distance = np.linalg.norm([drone_position[0] - self.landing_pad_position[0], drone_position[1] - self.landing_pad_position[1], drone_position[2]])
+        if distance < 0.16 and not self.reached_landing_pad:
+            goal_node = super().getFromDef('GOAL')
+            cam_node = super().getFromDef('CF_CAMERA')
+            goal_node.setVisibility(cam_node, 0)
+            print("Congratulations! You have reached the landing pad, the goal is now hidden.")
+            self.reached_landing_pad = True
+
+    # Create a function to detect if the drone has reached the goal
+    def check_goal(self, sensor_data):
+
+        drone_position = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['range_down']]
+
+        # Check that the drone is within the goal
+        goal_x_min = self.goal_position[0] - self.goal_width / 2
+        goal_x_max = self.goal_position[0] + self.goal_width / 2
+
+        goal_y_min = self.goal_position[1] - self.goal_depth / 2
+        goal_y_max = self.goal_position[1] + self.goal_depth / 2
+
+        goal_z_min = self.goal_position[2] - self.goal_height / 2
+        goal_z_max = self.goal_position[2] + self.goal_height / 2
+
+        if (goal_x_min < drone_position[0] < goal_x_max and goal_y_min < drone_position[1] < goal_y_max and goal_z_min < drone_position[2] < goal_z_max):
+            
+            if not self.reached_goal_first:
+                print("Congratulations! You have reached the goal for the first time.")
+                self.reached_goal_first = True
+
+            elif self.reached_goal_first and not self.reached_goal_second and self.reached_landing_pad:
+                print("Congratulations! You have reached the goal after it was hidden.")
+                self.reached_goal_second = True
+
+
     def reset(self):
         # Reset the simulation
         self.simulationResetPhysics()
@@ -209,12 +267,19 @@ if __name__ == '__main__':
         # Read sensor data including []
         sensor_data = drone.read_sensors()
 
+        # Check if the drone has reached the landing pad
+        drone.check_landing_pad(sensor_data)
+
+        # Check if the drone has reached the goal
+        drone.check_goal(sensor_data)
+
+
         # Control commands with [v_forward, v_left, yaw_rate, altitude]
         # ---- Select only one of the following control methods ---- #
-        control_commands = drone.action_from_keyboard()
+        control_commands = drone.action_from_keyboard(sensor_data)
         # control_commands = example.obstacle_avoidance(sensor_data)
-        if exp_num == 1:
-            control_commands = example.path_planning(sensor_data)
+        # if exp_num == 1:
+        #     control_commands = example.path_planning(sensor_data)
         # map = example.occupancy_map(sensor_data)
         # ---- end --- #
 

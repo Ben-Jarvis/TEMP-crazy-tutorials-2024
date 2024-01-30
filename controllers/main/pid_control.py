@@ -40,11 +40,11 @@ class pid_velocity_fixed_height_controller():
                                     "kp_vel_xy": 1.0,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.2}
         
         # Good gains
-        # gains = {
-        #         "off_alt": 55.26,   "kp_alt": 5.0,        "ki_alt": 0.05,       "kd_alt": 4.0,
-        #                             "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
-        #                             "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
-        #                             "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
+        gains = {
+                "off_alt": 55.26,   "kp_alt": 5.0,        "ki_alt": 0.05,       "kd_alt": 4.0,
+                                    "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
+                                    "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
+                                    "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
         
         # Reference clipping (only for advanced users)
         max_attitude = 0.5 #[rad]
