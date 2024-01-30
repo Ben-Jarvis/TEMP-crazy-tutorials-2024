@@ -21,7 +21,7 @@ class pid_velocity_fixed_height_controller():
         self.global_time = 0
 
         # Only for tuning
-        self.tuning_level = "off"
+        self.tuning_level = "off" # You need to change this for exercise 1
         self.tuning_on = False
         self.tuning_start = 7
         self.tuning_iter = 2
@@ -33,25 +33,25 @@ class pid_velocity_fixed_height_controller():
     def pid(self, dt, action, actual_roll, actual_pitch, actual_yaw_rate,
             actual_alt, actual_vx, actual_vy):
 
-        # Bad gains
+        # You need to change this for exercise 1
         gains = {"off_alt": 55.0,   "kp_alt": 4.0,        "ki_alt": 0.5,        "kd_alt": 5.0,
                                     "kp_att_rp": 0.5,     "ki_att_rp":0.0,      "kd_att_rp": 0.1,
                                     "kp_att_y": 1.0,      "ki_att_y": 0.0,      "kd_att_y": 0.0, 
                                     "kp_vel_xy": 1.0,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.2}
         
         # Good gains
-        gains = {
-                "off_alt": 55.26,   "kp_alt": 5.0,        "ki_alt": 0.05,       "kd_alt": 4.0,
-                                    "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
-                                    "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
-                                    "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
+        # gains = {
+        #         "off_alt": 55.26,   "kp_alt": 5.0,        "ki_alt": 0.05,       "kd_alt": 4.0,
+        #                             "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
+        #                             "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
+        #                             "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
         
-        # Reference clipping (only for advanced users)
+        # Reference clipping (bonus challenge exercise 1)
         max_attitude = 0.5 #[rad]
         max_yawrate = 2.0 #[rad/s]
         max_vel = 1 #[m/s]
 
-        # Command clipping (only for advanced users)
+        # Command clipping (bonus challenge exercise 1)
         max_command_attitude = 1 #[]
         max_command_altitude = 10 #[]
 
