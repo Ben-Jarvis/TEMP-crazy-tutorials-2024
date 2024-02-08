@@ -6,7 +6,7 @@ from pid_control import pid_velocity_fixed_height_controller
 import example
 import time, random
 
-exp_num = 4
+exp_num = 1
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -268,18 +268,19 @@ if __name__ == '__main__':
         sensor_data = drone.read_sensors()
 
         # Check if the drone has reached the landing pad
-        drone.check_landing_pad(sensor_data)
+        if exp_num != 1:
+            drone.check_landing_pad(sensor_data)
 
-        # Check if the drone has reached the goal
-        drone.check_goal(sensor_data)
+            # Check if the drone has reached the goal
+            drone.check_goal(sensor_data)
 
 
         # Control commands with [v_forward, v_left, yaw_rate, altitude]
         # ---- Select only one of the following control methods ---- #
         control_commands = drone.action_from_keyboard(sensor_data)
         # control_commands = example.obstacle_avoidance(sensor_data)
-        # if exp_num == 1:
-        #     control_commands = example.path_planning(sensor_data)
+        if exp_num == 1:
+            control_commands = example.path_planning(sensor_data)
         # map = example.occupancy_map(sensor_data)
         # ---- end --- #
 

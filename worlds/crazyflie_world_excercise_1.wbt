@@ -46,6 +46,14 @@ Crazyflie {
   controller "main"
   supervisor TRUE
   extensionSlot [
+    DEF CF_CAMERA Camera {
+      width 300
+      height 300
+      near 0.2
+      fieldOfView 1.5
+      projection "planar"
+      name "cf_camera"
+    }
     DistanceSensor {
       translation -0.0106777 -0.00872367 0.013
       rotation -0.23981088349186744 0.9407345429597554 0.23981088349186744 1.63185
