@@ -3,6 +3,7 @@
 import numpy as np
 from controller import Supervisor, Keyboard
 from pid_control import pid_velocity_fixed_height_controller
+from scipy.spatial.transform import Rotation as R
 import example
 import time, random
 
@@ -29,10 +30,22 @@ class CrazyflieInDroneDome(Supervisor):
         self.m4_motor.setVelocity(1)
 
         # Sensors
+
+        #Update rates for excercise 2 (Kalman filter)
+        self.gps_update_rate = 10*self.timestep
+        self.accel_update_rate = 4*self.timestep
+
         self.imu = self.getDevice('inertial unit')
         self.imu.enable(self.timestep)
         self.gps = self.getDevice('gps')
-        self.gps.enable(self.timestep)
+        
+        if exp_num == 2:
+            self.accelerometer = self.getDevice('accelerometer')
+            self.gps.enable(self.gps_update_rate)
+            self.accelerometer.enable(self.accel_update_rate)
+        else:
+            self.gps.enable(self.timestep)
+
         self.gyro = self.getDevice('gyro')
         self.gyro.enable(self.timestep)
         self.camera = self.getDevice('cf_camera')
@@ -178,6 +191,20 @@ class CrazyflieInDroneDome(Supervisor):
         data['v_forward'] =  vx_global * np.cos(data['yaw']) + vy_global * np.sin(data['yaw'])
         data['v_left'] =  -vx_global * np.sin(data['yaw']) + vy_global * np.cos(data['yaw'])
 
+        if exp_num == 2:
+            ax_body = self.accelerometer.getValues()[0]
+            ay_body = self.accelerometer.getValues()[1]
+            az_body = self.accelerometer.getValues()[2]
+
+            r = R.from_euler('zyx', [data['yaw'], data['pitch'], data['roll']])
+            R_T = r.as_matrix()
+
+            a_global = np.linalg.inv(R_T) @ np.array([[ax_body, ay_body, az_body]]).transpose()
+
+            data['ax_global'] = a_global[0]
+            data['ay_global'] = a_global[1]
+            data['az_global'] = a_global[2]                        
+
         # Range sensor
         data['range_front'] = self.range_front.getValue() / 1000.0
         data['range_left']  = self.range_left.getValue() / 1000.0
@@ -238,11 +265,11 @@ class CrazyflieInDroneDome(Supervisor):
     def step(self, control_commands, sensor_data):
 
         # Time interval for PID control
-        dt = self.getTime() - self.PID_update_last_time
+        dt_ctrl = self.getTime() - self.PID_update_last_time
         self.PID_update_last_time = self.getTime()
 
         # Low-level PID velocity control with fixed height
-        motorPower = self.PID_CF.pid(dt, control_commands, sensor_data['roll'], sensor_data['pitch'],
+        motorPower = self.PID_CF.pid(dt_ctrl, control_commands, sensor_data['roll'], sensor_data['pitch'],
                                                     sensor_data['yaw_rate'], sensor_data['range_down'],
                                                     sensor_data['v_forward'], sensor_data['v_left'])
         
@@ -254,7 +281,6 @@ class CrazyflieInDroneDome(Supervisor):
 
         # Update drone states in simulation
         super().step(self.timestep)
-
 
 if __name__ == '__main__':
 
@@ -268,7 +294,7 @@ if __name__ == '__main__':
         sensor_data = drone.read_sensors()
 
         # Check if the drone has reached the landing pad
-        if exp_num != 1:
+        if exp_num != 1 and exp_num != 2:
             drone.check_landing_pad(sensor_data)
 
             # Check if the drone has reached the goal
@@ -279,7 +305,7 @@ if __name__ == '__main__':
         # ---- Select only one of the following control methods ---- #
         control_commands = drone.action_from_keyboard(sensor_data)
         # control_commands = example.obstacle_avoidance(sensor_data)
-        if exp_num == 1:
+        if exp_num == 1 or exp_num == 2:
             control_commands = example.path_planning(sensor_data)
         # map = example.occupancy_map(sensor_data)
         # ---- end --- #
