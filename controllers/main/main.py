@@ -3,6 +3,7 @@
 import numpy as np
 from controller import Supervisor, Keyboard
 from pid_control import pid_velocity_fixed_height_controller
+from kalman_filter import kalman_filter as KF
 from scipy.spatial.transform import Rotation as R
 import example
 import time, random
@@ -32,8 +33,9 @@ class CrazyflieInDroneDome(Supervisor):
         # Sensors
 
         #Update rates for excercise 2 (Kalman filter)
-        self.gps_update_rate = 10*self.timestep
-        self.accel_update_rate = 4*self.timestep
+        self.gps_update_period = int(self.timestep*2)
+        self.accel_update_period = int(self.timestep)
+        self.g = 9.81 #Used for accelerometer Z-direction correction
 
         self.imu = self.getDevice('inertial unit')
         self.imu.enable(self.timestep)
@@ -41,8 +43,8 @@ class CrazyflieInDroneDome(Supervisor):
         
         if exp_num == 2:
             self.accelerometer = self.getDevice('accelerometer')
-            self.gps.enable(self.gps_update_rate)
-            self.accelerometer.enable(self.accel_update_rate)
+            self.gps.enable(self.gps_update_period)
+            self.accelerometer.enable(self.accel_update_period)
         else:
             self.gps.enable(self.timestep)
 
@@ -61,6 +63,18 @@ class CrazyflieInDroneDome(Supervisor):
         self.laser_down = self.getDevice("laser_down")
         self.laser_down.enable(self.timestep)
 
+        # Kalman filter variables
+        self.KF = KF()
+        self.dt_accel = 0.0
+        self.dt_gps = 0.0
+        self.dt_fusion = 0.0
+
+        self.meas_state = []
+        self.accel_read_last_time = 0.0
+        self.gps_read_last_time = 0.0
+
+        self.ctrl_udpate_period = int(self.timestep)
+        
         # Crazyflie velocity PID controller
         self.PID_CF = pid_velocity_fixed_height_controller()
         self.PID_update_last_time = self.getTime()
@@ -164,6 +178,47 @@ class CrazyflieInDroneDome(Supervisor):
             key = self.keyboard.getKey()
         return [forward_velocity, left_velocity, yaw_rate, altitude]
 
+    def read_KF_estimates(self):
+        
+        # Data dictionary
+        measured_data_raw = self.read_sensors()
+        measured_noisy_data = self.KF.add_noise(measured_data_raw.copy())
+        
+        self.dt_accel = self.getTime() - self.accel_read_last_time
+        self.dt_gps = self.getTime() - self.gps_read_last_time
+        self.dt_fusion = min(self.dt_accel, self.dt_gps)
+        # print(self.dt_accel)
+        # print(self.dt_gps)
+        # print(self.dt_fusion)
+
+        self.meas_state_gps = np.array([[measured_noisy_data['x_global'], measured_noisy_data['y_global']]]).transpose()
+        self.meas_state_accel = np.array([[measured_noisy_data['ax_global'], measured_noisy_data['ay_global'], measured_noisy_data['az_global']]]).transpose()
+
+        if self.dt_gps >= self.gps.getSamplingPeriod()/1000:
+            print("Called GPS")
+            self.gps_read_last_time = self.getTime()
+        if self.dt_accel >= self.accelerometer.getSamplingPeriod()/1000:
+            print("Called Accel")
+            self.accel_read_last_time = self.getTime()
+
+        estimated_state, estimated_covariance = self.KF.KF_sensor_fusion_estimate(self.meas_state_gps, self.meas_state_accel, self.dt_gps, self.dt_accel, self.gps.getSamplingPeriod()/1000, self.accelerometer.getSamplingPeriod()/1000)
+
+        x_g_est, v_x_g_est, a_x_g_est, y_g_est, v_y_g_est, a_y_g_est, z_g_est, v_z_g_est, a_z_g_est = estimated_state.flatten()
+        output_measurement = measured_noisy_data.copy()
+        output_measurement['x_global'] = x_g_est
+        output_measurement['y_global'] = y_g_est
+        output_measurement['v_forward'] = v_x_g_est * np.cos(output_measurement['yaw']) + v_y_g_est * np.sin(output_measurement['yaw'])
+        output_measurement['v_left'] =  -v_x_g_est * np.sin(output_measurement['yaw']) + v_y_g_est * np.cos(output_measurement['yaw'])
+        output_measurement['ax_global'] = a_x_g_est
+        output_measurement['ay_global'] = a_y_g_est
+        output_measurement['az_global'] = a_z_g_est
+
+        print(measured_data_raw)
+        print(measured_noisy_data)
+        print(output_measurement)
+
+        return measured_data_raw
+    
     def read_sensors(self):
         
         # Data dictionary
@@ -177,6 +232,7 @@ class CrazyflieInDroneDome(Supervisor):
         # Position
         data['x_global'] = self.gps.getValues()[0]
         data['y_global'] = self.gps.getValues()[1]
+        data['z_global'] = self.gps.getValues()[2]
 
         # Attitude
         data['roll'] = self.imu.getRollPitchYaw()[0]
@@ -194,16 +250,16 @@ class CrazyflieInDroneDome(Supervisor):
         if exp_num == 2:
             ax_body = self.accelerometer.getValues()[0]
             ay_body = self.accelerometer.getValues()[1]
-            az_body = self.accelerometer.getValues()[2]
+            az_body = self.accelerometer.getValues()[2] 
 
             r = R.from_euler('zyx', [data['yaw'], data['pitch'], data['roll']])
             R_T = r.as_matrix()
 
-            a_global = np.linalg.inv(R_T) @ np.array([[ax_body, ay_body, az_body]]).transpose()
+            a_global = (np.linalg.inv(R_T) @ np.array([[ax_body, ay_body, az_body]]).transpose()).flatten()
 
             data['ax_global'] = a_global[0]
             data['ay_global'] = a_global[1]
-            data['az_global'] = a_global[2]                        
+            data['az_global'] = a_global[2] - self.g               
 
         # Range sensor
         data['range_front'] = self.range_front.getValue() / 1000.0
@@ -266,18 +322,35 @@ class CrazyflieInDroneDome(Supervisor):
 
         # Time interval for PID control
         dt_ctrl = self.getTime() - self.PID_update_last_time
-        self.PID_update_last_time = self.getTime()
 
-        # Low-level PID velocity control with fixed height
-        motorPower = self.PID_CF.pid(dt_ctrl, control_commands, sensor_data['roll'], sensor_data['pitch'],
+        if exp_num == 2:
+            if dt_ctrl >= self.ctrl_udpate_period/1000:
+                print("Controlling")
+                # Low-level PID velocity control with fixed height
+                motorPower = self.PID_CF.pid(dt_ctrl, control_commands, sensor_data['roll'], sensor_data['pitch'],
                                                     sensor_data['yaw_rate'], sensor_data['range_down'],
                                                     sensor_data['v_forward'], sensor_data['v_left'])
         
-        # Update motor command
-        self.m1_motor.setVelocity(-motorPower[0])
-        self.m2_motor.setVelocity(motorPower[1])
-        self.m3_motor.setVelocity(-motorPower[2])
-        self.m4_motor.setVelocity(motorPower[3])
+                # Update motor command
+                self.m1_motor.setVelocity(-motorPower[0])
+                self.m2_motor.setVelocity(motorPower[1])
+                self.m3_motor.setVelocity(-motorPower[2])
+                self.m4_motor.setVelocity(motorPower[3])
+
+                self.PID_update_last_time = self.getTime()
+        else:
+            self.PID_update_last_time = self.getTime()
+
+            # Low-level PID velocity control with fixed height
+            motorPower = self.PID_CF.pid(dt_ctrl, control_commands, sensor_data['roll'], sensor_data['pitch'],
+                                                            sensor_data['yaw_rate'], sensor_data['range_down'],
+                                                            sensor_data['v_forward'], sensor_data['v_left'])
+        
+            # Update motor command
+            self.m1_motor.setVelocity(-motorPower[0])
+            self.m2_motor.setVelocity(motorPower[1])
+            self.m3_motor.setVelocity(-motorPower[2])
+            self.m4_motor.setVelocity(motorPower[3])
 
         # Update drone states in simulation
         super().step(self.timestep)
@@ -291,7 +364,10 @@ if __name__ == '__main__':
     for step in range(100000):
 
         # Read sensor data including []
-        sensor_data = drone.read_sensors()
+        if exp_num == 2:
+            sensor_data = drone.read_KF_estimates()
+        else:
+            sensor_data = drone.read_sensors()
 
         # Check if the drone has reached the landing pad
         if exp_num != 1 and exp_num != 2:
