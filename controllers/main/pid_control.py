@@ -39,12 +39,20 @@ class pid_velocity_fixed_height_controller():
         #                             "kp_att_y": 1.0,      "ki_att_y": 0.0,      "kd_att_y": 0.0, 
         #                             "kp_vel_xy": 1.0,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.2}
         
-        # Good gains
+        # # Good gains
+        # gains = {
+        #         "off_alt": 55.26,   "kp_alt": 5.0,        "ki_alt": 0.05,       "kd_alt": 4.0,
+        #                             "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
+        #                             "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
+        #                             "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
+        
+        # KF gains
         gains = {
-                "off_alt": 55.26,   "kp_alt": 5.0,        "ki_alt": 0.05,       "kd_alt": 4.0,
-                                    "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
-                                    "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
-                                    "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
+                "off_alt": 55.26,   "kp_alt": 4.0,        "ki_alt": 0.05,       "kd_alt": 3.5,
+                                    "kp_att_rp": 0.75,     "ki_att_rp":0.0,      "kd_att_rp": 0.3,
+                                    "kp_att_y": 1.2,      "ki_att_y": 0.0,      "kd_att_y": 0.04, 
+                                    "kp_vel_xy": 1.3,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.3}
+        
         
         # Reference clipping (bonus challenge exercise 1)
         max_attitude = 0.5 #[rad]

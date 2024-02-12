@@ -38,7 +38,7 @@ def path_planning(sensor_data):
     global on_ground, height_desired, index_current_setpoint, setpoints, starttime, endtime
 
     # Take off
-    if on_ground and sensor_data['range_down'] < 0.49:
+    if on_ground and sensor_data['z_global'] < 0.49:
         control_command = [0.0, 0.0, 0.0, height_desired]
         return control_command
     else:
