@@ -239,16 +239,10 @@ class CrazyflieInDroneDome(Supervisor):
         output_measurement['ay_global'] = a_y_g_est
         output_measurement['az_global'] = a_z_g_est
 
-        # print(measured_data_raw)
-        # print(measured_noisy_data)
-        # print(output_measurement)
-
         self.KF.aggregate_states(measured_data_raw, measured_noisy_data, output_measurement)
 
         if np.isnan(np.array(list(measured_data_raw.values()))).any():
             measured_data_raw = dict.fromkeys(measured_data_raw, 0)
-
-        print(output_measurement['z_global'])
 
         return output_measurement
     

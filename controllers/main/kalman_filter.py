@@ -180,23 +180,23 @@ class kalman_filter():
     def plot_states(self):
         plt.figure(0)
 
-        self.raw_data_vec = np.array(self.raw_data_vec)
-        self.noisy_data_vec = np.array(self.noisy_data_vec)
-        self.KF_estimate_vec = np.array(self.KF_estimate_vec)
+        raw_data_vec_np = np.array(self.raw_data_vec)
+        noisy_data_vec_np = np.array(self.noisy_data_vec)
+        KF_estimate_vec_np = np.array(self.KF_estimate_vec)
 
-        plt.plot(self.raw_data_vec[:,:3])
-        plt.plot(self.noisy_data_vec[:,:3])
-        plt.plot(self.KF_estimate_vec[:,:3])
+        plt.plot(raw_data_vec_np[:,:3])
+        plt.plot(noisy_data_vec_np[:,:3])
+        plt.plot(KF_estimate_vec_np[:,:3])
 
         plt.figure(1)
-        plt.plot(self.raw_data_vec[:,3:5])
-        plt.plot(self.noisy_data_vec[:,3:5])
-        plt.plot(self.KF_estimate_vec[:,3:5])
+        plt.plot(raw_data_vec_np[:,3:5])
+        plt.plot(noisy_data_vec_np[:,3:5])
+        plt.plot(KF_estimate_vec_np[:,3:5])
 
         plt.figure(2)
-        plt.plot(self.raw_data_vec[:,5:8])
-        plt.plot(self.noisy_data_vec[:,5:8])
-        plt.plot(self.KF_estimate_vec[:,5:8])
+        plt.plot(raw_data_vec_np[:,5:8])
+        plt.plot(noisy_data_vec_np[:,5:8])
+        plt.plot(KF_estimate_vec_np[:,5:8])
 
         plt.show()
 
