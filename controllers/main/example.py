@@ -75,7 +75,7 @@ def path_planning(sensor_data):
     x_goal, y_goal, z_goal = setpoints[index_current_setpoint]
     x_drone, y_drone = sensor_data['x_global'], sensor_data['y_global']
     gain = 2
-    v_x, v_y, yawrate = (x_goal - x_drone)*gain, (y_goal - y_drone)*gain, 2     # TODO: -sensor_data['yaw']*gain
+    v_x, v_y, yawrate = (x_goal - x_drone)*gain, (y_goal - y_drone)*gain, -sensor_data['yaw']*gain
     control_command = [v_x, v_y, yawrate, z_goal]
     return control_command
     
