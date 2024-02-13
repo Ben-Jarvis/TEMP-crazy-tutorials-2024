@@ -4,12 +4,13 @@ import numpy as np
 from controller import Supervisor, Keyboard
 from pid_control import pid_velocity_fixed_height_controller
 from kalman_filter import kalman_filter as KF
+import utils
 from scipy.spatial.transform import Rotation as R
 import example
 import time, random
 
-exp_num = 2
-control_style = 'keyboard'
+exp_num = 0
+control_style = 'path_planning'
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -464,6 +465,7 @@ if __name__ == '__main__':
                 # Check if the drone has reached the goal
                 drone.check_goal(sensor_data)
             
+            control_commands = utils.rot_global2body(control_commands, [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']])
             drone.step(control_commands, sensor_data)
         else:
             state_data = drone.read_KF_estimates()

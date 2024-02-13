@@ -11,7 +11,6 @@ def euler2rotmat(euler_angles):
 
     # --- YOUR CODE HERE ---
     
-    
     return R
 
 # Rotate the control commands from the global refernce frame to the drone reference frame
@@ -20,6 +19,7 @@ def rot_global2body(control_commands, euler_angles):
     # Here you need to rotate the control commands from the global reference frame to the drone reference frame
     # You should use the euler2rotmat function to get the rotation matrix
     # Keep in mind that you only want to rotate the velocity commands, which are the first two elements of the control_commands array
+    # Think carefully about which direction you need to perform the rotation
 
     # --- YOUR CODE HERE ---
 
