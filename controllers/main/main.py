@@ -9,6 +9,7 @@ import example
 import time, random
 
 exp_num = 2
+control_style = 'keyboard'
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -99,6 +100,13 @@ class CrazyflieInDroneDome(Supervisor):
         # Tools
         self.keyboard = self.getKeyboard()
         self.keyboard.enable(self.timestep)
+
+        # Set a random initial yaw of the drone
+        drone = super().getSelf()
+        init_yaw_drone = random.uniform(-np.pi, np.pi)
+        # init_yaw_drone = np.pi/6
+        rotation_field = drone.getField('rotation')
+        rotation_field.setSFRotation([0, 0, 1, init_yaw_drone])
 
         # Simulation step update
         super().step(self.timestep)
@@ -443,8 +451,11 @@ if __name__ == '__main__':
         if exp_num != 2:            
             sensor_data = drone.read_sensors()
 
-            if exp_num == 1:
-                control_commands = example.path_planning(sensor_data)
+            if exp_num == 0 or exp_num == 1:
+                if control_style == 'keyboard':
+                    control_commands = drone.action_from_keyboard(sensor_data)
+                else:
+                    control_commands = example.path_planning(sensor_data)
             else:
                 # Control commands with [v_forward, v_left, yaw_rate, altitude]
                 # ---- Select only one of the following control methods ---- #
