@@ -14,12 +14,15 @@ This documentation shows the project description, step-by-step software implemen
 .. toctree::
    :maxdepth: 3
 
-   project_description
-   simulation_quickstart
-   examples
-   leaderboard
-   hardware_instruction
-   hardware_quickstart
+   exercise_0/exercise_0_description
+   exercise_1/exercise_1_description
+   exercise_2/exercise_2_description
+   assignment/project_description
+   assignment/simulation_quickstart
+   assignment/examples
+   assignment/leaderboard
+   assignment/hardware_instruction
+   assignment/hardware_quickstart
 
 .. rubric:: Indices and tables
 
