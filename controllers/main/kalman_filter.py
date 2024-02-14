@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from pid_control import pid_velocity_fixed_height_controller as pid
+from control import quadrotor_controller as pid
 import matplotlib.pyplot as plt
 import pandas as pd
 

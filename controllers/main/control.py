@@ -1,8 +1,9 @@
 # Low-level PID control of velocity and attitude
 import numpy as np
 import matplotlib.pyplot as plt
+from simple_pid import PID
 
-class pid_velocity_fixed_height_controller():
+class quadrotor_controller():
     def __init__(self):
         self.pastVxError = 0
         self.pastVyError = 0
@@ -23,48 +24,172 @@ class pid_velocity_fixed_height_controller():
         # Only for tuning
         self.tuning_level = "off" # You need to change this for exercise 1
         self.tuning_on = False
-        self.tuning_start = 7
+        self.tuning_start = 10
         self.tuning_iter = 2
         self.tuning_time = 0.0
         self.tuning_ts = []
         self.tuning_desired = []
         self.tuning_actual = []
 
-    def pid(self, dt, action, actual_roll, actual_pitch, actual_yaw_rate,
-            actual_alt, actual_vx, actual_vy):
+        gains = {"offset": 55.5,
+                "P_vel_z": 13,     "I_vel_z": 0.2,     "D_vel_z": 0.01,
+                "P_pos_z": 2,     "I_pos_z": 0.0,     "D_pos_z": 0.0,
+                "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.0,
+                "P_rate_y": 1.0,      "I_rate_y": 0.0,      "D_rate_y": 0.0,
+                "P_att_rp": 0.5,     "I_att_rp":0.0,      "D_att_rp": 0.0,
+                "P_att_y": 0.01,      "I_att_y": 0.0,      "D_att_y": 0.0,
+                "P_vel_xy": 0.01,     "I_vel_xy": 0.0,     "D_vel_xy": 0.0,
+                "P_pos_xy": 0.01,     "I_pos_xy": 0.0,     "D_pos_xy": 0.0}
+        
+        self.limits = {
+                "L_rate_rp": 1.5,
+                "L_rate_y": 2,
+                "L_att_rp": 0.5,
+                "L_vel_z": 1.0,
+                "L_vel_xy": 1
+        }
 
-        # You need to change this for exercise 1
-        # gains = {"off_alt": 55.0,   "kp_alt": 4.0,        "ki_alt": 0.5,        "kd_alt": 5.0,
-        #                             "kp_att_rp": 0.5,     "ki_att_rp":0.0,      "kd_att_rp": 0.1,
-        #                             "kp_att_y": 1.0,      "ki_att_y": 0.0,      "kd_att_y": 0.0, 
-        #                             "kp_vel_xy": 1.0,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.2}
-        
-        # # Good gains
-        # gains = {
-        #         "off_alt": 55.26,   "kp_alt": 5.0,        "ki_alt": 0.05,       "kd_alt": 4.0,
-        #                             "kp_att_rp": 1.0,     "ki_att_rp":0.0,      "kd_att_rp": 0.35,
-        #                             "kp_att_y": 1.5,      "ki_att_y": 0.0,      "kd_att_y": 0.05, 
-        #                             "kp_vel_xy": 1.8,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.32}
-        
-        # KF gains
-        gains = {
-                "off_alt": 55.26,   "kp_alt": 4.0,        "ki_alt": 0.05,       "kd_alt": 3.5,
-                                    "kp_att_rp": 0.75,     "ki_att_rp":0.0,      "kd_att_rp": 0.3,
-                                    "kp_att_y": 1.2,      "ki_att_y": 0.0,      "kd_att_y": 0.04, 
-                                    "kp_vel_xy": 1.3,     "ki_vel_xy": 0.0,     "kd_vel_xy": 0.3}
-        
-        
-        # Reference clipping (bonus challenge exercise 1)
-        max_attitude = 0.5 #[rad]
-        max_yawrate = 2.0 #[rad/s]
-        max_vel = 1 #[m/s]
+        # Thrust offset so hovering is possible
+        self.offset = gains["offset"]
 
-        # Command clipping (bonus challenge exercise 1)
-        max_command_attitude = 1 #[]
-        max_command_altitude = 10 #[]
+        # Position controller
+        self.pid_pos_x = PID(gains["P_pos_xy"], gains["I_pos_xy"], gains["D_pos_xy"])
+        self.pid_pos_y = PID(gains["P_pos_xy"], gains["I_pos_xy"], gains["D_pos_xy"])
+        self.pid_pos_z = PID(gains["P_pos_z"], gains["I_pos_z"], gains["D_pos_z"])
+        
+        self.pid_pos_x.output_limits = (-self.limits["L_vel_xy"],self.limits["L_vel_xy"])
+        self.pid_pos_y.output_limits = (-self.limits["L_vel_xy"],self.limits["L_vel_xy"])
+        self.pid_pos_z.output_limits = (-self.limits["L_vel_z"],self.limits["L_vel_z"])
+
+        # Velocity controller
+        self.pid_vel_x = PID(gains["P_vel_xy"], gains["I_vel_xy"], gains["D_vel_xy"])
+        self.pid_vel_y = PID(gains["P_vel_xy"], gains["I_vel_xy"], gains["D_vel_xy"])
+        self.pid_vel_z = PID(gains["P_vel_z"], gains["I_vel_z"], gains["D_vel_z"])
+
+        self.pid_vel_x.output_limits = (-self.limits["L_att_rp"],self.limits["L_att_rp"])
+        self.pid_vel_y.output_limits = (-self.limits["L_att_rp"],self.limits["L_att_rp"])
+        self.pid_vel_z.output_limits = (None,None)
+
+        # Attitude controller
+        self.pid_att_x = PID(gains["P_att_rp"], gains["I_att_rp"], gains["D_att_rp"])
+        self.pid_att_y = PID(gains["P_att_rp"], gains["I_att_rp"], gains["D_att_rp"])
+        self.pid_att_z = PID(gains["P_att_y"], gains["I_att_y"], gains["D_att_y"])
+        
+        self.pid_att_x.output_limits = (-self.limits["L_rate_rp"],self.limits["L_rate_rp"])
+        self.pid_att_y.output_limits = (-self.limits["L_rate_rp"],self.limits["L_rate_rp"])
+        self.pid_att_z.output_limits = (-self.limits["L_rate_y"],self.limits["L_rate_y"])
+
+        # Rate controller
+        self.pid_rate_roll = PID(gains["P_rate_rp"], gains["I_rate_rp"], gains["D_rate_rp"])
+        self.pid_rate_pitch = PID(gains["P_rate_rp"], gains["I_rate_rp"], gains["D_rate_rp"])
+        self.pid_rate_yaw = PID(gains["P_rate_y"], gains["I_rate_y"], gains["D_rate_y"])
+        
+        self.pid_rate_roll.output_limits = (None,None)
+        self.pid_rate_pitch.output_limits = (None,None)
+        self.pid_rate_yaw.output_limits = (None,None)
+
+
+    def pid(self, dt, setpoint, sensor_data):
+
+        if self.tuning_level != "off":
+            setpoint = [0,0,2,0]
+
+        pos_x_setpoint = setpoint[0]
+        pos_y_setpoint = setpoint[1]
+        pos_z_setpoint = setpoint[2]
+        att_z_setpoint = setpoint[3]
+
+        # Position control loop
+        self.pid_pos_x.sample_time = dt
+        self.pid_pos_y.sample_time = dt
+        self.pid_pos_z.sample_time = dt
+
+        if self.tuning_level == "position":
+            pos_x_setpoint = self.tuning(-5,5,5,dt,pos_x_setpoint, sensor_data["x_global"], "position [m]")
+        if self.tuning_level == "altitude":
+            pos_z_setpoint = self.tuning(0.5,1.5,10,dt,pos_z_setpoint, sensor_data["z_global"], "altitude [m]")
+
+        self.pid_pos_x.setpoint = pos_x_setpoint
+        self.pid_pos_y.setpoint = pos_y_setpoint
+        self.pid_pos_z.setpoint = pos_z_setpoint
+
+        vel_x_setpoint = self.pid_pos_x(sensor_data["x_global"])
+        vel_y_setpoint = self.pid_pos_y(sensor_data["y_global"])
+        vel_z_setpoint = self.pid_pos_z(sensor_data["z_global"])
+
+
+        # Velocity control loop
+        self.pid_vel_x.sample_time = dt
+        self.pid_vel_y.sample_time = dt
+        self.pid_vel_z.sample_time = dt
+
+        if self.tuning_level == "velocity":
+            vel_x_setpoint = self.tuning(-self.limits["L_vel_xy"],self.limits["L_vel_xy"],3,dt,vel_x_setpoint, sensor_data["v_x"], "velocity [m/s]")
+        if self.tuning_level == "climb":
+            vel_z_setpoint = self.tuning(-self.limits["L_vel_z"],self.limits["L_vel_z"],2,dt,vel_z_setpoint, sensor_data["v_z"], "climb [m/s]")
+
+        self.pid_vel_x.setpoint = vel_x_setpoint
+        self.pid_vel_y.setpoint = vel_y_setpoint
+        self.pid_vel_z.setpoint = vel_z_setpoint
+
+        att_y_setpoint = self.pid_vel_x(sensor_data["v_x"])
+        att_x_setpoint = self.pid_vel_y(sensor_data["v_y"])
+        thrustCommand = self.pid_vel_z(sensor_data["v_z"])
+
+        # Attitude control loop
+        self.pid_att_x.sample_time = dt
+        self.pid_att_y.sample_time = dt
+        self.pid_att_z.sample_time = dt
+
+        if self.tuning_level == "attitude":
+            att_x_setpoint = self.tuning(-self.limits["L_att_rp"],self.limits["L_att_rp"],2,dt,att_x_setpoint, sensor_data["roll"], "attitude [rad]")
+        if self.tuning_level == "yaw":
+            att_z_setpoint = self.tuning(-2,2,1,dt,att_z_setpoint, sensor_data["yaw"], "yaw [rad]")
+
+        self.pid_att_x.setpoint = att_x_setpoint
+        self.pid_att_y.setpoint = att_y_setpoint
+        self.pid_att_z.setpoint = att_z_setpoint
+
+        rate_roll_setpoint = self.pid_att_x(sensor_data["q_x"]*sensor_data["q_w"])
+        rate_pitch_setpoint = self.pid_att_y(sensor_data["q_y"]*sensor_data["q_w"])
+        rate_yaw_setpoint = self.pid_att_z(sensor_data["q_z"]*sensor_data["q_w"])
+
+
+        # Body Rate control loop
+        self.pid_rate_roll.sample_time = dt
+        self.pid_rate_pitch.sample_time = dt
+        self.pid_rate_yaw.sample_time = dt
+
+        if self.tuning_level == "rate":
+            rate_roll_setpoint = self.tuning(-self.limits["L_rate_rp"],self.limits["L_rate_rp"],0.2,dt,rate_roll_setpoint, sensor_data["rate_roll"], "attitude [rad]")
+        if self.tuning_level == "yaw rate":
+            rate_yaw_setpoint = self.tuning(-self.limits["L_rate_y"],-self.limits["L_rate_y"],1.0,dt,rate_yaw_setpoint, sensor_data["yaw"], "yaw [rad]")
+
+        self.pid_rate_roll.setpoint = rate_roll_setpoint
+        self.pid_rate_pitch.setpoint = rate_pitch_setpoint
+        self.pid_rate_yaw.setpoint = rate_yaw_setpoint
+
+        rollCommand = self.pid_rate_roll(sensor_data["rate_roll"])
+        pitchCommand = self.pid_rate_pitch(sensor_data["rate_pitch"])
+        yawCommand = self.pid_rate_yaw(sensor_data["rate_yaw"])
+
+        # Motor mixing
+        m1 =  self.offset + thrustCommand - rollCommand + pitchCommand + yawCommand
+        m2 =  self.offset + thrustCommand - rollCommand - pitchCommand - yawCommand
+        m3 =  self.offset + thrustCommand + rollCommand - pitchCommand + yawCommand
+        m4 =  self.offset + thrustCommand + rollCommand + pitchCommand - yawCommand
+
+        # Limit the motor command
+        m1 = np.clip(m1, 0, 600)
+        m2 = np.clip(m2, 0, 600)
+        m3 = np.clip(m3, 0, 600)
+        m4 = np.clip(m4, 0, 600)
+
+        self.global_time += dt
+        return [m1, m2, m3, m4]
 
         # Actions
-        desired_vx, desired_vy, desired_yaw_rate, desired_alt = action[0], action[1], action[2], action[3]
+        desired_vx, desired_vy, desired_yaw_rate, desired_alt = setpoint[0], setpoint[1], setpoint[2], setpoint[3]
 
         if self.tuning_level != "off":
             desired_vx, desired_vy, desired_yaw_rate, desired_alt = 0,0,0,1
@@ -85,8 +210,8 @@ class pid_velocity_fixed_height_controller():
         self.intVy += vyError * dt
         self.intVx = np.clip(self.intVx,-max_vel/2,max_vel/2)
         self.intVy = np.clip(self.intVy,-max_vel/2,max_vel/2)
-        desired_pitch = gains["kp_vel_xy"] * vxError + gains["kd_vel_xy"] * vxDeriv + gains["ki_vel_xy"] * self.intVx
-        desired_roll = -gains["kp_vel_xy"] * vyError - gains["kd_vel_xy"] * vyDeriv + gains["ki_vel_xy"] * self.intVy
+        desired_pitch = gains["P_vel_xy"] * vxError + gains["D_vel_xy"] * vxDeriv + gains["I_vel_xy"] * self.intVx
+        desired_roll = -gains["P_vel_xy"] * vyError - gains["D_vel_xy"] * vyDeriv + gains["I_vel_xy"] * self.intVy
         self.pastVxError = vxError
         self.pastVyError = vyError
 
@@ -99,7 +224,7 @@ class pid_velocity_fixed_height_controller():
         altDeriv = (altError - self.pastAltError) / dt
         self.intAlt += altError * dt
         self.intAlt = np.clip(self.intAlt,-2,2)
-        altCommand = gains["kp_alt"] * altError + gains["kd_alt"] * altDeriv + gains["ki_alt"] * self.intAlt
+        altCommand = gains["P_alt"] * altError + gains["D_alt"] * altDeriv + gains["I_alt"] * self.intAlt
         self.pastAltError = altError
 
         # Tuning attitude PID
@@ -125,14 +250,14 @@ class pid_velocity_fixed_height_controller():
         self.intPitch = np.clip(self.intPitch,-max_attitude/2,max_attitude/2)
         self.intRoll = np.clip(self.intRoll,-max_attitude/2,max_attitude/2)
         self.intYawrate = np.clip(self.intYawrate,-max_yawrate/2,max_yawrate/2)
-        rollCommand = gains["kp_att_rp"] * rollError + gains["kd_att_rp"] * rollDeriv + gains["ki_att_rp"] * self.intPitch
-        pitchCommand = -gains["kp_att_rp"] * pitchError - gains["kd_att_rp"] * pitchDeriv + gains["ki_att_rp"] * self.intRoll
-        yawCommand = gains["kp_att_y"] * yawRateError + gains["kd_att_y"] * yawRateDeriv + gains["ki_att_y"] * self.intYawrate
+        rollCommand = gains["P_att_rp"] * rollError + gains["D_att_rp"] * rollDeriv + gains["I_att_rp"] * self.intPitch
+        pitchCommand = -gains["P_att_rp"] * pitchError - gains["D_att_rp"] * pitchDeriv + gains["I_att_rp"] * self.intRoll
+        yawCommand = gains["P_att_y"] * yawRateError + gains["D_att_y"] * yawRateDeriv + gains["I_att_y"] * self.intYawrate
         self.pastPitchError = pitchError
         self.pastRollError = rollError
         self.pastYawrateError = yawRateError
         
-        altCommand = np.clip(altCommand,-max_command_altitude,max_command_altitude) + gains["off_alt"]
+        altCommand = np.clip(altCommand,-max_command_altitude,max_command_altitude) + gains["O_alt"]
         rollCommand = np.clip(rollCommand,-max_command_attitude,max_command_attitude)
         pitchCommand = np.clip(pitchCommand,-max_command_attitude,max_command_attitude)
         yawCommand = np.clip(yawCommand,-max_command_attitude,max_command_attitude)
