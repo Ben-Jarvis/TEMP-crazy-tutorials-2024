@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from simple_pid import PID
+from scipy.spatial.transform import Rotation as R
 
 class quadrotor_controller():
     def __init__(self):
@@ -20,6 +21,7 @@ class quadrotor_controller():
         self.intYawrate = 0
 
         self.global_time = 0
+        self.mass = 0.05 #[kg]
 
         # Only for tuning
         self.tuning_level = "off" # You need to change this for exercise 1
@@ -31,58 +33,54 @@ class quadrotor_controller():
         self.tuning_desired = []
         self.tuning_actual = []
 
-        gains = {"offset": 55.5,
-                "P_vel_z": 13,     "I_vel_z": 0.2,     "D_vel_z": 0.01,
-                "P_pos_z": 2,     "I_pos_z": 0.0,     "D_pos_z": 0.0,
-                "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.0,
-                "P_rate_y": 1.0,      "I_rate_y": 0.0,      "D_rate_y": 0.0,
-                "P_att_rp": 0.5,     "I_att_rp":0.0,      "D_att_rp": 0.0,
-                "P_att_y": 0.01,      "I_att_y": 0.0,      "D_att_y": 0.0,
-                "P_vel_xy": 0.01,     "I_vel_xy": 0.0,     "D_vel_xy": 0.0,
-                "P_pos_xy": 0.01,     "I_pos_xy": 0.0,     "D_pos_xy": 0.0}
+        self.gains = {"P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 1.3,
+                "P_pos_z": 2.0,     "I_pos_z": 0.0,     "D_pos_z": 0.15,
+                "P_rate_rp": 0.5,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
+                "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
+                "P_att_rp": 30.0,     "I_att_rp":10.0,      "D_att_rp": 0.2,
+                "P_att_y": 10.0,      "I_att_y": 0.0,      "D_att_y": 0.0,
+                "P_vel_xy": 1.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.0,
+                "P_pos_xy": 3.0,     "I_pos_xy": 0.0,     "D_pos_xy": 0.0}
         
         self.limits = {
-                "L_rate_rp": 1.5,
-                "L_rate_y": 2,
-                "L_att_rp": 0.5,
+                "L_rate_rp": 2.0,
+                "L_rate_y": 3.0,
+                "L_acc_rp": 3.0,
                 "L_vel_z": 1.0,
-                "L_vel_xy": 1
+                "L_vel_xy": 1.5
         }
 
-        # Thrust offset so hovering is possible
-        self.offset = gains["offset"]
-
         # Position controller
-        self.pid_pos_x = PID(gains["P_pos_xy"], gains["I_pos_xy"], gains["D_pos_xy"])
-        self.pid_pos_y = PID(gains["P_pos_xy"], gains["I_pos_xy"], gains["D_pos_xy"])
-        self.pid_pos_z = PID(gains["P_pos_z"], gains["I_pos_z"], gains["D_pos_z"])
+        self.pid_pos_x = PID(self.gains["P_pos_xy"], self.gains["I_pos_xy"], self.gains["D_pos_xy"])
+        self.pid_pos_y = PID(self.gains["P_pos_xy"], self.gains["I_pos_xy"], self.gains["D_pos_xy"])
+        self.pid_pos_z = PID(self.gains["P_pos_z"], self.gains["I_pos_z"], self.gains["D_pos_z"])
         
         self.pid_pos_x.output_limits = (-self.limits["L_vel_xy"],self.limits["L_vel_xy"])
         self.pid_pos_y.output_limits = (-self.limits["L_vel_xy"],self.limits["L_vel_xy"])
         self.pid_pos_z.output_limits = (-self.limits["L_vel_z"],self.limits["L_vel_z"])
 
         # Velocity controller
-        self.pid_vel_x = PID(gains["P_vel_xy"], gains["I_vel_xy"], gains["D_vel_xy"])
-        self.pid_vel_y = PID(gains["P_vel_xy"], gains["I_vel_xy"], gains["D_vel_xy"])
-        self.pid_vel_z = PID(gains["P_vel_z"], gains["I_vel_z"], gains["D_vel_z"])
+        self.pid_vel_x = PID(self.gains["P_vel_xy"], self.gains["I_vel_xy"], self.gains["D_vel_xy"])
+        self.pid_vel_y = PID(self.gains["P_vel_xy"], self.gains["I_vel_xy"], self.gains["D_vel_xy"])
+        self.pid_vel_z = PID(self.gains["P_vel_z"], self.gains["I_vel_z"], self.gains["D_vel_z"])
 
-        self.pid_vel_x.output_limits = (-self.limits["L_att_rp"],self.limits["L_att_rp"])
-        self.pid_vel_y.output_limits = (-self.limits["L_att_rp"],self.limits["L_att_rp"])
+        self.pid_vel_x.output_limits = (-self.limits["L_acc_rp"],self.limits["L_acc_rp"])
+        self.pid_vel_y.output_limits = (-self.limits["L_acc_rp"],self.limits["L_acc_rp"])
         self.pid_vel_z.output_limits = (None,None)
 
         # Attitude controller
-        self.pid_att_x = PID(gains["P_att_rp"], gains["I_att_rp"], gains["D_att_rp"])
-        self.pid_att_y = PID(gains["P_att_rp"], gains["I_att_rp"], gains["D_att_rp"])
-        self.pid_att_z = PID(gains["P_att_y"], gains["I_att_y"], gains["D_att_y"])
+        self.pid_att_x = PID(self.gains["P_att_rp"], self.gains["I_att_rp"], self.gains["D_att_rp"])
+        self.pid_att_y = PID(self.gains["P_att_rp"], self.gains["I_att_rp"], self.gains["D_att_rp"])
+        self.pid_att_z = PID(self.gains["P_att_y"], self.gains["I_att_y"], self.gains["D_att_y"])
         
         self.pid_att_x.output_limits = (-self.limits["L_rate_rp"],self.limits["L_rate_rp"])
         self.pid_att_y.output_limits = (-self.limits["L_rate_rp"],self.limits["L_rate_rp"])
         self.pid_att_z.output_limits = (-self.limits["L_rate_y"],self.limits["L_rate_y"])
 
         # Rate controller
-        self.pid_rate_roll = PID(gains["P_rate_rp"], gains["I_rate_rp"], gains["D_rate_rp"])
-        self.pid_rate_pitch = PID(gains["P_rate_rp"], gains["I_rate_rp"], gains["D_rate_rp"])
-        self.pid_rate_yaw = PID(gains["P_rate_y"], gains["I_rate_y"], gains["D_rate_y"])
+        self.pid_rate_roll = PID(self.gains["P_rate_rp"], self.gains["I_rate_rp"], self.gains["D_rate_rp"])
+        self.pid_rate_pitch = PID(self.gains["P_rate_rp"], self.gains["I_rate_rp"], self.gains["D_rate_rp"])
+        self.pid_rate_yaw = PID(self.gains["P_rate_y"], self.gains["I_rate_y"], self.gains["D_rate_y"])
         
         self.pid_rate_roll.output_limits = (None,None)
         self.pid_rate_pitch.output_limits = (None,None)
@@ -92,7 +90,7 @@ class quadrotor_controller():
     def pid(self, dt, setpoint, sensor_data):
 
         if self.tuning_level != "off":
-            setpoint = [0,0,2,0]
+            setpoint = [1,1,1,0]
 
         pos_x_setpoint = setpoint[0]
         pos_y_setpoint = setpoint[1]
@@ -105,9 +103,9 @@ class quadrotor_controller():
         self.pid_pos_z.sample_time = dt
 
         if self.tuning_level == "position":
-            pos_x_setpoint = self.tuning(-5,5,5,dt,pos_x_setpoint, sensor_data["x_global"], "position [m]")
+            pos_x_setpoint = self.tuning(-3,3,5,dt,pos_x_setpoint, sensor_data["x_global"], "position [m]")
         if self.tuning_level == "altitude":
-            pos_z_setpoint = self.tuning(0.5,1.5,10,dt,pos_z_setpoint, sensor_data["z_global"], "altitude [m]")
+            pos_z_setpoint = self.tuning(0.5,1.5,5,dt,pos_z_setpoint, sensor_data["z_global"], "altitude [m]")
 
         self.pid_pos_x.setpoint = pos_x_setpoint
         self.pid_pos_y.setpoint = pos_y_setpoint
@@ -117,7 +115,6 @@ class quadrotor_controller():
         vel_y_setpoint = self.pid_pos_y(sensor_data["y_global"])
         vel_z_setpoint = self.pid_pos_z(sensor_data["z_global"])
 
-
         # Velocity control loop
         self.pid_vel_x.sample_time = dt
         self.pid_vel_y.sample_time = dt
@@ -126,34 +123,42 @@ class quadrotor_controller():
         if self.tuning_level == "velocity":
             vel_x_setpoint = self.tuning(-self.limits["L_vel_xy"],self.limits["L_vel_xy"],3,dt,vel_x_setpoint, sensor_data["v_x"], "velocity [m/s]")
         if self.tuning_level == "climb":
-            vel_z_setpoint = self.tuning(-self.limits["L_vel_z"],self.limits["L_vel_z"],2,dt,vel_z_setpoint, sensor_data["v_z"], "climb [m/s]")
+            vel_z_setpoint = self.tuning(-self.limits["L_vel_z"],self.limits["L_vel_z"],1.5,dt,vel_z_setpoint, sensor_data["v_z"], "climb [m/s]")
 
         self.pid_vel_x.setpoint = vel_x_setpoint
         self.pid_vel_y.setpoint = vel_y_setpoint
         self.pid_vel_z.setpoint = vel_z_setpoint
 
-        att_y_setpoint = self.pid_vel_x(sensor_data["v_x"])
-        att_x_setpoint = self.pid_vel_y(sensor_data["v_y"])
-        thrustCommand = self.pid_vel_z(sensor_data["v_z"])
+        acc_x_setpoint = self.pid_vel_x(sensor_data["v_x"])
+        acc_y_setpoint = self.pid_vel_y(sensor_data["v_y"])
+        acc_z_setpoint = self.pid_vel_z(sensor_data["v_z"])
+
+        # Convert linear accelerations to orientation        
+        if self.tuning_level == "attitude":
+            acc_y_setpoint = self.tuning(-self.limits["L_acc_rp"],self.limits["L_acc_rp"],2,dt,acc_y_setpoint, sensor_data["roll"], "attitude [rad]", transform=True)
+        if self.tuning_level == "yaw":
+            att_z_setpoint = self.tuning(-2,2,1,dt,att_z_setpoint, sensor_data["yaw"], "yaw [rad]")
+
+        R_setpoint, combined_thrust = self.acc_to_rotation(acc_x_setpoint, acc_y_setpoint, acc_z_setpoint, att_z_setpoint)
+
+        # Calculate error quaternion
+        R_current = R.from_quat([sensor_data["q_x"], sensor_data["q_y"], sensor_data["q_z"], sensor_data["q_w"]])        
+        R_current_inv = R_current.inv()
+        error_quat = (R_current_inv*R_setpoint).as_quat()
+
 
         # Attitude control loop
         self.pid_att_x.sample_time = dt
         self.pid_att_y.sample_time = dt
         self.pid_att_z.sample_time = dt
 
-        if self.tuning_level == "attitude":
-            att_x_setpoint = self.tuning(-self.limits["L_att_rp"],self.limits["L_att_rp"],2,dt,att_x_setpoint, sensor_data["roll"], "attitude [rad]")
-        if self.tuning_level == "yaw":
-            att_z_setpoint = self.tuning(-2,2,1,dt,att_z_setpoint, sensor_data["yaw"], "yaw [rad]")
-
-        self.pid_att_x.setpoint = att_x_setpoint
-        self.pid_att_y.setpoint = att_y_setpoint
-        self.pid_att_z.setpoint = att_z_setpoint
-
-        rate_roll_setpoint = self.pid_att_x(sensor_data["q_x"]*sensor_data["q_w"])
-        rate_pitch_setpoint = self.pid_att_y(sensor_data["q_y"]*sensor_data["q_w"])
-        rate_yaw_setpoint = self.pid_att_z(sensor_data["q_z"]*sensor_data["q_w"])
-
+        self.pid_att_x.setpoint = 0
+        self.pid_att_y.setpoint = 0
+        self.pid_att_z.setpoint = 0
+        
+        rate_roll_setpoint = self.pid_att_x(-error_quat[0]*np.sign(error_quat[3]))
+        rate_pitch_setpoint = self.pid_att_y(-error_quat[1]*np.sign(error_quat[3]))
+        rate_yaw_setpoint = self.pid_att_z(-error_quat[2]*np.sign(error_quat[3]))
 
         # Body Rate control loop
         self.pid_rate_roll.sample_time = dt
@@ -161,9 +166,9 @@ class quadrotor_controller():
         self.pid_rate_yaw.sample_time = dt
 
         if self.tuning_level == "rate":
-            rate_roll_setpoint = self.tuning(-self.limits["L_rate_rp"],self.limits["L_rate_rp"],0.2,dt,rate_roll_setpoint, sensor_data["rate_roll"], "attitude [rad]")
+            rate_roll_setpoint = self.tuning(-self.limits["L_rate_rp"],self.limits["L_rate_rp"],0.2,dt,rate_roll_setpoint, sensor_data["rate_roll"], "roll rate [rad/s]")
         if self.tuning_level == "yaw rate":
-            rate_yaw_setpoint = self.tuning(-self.limits["L_rate_y"],-self.limits["L_rate_y"],1.0,dt,rate_yaw_setpoint, sensor_data["yaw"], "yaw [rad]")
+            rate_yaw_setpoint = self.tuning(-self.limits["L_rate_y"],self.limits["L_rate_y"],1.0,dt,rate_yaw_setpoint, sensor_data["rate_yaw"], "yaw rate [rad]")
 
         self.pid_rate_roll.setpoint = rate_roll_setpoint
         self.pid_rate_pitch.setpoint = rate_pitch_setpoint
@@ -173,11 +178,15 @@ class quadrotor_controller():
         pitchCommand = self.pid_rate_pitch(sensor_data["rate_pitch"])
         yawCommand = self.pid_rate_yaw(sensor_data["rate_yaw"])
 
+        k_thrust = 100
+        k_rollpitch = k_thrust*0.7
+        k_yaw = k_thrust*10
+
         # Motor mixing
-        m1 =  self.offset + thrustCommand - rollCommand + pitchCommand + yawCommand
-        m2 =  self.offset + thrustCommand - rollCommand - pitchCommand - yawCommand
-        m3 =  self.offset + thrustCommand + rollCommand - pitchCommand + yawCommand
-        m4 =  self.offset + thrustCommand + rollCommand + pitchCommand - yawCommand
+        m1 =  (k_thrust*combined_thrust - k_rollpitch*rollCommand - k_rollpitch*pitchCommand + k_yaw*yawCommand)
+        m2 =  (k_thrust*combined_thrust - k_rollpitch*rollCommand + k_rollpitch*pitchCommand - k_yaw*yawCommand)
+        m3 =  (k_thrust*combined_thrust + k_rollpitch*rollCommand + k_rollpitch*pitchCommand + k_yaw*yawCommand)
+        m4 =  (k_thrust*combined_thrust + k_rollpitch*rollCommand - k_rollpitch*pitchCommand - k_yaw*yawCommand)
 
         # Limit the motor command
         m1 = np.clip(m1, 0, 600)
@@ -188,107 +197,42 @@ class quadrotor_controller():
         self.global_time += dt
         return [m1, m2, m3, m4]
 
-        # Actions
-        desired_vx, desired_vy, desired_yaw_rate, desired_alt = setpoint[0], setpoint[1], setpoint[2], setpoint[3]
+    def acc_to_rotation(self, acc_x, acc_y, acc_z, yaw):
+        commanded_thrust = self.mass*np.array([acc_x, acc_y, acc_z + 9.81])
+        # commanded_thrust = [1,0,0]
+        combined_thrust = np.linalg.norm(commanded_thrust)
 
-        if self.tuning_level != "off":
-            desired_vx, desired_vy, desired_yaw_rate, desired_alt = 0,0,0,1
-
-        # Tuning velocity PID
-        if self.tuning_level == "velocity":
-            desired_vx = self.tuning(-max_vel,max_vel,3,dt,desired_vx, actual_vx, "velocity [m/s]")
-
-        # Velocity PID control
-        desired_vx = np.clip(desired_vx, -max_vel, max_vel)
-        desired_vy = np.clip(desired_vy, -max_vel, max_vel)
-
-        vxError = desired_vx - actual_vx
-        vxDeriv = (vxError - self.pastVxError) / dt
-        vyError = desired_vy - actual_vy
-        vyDeriv = (vyError - self.pastVyError) / dt
-        self.intVx += vxError * dt
-        self.intVy += vyError * dt
-        self.intVx = np.clip(self.intVx,-max_vel/2,max_vel/2)
-        self.intVy = np.clip(self.intVy,-max_vel/2,max_vel/2)
-        desired_pitch = gains["P_vel_xy"] * vxError + gains["D_vel_xy"] * vxDeriv + gains["I_vel_xy"] * self.intVx
-        desired_roll = -gains["P_vel_xy"] * vyError - gains["D_vel_xy"] * vyDeriv + gains["I_vel_xy"] * self.intVy
-        self.pastVxError = vxError
-        self.pastVyError = vyError
-
-        # Tuning altitude PID
-        if self.tuning_level == "altitude":
-            desired_alt = self.tuning(0.5,1.5,10,dt,desired_alt, actual_alt, "altitude [m]")
-
-        # Altitude PID control
-        altError = desired_alt - actual_alt
-        altDeriv = (altError - self.pastAltError) / dt
-        self.intAlt += altError * dt
-        self.intAlt = np.clip(self.intAlt,-2,2)
-        altCommand = gains["P_alt"] * altError + gains["D_alt"] * altDeriv + gains["I_alt"] * self.intAlt
-        self.pastAltError = altError
-
-        # Tuning attitude PID
-        if self.tuning_level == "attitude":
-            desired_pitch = self.tuning(-max_attitude,max_attitude,2.0,dt,desired_pitch, actual_pitch, "attitude [rad]")
-        elif self.tuning_level == "yawrate":
-            desired_yaw_rate = self.tuning(-max_yawrate,max_yawrate,2.0,dt,desired_yaw_rate, actual_yaw_rate, "yawrate [rad/s]")
-
-        # Attitude PID control
-        desired_pitch = np.clip(desired_pitch, -max_attitude, max_attitude)
-        desired_roll = np.clip(desired_roll, -max_attitude, max_attitude)
-        desired_yaw_rate = np.clip(desired_yaw_rate, -max_yawrate, max_yawrate)
-
-        pitchError = desired_pitch - actual_pitch
-        pitchDeriv = (pitchError - self.pastPitchError) / dt
-        rollError = desired_roll - actual_roll
-        rollDeriv = (rollError - self.pastRollError) / dt
-        yawRateError = desired_yaw_rate - actual_yaw_rate
-        yawRateDeriv = (yawRateError - self.pastYawrateError) / dt
-        self.intPitch += pitchError * dt
-        self.intRoll += rollError * dt
-        self.intYawrate += yawRateError * dt
-        self.intPitch = np.clip(self.intPitch,-max_attitude/2,max_attitude/2)
-        self.intRoll = np.clip(self.intRoll,-max_attitude/2,max_attitude/2)
-        self.intYawrate = np.clip(self.intYawrate,-max_yawrate/2,max_yawrate/2)
-        rollCommand = gains["P_att_rp"] * rollError + gains["D_att_rp"] * rollDeriv + gains["I_att_rp"] * self.intPitch
-        pitchCommand = -gains["P_att_rp"] * pitchError - gains["D_att_rp"] * pitchDeriv + gains["I_att_rp"] * self.intRoll
-        yawCommand = gains["P_att_y"] * yawRateError + gains["D_att_y"] * yawRateDeriv + gains["I_att_y"] * self.intYawrate
-        self.pastPitchError = pitchError
-        self.pastRollError = rollError
-        self.pastYawrateError = yawRateError
+        # Build quaternion from direction (commanded thrust) and yaw
+        z_b = commanded_thrust/combined_thrust
+        yaw_matrix = R.from_euler('z', yaw).as_matrix()
+        x_b_prime = yaw_matrix@np.array([1,0,0])
+        y_b = np.cross(z_b,x_b_prime)
+        y_b /= np.linalg.norm(y_b)
+        x_b = np.cross(y_b,z_b)
+        x_b /= np.linalg.norm(x_b)
+        r_matrix = np.array([x_b,y_b,z_b]).T
+        R_setpoint = R.from_matrix(r_matrix)
         
-        altCommand = np.clip(altCommand,-max_command_altitude,max_command_altitude) + gains["O_alt"]
-        rollCommand = np.clip(rollCommand,-max_command_attitude,max_command_attitude)
-        pitchCommand = np.clip(pitchCommand,-max_command_attitude,max_command_attitude)
-        yawCommand = np.clip(yawCommand,-max_command_attitude,max_command_attitude)
-
-        # Motor mixing
-        m1 =  altCommand - rollCommand + pitchCommand + yawCommand
-        m2 =  altCommand - rollCommand - pitchCommand - yawCommand
-        m3 =  altCommand + rollCommand - pitchCommand + yawCommand
-        m4 =  altCommand + rollCommand + pitchCommand - yawCommand
-
-        # Limit the motor command
-        m1 = np.clip(m1, 0, 600)
-        m2 = np.clip(m2, 0, 600)
-        m3 = np.clip(m3, 0, 600)
-        m4 = np.clip(m4, 0, 600)
-
-        self.global_time += dt
-        return [m1, m2, m3, m4]
+        return R_setpoint, combined_thrust
     
     # Only for tuning
     def set_tuning(self,level):
         self.tuning_level = level
 
-    def tuning(self,input_min,input_max,T,dt,desired,actual,ylabel):
+    def tuning(self,input_min,input_max,T,dt,desired,actual,ylabel,transform=False):
         if self.global_time > self.tuning_start:
             self.tuning_on = True
         if self.tuning_on:
             if (self.tuning_iter > 0):
                 desired = self.step_function(dt,input_min,input_max,T)
 
-                self.tuning_desired.append(desired)
+                if transform:
+                    rot, _ = self.acc_to_rotation(0,desired,0,0)
+                    desired_att = rot.as_euler('zyx', degrees=False)[2]
+
+                    self.tuning_desired.append(desired_att)
+                else:
+                    self.tuning_desired.append(desired)
                 self.tuning_actual.append(actual)
                 self.tuning_ts.append(self.global_time)
             else:
@@ -300,9 +244,9 @@ class quadrotor_controller():
     def step_function(self,dt,input_min,input_max,T):
         # Calculate step function
         if self.tuning_time < T:
-            input = input_min
-        else:
             input = input_max
+        else:
+            input = input_min
         
         # Keep track of cycle
         self.tuning_time += dt
@@ -349,39 +293,41 @@ class quadrotor_controller():
         actual_cut = self.tuning_actual[idx_ss_low:-1]
         idx_os_high = idx_ss_low + np.argmax(actual_cut)
         actual_cut = self.tuning_actual[idx_low:idx_ss_low]
-        idx_os_low = idx_low + np.argmin(actual_cut)
-        perc_max = (self.tuning_actual[idx_os_high]-self.tuning_desired[idx_os_high])/std*100
-        perc_min = (self.tuning_actual[idx_os_low]-self.tuning_desired[idx_os_low])/std*100
-        if (self.tuning_desired[idx_os_high] < self.tuning_actual[idx_os_high]) & (abs(perc_max) >= 1):
-            ax.plot([self.tuning_ts[idx_os_high],self.tuning_ts[idx_os_high]],[self.tuning_desired[idx_os_high],self.tuning_actual[idx_os_high]],
-                    linewidth=3,color=c_os,label="overshoot")
-            ax.text(x=self.tuning_ts[idx_os_high],y=self.tuning_actual[idx_os_high],s=str(int(abs(perc_max)))+" [%]",
-                    color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
-        if (self.tuning_desired[idx_os_low] > self.tuning_actual[idx_os_low]) & (abs(perc_max) >= 1):
-            ax.plot([self.tuning_ts[idx_os_low],self.tuning_ts[idx_os_low]],[self.tuning_desired[idx_os_low],self.tuning_actual[idx_os_low]],
-                    linewidth=3,color=c_os)
-            ax.text(x=self.tuning_ts[idx_os_low],y=self.tuning_actual[idx_os_low],s=str(int(abs(perc_min)))+" [%]",
-                    color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
+        if len(actual_cut) > 0:
+            idx_os_low = idx_low + np.argmin(actual_cut)
+            perc_max = (self.tuning_actual[idx_os_high]-self.tuning_desired[idx_os_high])/std*100
+            perc_min = (self.tuning_actual[idx_os_low]-self.tuning_desired[idx_os_low])/std*100
+            if (self.tuning_desired[idx_os_high] < self.tuning_actual[idx_os_high]) & (abs(perc_max) >= 1):
+                ax.plot([self.tuning_ts[idx_os_high],self.tuning_ts[idx_os_high]],[self.tuning_desired[idx_os_high],self.tuning_actual[idx_os_high]],
+                        linewidth=3,color=c_os,label="overshoot")
+                ax.text(x=self.tuning_ts[idx_os_high],y=self.tuning_actual[idx_os_high],s=str(int(abs(perc_max)))+" [%]",
+                        color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
+            if (self.tuning_desired[idx_os_low] > self.tuning_actual[idx_os_low]) & (abs(perc_max) >= 1):
+                ax.plot([self.tuning_ts[idx_os_low],self.tuning_ts[idx_os_low]],[self.tuning_desired[idx_os_low],self.tuning_actual[idx_os_low]],
+                        linewidth=3,color=c_os)
+                ax.text(x=self.tuning_ts[idx_os_low],y=self.tuning_actual[idx_os_low],s=str(int(abs(perc_min)))+" [%]",
+                        color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
             
         # Calculate rise time
         limit = 0.05
         actual_cut = self.tuning_actual[idx_ss_low:-1]
         idx_rt_high = idx_ss_low + np.argmax((des_max-actual_cut)/des_max < limit)
         actual_cut = self.tuning_actual[idx_low:idx_ss_low]
-        idx_rt_low = idx_low + np.argmax((actual_cut-des_min)/des_min < limit)
-        
-        rt_high = self.tuning_ts[idx_rt_high] - self.tuning_ts[idx_ss_low]
-        rt_low = self.tuning_ts[idx_rt_low] - self.tuning_ts[idx_low]
-        if idx_rt_high > idx_ss_low:
-            ax.plot([self.tuning_ts[idx_ss_low],self.tuning_ts[idx_rt_high]],[self.tuning_desired[idx_rt_high],self.tuning_desired[idx_rt_high]],
-                    linewidth=3,color=c_rt,label="rise time")
-            ax.text(x=self.tuning_ts[idx_rt_high],y=self.tuning_actual[idx_rt_high],s=str(np.round(rt_high,1))+"[s]",
-                    color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="bottom")
-        if idx_rt_low > idx_low:
-            ax.plot([self.tuning_ts[idx_low],self.tuning_ts[idx_rt_low]],[self.tuning_desired[idx_rt_low],self.tuning_desired[idx_rt_low]],
-                    linewidth=3,color=c_rt)
-            ax.text(x=self.tuning_ts[idx_rt_low],y=self.tuning_actual[idx_rt_low],s=str(np.round(rt_low,1))+"[s]",
+        if len(actual_cut) > 0:
+            idx_rt_low = idx_low + np.argmax((actual_cut-des_min)/des_min < limit)
+            
+            rt_high = self.tuning_ts[idx_rt_high] - self.tuning_ts[idx_ss_low]
+            rt_low = self.tuning_ts[idx_rt_low] - self.tuning_ts[idx_low]
+            if idx_rt_high > idx_ss_low:
+                ax.plot([self.tuning_ts[idx_ss_low],self.tuning_ts[idx_rt_high]],[self.tuning_desired[idx_rt_high],self.tuning_desired[idx_rt_high]],
+                        linewidth=3,color=c_rt,label="rise time")
+                ax.text(x=self.tuning_ts[idx_rt_high],y=self.tuning_actual[idx_rt_high],s=str(np.round(rt_high,1))+"[s]",
                         color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="bottom")
+            if idx_rt_low > idx_low:
+                ax.plot([self.tuning_ts[idx_low],self.tuning_ts[idx_rt_low]],[self.tuning_desired[idx_rt_low],self.tuning_desired[idx_rt_low]],
+                        linewidth=3,color=c_rt)
+                ax.text(x=self.tuning_ts[idx_rt_low],y=self.tuning_actual[idx_rt_low],s=str(np.round(rt_low,1))+"[s]",
+                            color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="bottom")
 
         # Plot the smoothed version of tuning_actual that is used to detect the overshoot
         # ax.plot(self.tuning_ts,self.moving_average(self.tuning_actual,10),label="smoothed",color=c_rt)

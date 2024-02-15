@@ -32,15 +32,14 @@ def obstacle_avoidance(sensor_data):
     return control_command
 
 # Coverage path planning
-# setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, 0.0], [5.0, 3.0, 1.5, 0.0], [5.0, 0.0, 0.25, 0.0], [0.0, 0.0, 1.0, 0.0]]
-setpoints = [[0.0, 0.0, 1.0, 0.0]]
+setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, 1.0], [5.0, 3.0, 1.5, 2.0], [5.0, 0.0, 0.25, 3.0], [0.0, 0.0, 1.0, 0.0]]
 index_current_setpoint = 0
 def path_planning(sensor_data):
     global on_ground, height_desired, index_current_setpoint, setpoints, starttime, endtime
 
     # Take off
     if on_ground and sensor_data['z_global'] < 0.49:
-        current_setpoint = [0.0, 0.0, height_desired, 0.0]
+        current_setpoint = [1.0, 1.0, height_desired, 0.0]
         return current_setpoint
     else:
         on_ground = False
