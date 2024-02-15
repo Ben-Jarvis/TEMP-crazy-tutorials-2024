@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from pid_control import pid_velocity_fixed_height_controller as pid
 import matplotlib.pyplot as plt
 import pandas as pd
+from PIL import Image
 
 class kalman_filter():
     def __init__(self):
@@ -28,7 +29,7 @@ class kalman_filter():
         self.noisy_data_vec = []
         self.KF_estimate_vec = []
         self.time = []
-        self.plot_time_limit = 30.0
+        self.plot_time_limit = 40.0
 
         # Variable for noise generation
         self.x_noisy_global_last = 0.0
@@ -126,15 +127,13 @@ class kalman_filter():
 
         return self.X_opt, self.P_opt
 
-    def KF_estimate(self, measured_state_gps, measured_state_accel, dt_gps, dt_accel, dt_state_prop, sensor_state_flag):
+    def KF_estimate(self, measured_state_gps, measured_state_accel, dt_last_measurement, sensor_state_flag):
         # Function that outputs the state estimate wehn requested
         # Inputs:
-        #   dt_accel: Time elapsed since last acceleration measurements received from accelerometer (always > 0)
-        #   dt_gps: Time elapsed since last position measurements received from GPS (always > 0)
-        #   dt_state_prop: Time elapsed since last state propagation (Used to predict state when no measurements are recorded) (always > 0)
+        #   dt_last_measurement: Time elapsed since last acceleration measurements received from either acclerometer or GPS (always > 0)
         #   sensor_state_flag: Possible values are [0,1,2,3]
         #       -> 0: No sensor measurement received at current requested time // 
-        #       -> 1: GPS measurement received at current requested time // 
+        #       -> 1: GPS measurement received at current requested time (if both measurements are received simultaneously, the GPS is also used) // 
         #       -> 2: Accelerometer measurement received at current requested time
         #   measured_state_gps: The latest GPS position measurement (X,Y,Z) in inertial world frame (n_measurements x 1)
         #   measured_state_accel: The latest ACCELEROMETER measurement (A_X, A_Y, A_Z) in inertial world frame (n_measurements x 1)
@@ -147,23 +146,27 @@ class kalman_filter():
 
         # SAMPLE SOLUTION
 
+        # Propagate 
+        X_prop, P_prop = self.KF_state_propagation(dt_last_measurement)
+        
+        # Calculate estimate depending on sensor state
         if sensor_state_flag == 0:
-            X_est, P_est = self.KF_state_propagation(dt_state_prop)
-            # print("In PROP step")
+            X_est, P_est = X_prop, P_prop
         if sensor_state_flag == 1:
             H = self.H_GPS
             R = self.R_GPS
             Z = measured_state_gps
-            X_pred_accel, P_pred_accel = self.KF_state_propagation(dt_accel)
-            X_est, P_est = self.KF_sensor_fusion(X_pred_accel,P_pred_accel,H,R,Z)
+            X_est, P_est = self.KF_sensor_fusion(X_prop,P_prop,H,R,Z)
             # print("In GPS meas step")
         if sensor_state_flag == 2:
             H = self.H_ACCEL
             R = self.R_ACCEL
             Z = measured_state_accel
-            X_pred_gps, P_pred_gps = self.KF_state_propagation(dt_gps)
-            X_est, P_est = self.KF_sensor_fusion(X_pred_gps,P_pred_gps,H,R,Z)
+            X_est, P_est = self.KF_sensor_fusion(X_prop,P_prop,H,R,Z)
             # print("In ACCEL meas step")
+        if sensor_state_flag == 3:
+            X_opt_gps, P_opt_gps = self.KF_sensor_fusion(X_prop, P_prop, self.H_GPS, self.R_GPS, measured_state_gps)
+            X_est, P_est = self.KF_sensor_fusion(X_opt_gps, P_opt_gps, self.H_ACCEL, self.R_ACCEL, measured_state_accel)
 
         return X_est, P_est
     
@@ -193,11 +196,11 @@ class kalman_filter():
         noisy_sensor_data['ay_global'] += np.random.normal(loc = accel_bias, scale = self.noise_std_ACCEL)
         noisy_sensor_data['az_global'] += np.random.normal(loc = accel_bias, scale = self.noise_std_ACCEL) 
 
-        if self.use_accel_only and self.use_ground_truth_measurement:
+        if self.use_accel_only:
             if np.round(dt_accel,3) >= accel_period/1000:
-                self.v_x_noisy += (noisy_sensor_data['ax_global'] - self.ax_noisy_global_last)*dt_accel
-                self.v_y_noisy += (noisy_sensor_data['ay_global'] - self.ay_noisy_global_last)*dt_accel
-                self.v_z_noisy += (noisy_sensor_data['az_global'] - self.az_noisy_global_last)*dt_accel
+                self.v_x_noisy += ((noisy_sensor_data['ax_global'] + self.ax_noisy_global_last)/2)*dt_accel
+                self.v_y_noisy += ((noisy_sensor_data['ay_global'] + self.ay_noisy_global_last)/2)*dt_accel
+                self.v_z_noisy += ((noisy_sensor_data['az_global'] + self.az_noisy_global_last)/2)*dt_accel
                 self.ax_noisy_global_last = noisy_sensor_data['ax_global']
                 self.ay_noisy_global_last = noisy_sensor_data['ay_global']
                 self.az_noisy_global_last = noisy_sensor_data['az_global']
@@ -295,29 +298,28 @@ class kalman_filter():
         ax.set_ylabel("Acceleration (m/s²)")
         plt.savefig("acceleration_estimates_truth_KF.png")
 
-        if self.use_ground_truth_measurement:
-            fig, ax = plt.subplots(1,3)
-            fig.canvas.manager.set_window_title("True and Noisy Measurements")
-            ax[0].title.set_text("Position measurements")
-            ax[0].plot(time,noisy_data_vec_np[:,:3])
-            ax[0].plot(time,raw_data_vec_np[:,:3])
-            ax[0].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
-            ax[0].set_xlabel("Time (s)")
-            ax[0].set_ylabel("Position (m)")
-            ax[1].title.set_text("Velocity measurements")
-            ax[1].plot(time,noisy_data_vec_np[:,3:6])
-            ax[1].plot(time,raw_data_vec_np[:,3:6])
-            ax[1].legend(['Noisy Forward','Noisy Leftward', 'Noisy Upward','Ground truth Forward ','Ground truth Leftward','Ground truth Upward'], fontsize = 10)
-            ax[1].set_xlabel("Time (s)")
-            ax[1].set_ylabel("Velocity (m/s)")
-            ax[2].title.set_text("Acceleration measurements")
-            ax[2].plot(time,noisy_data_vec_np[:,6:9])
-            ax[2].plot(time,raw_data_vec_np[:,6:9])
-            ax[2].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
-            ax[2].set_xlabel("Time (s)")
-            ax[2].set_ylabel("Acceleration (m/s²)")
-            ax[2].set_ylim(-10,10)
-            plt.savefig("Comparison_accel_int_truth_Noise.png")
+        fig, ax = plt.subplots(1,3)
+        fig.canvas.manager.set_window_title("True and Noisy Measurements")
+        ax[0].title.set_text("Position measurements")
+        ax[0].plot(time,noisy_data_vec_np[:,:3])
+        ax[0].plot(time,raw_data_vec_np[:,:3])
+        ax[0].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
+        ax[0].set_xlabel("Time (s)")
+        ax[0].set_ylabel("Position (m)")
+        ax[1].title.set_text("Velocity measurements")
+        ax[1].plot(time,noisy_data_vec_np[:,3:6])
+        ax[1].plot(time,raw_data_vec_np[:,3:6])
+        ax[1].legend(['Noisy Forward','Noisy Leftward', 'Noisy Upward','Ground truth Forward ','Ground truth Leftward','Ground truth Upward'], fontsize = 10)
+        ax[1].set_xlabel("Time (s)")
+        ax[1].set_ylabel("Velocity (m/s)")
+        ax[2].title.set_text("Acceleration measurements")
+        ax[2].plot(time,noisy_data_vec_np[:,6:9])
+        ax[2].plot(time,raw_data_vec_np[:,6:9])
+        ax[2].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
+        ax[2].set_xlabel("Time (s)")
+        ax[2].set_ylabel("Acceleration (m/s²)")
+        ax[2].set_ylim(-10,10)
+        plt.savefig("Comparison_accel_int_truth_Noise.png")
         
         # plt.figure(1)
         # plt.plot(time,raw_data_vec_np[:,:3])
@@ -336,6 +338,17 @@ class kalman_filter():
         # plt.plot(time,KF_estimate_vec_np[:,6:9])
 
         plt.show()
+
+    def create_gif(input_folder, output_file, duration=500):
+        images = []
+        # Assuming the images are named in numerical order (e.g., 1.png, 2.png, ...)
+        image_files = sorted([f for f in os.listdir(input_folder) if f.endswith(".png")])
+        for image_file in image_files:
+            image_path = os.path.join(input_folder, image_file)
+            with Image.open(image_path) as img:
+                images.append(img.copy())
+        # Save as GIF
+        images[0].save(output_file, save_all=True, append_images=images[1:], duration=duration, loop=0)
 
     # def moving_average(self,data,window_size):
     #     # Define the kernel for the moving average

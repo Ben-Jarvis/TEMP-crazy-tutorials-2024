@@ -9,7 +9,7 @@ from scipy.spatial.transform import Rotation as R
 import example
 import time, random
 
-exp_num = 0
+exp_num = 2
 control_style = 'path_planning'
 
 # Crazyflie drone class in webots
@@ -32,11 +32,32 @@ class CrazyflieInDroneDome(Supervisor):
         self.m4_motor.setPosition(float('inf'))
         self.m4_motor.setVelocity(1)
 
+        # Kalman filter variables
+        self.KF = KF()
+        self.sensor_flag = 0
+        self.dt_accel = 0.0
+        self.dt_gps = 0.0
+        self.dt_propagate = 0.0
+
+        self.meas_state_gps = np.zeros((2,1))
+        self.meas_state_accel = np.zeros((3,1))
+
+        self.accel_read_last_time = 0.0
+        self.gps_read_last_time = 0.0
+
+        if exp_num == 2:
+            self.ctrl_update_period = int(self.timestep*3) #timestep equal to GPS time 2 or 3 works well
+            self.dt_ctrl = 0.0
+        else:
+            self.ctrl_update_period = int(self.timestep)
+
         # Sensors
 
         #Update rates for excercise 2 (Kalman filter)
-        self.gps_update_period = int(self.timestep*2) # 2*timestep
-        self.accel_update_period = int(self.timestep) # 1*timestep
+
+        self.gps_update_period = int(self.timestep*3) # 2*timestep
+        self.accel_update_period = int(self.timestep*2) # 1*timestep
+
         self.g = 9.81 #Used for accelerometer Z-direction correction
 
         self.imu = self.getDevice('inertial unit')
@@ -64,25 +85,6 @@ class CrazyflieInDroneDome(Supervisor):
         self.range_right.enable(self.timestep)
         self.laser_down = self.getDevice("laser_down")
         self.laser_down.enable(self.timestep)
-
-        # Kalman filter variables
-        self.KF = KF()
-        self.sensor_flag = 0
-        self.dt_accel = 0.0
-        self.dt_gps = 0.0
-        self.dt_propagate = 0.0
-
-        self.meas_state_gps = np.zeros((2,1))
-        self.meas_state_accel = np.zeros((3,1))
-
-        self.accel_read_last_time = 0.0
-        self.gps_read_last_time = 0.0
-        self.state_prop_last_time = 0.0
-
-        if exp_num == 2:
-            self.ctrl_update_period = int(self.timestep*2) #timestep * 2 works well
-        else:
-            self.ctrl_update_period = int(self.timestep)
         
         # Crazyflie velocity PID controller
         self.PID_CF = pid_velocity_fixed_height_controller()
@@ -203,55 +205,58 @@ class CrazyflieInDroneDome(Supervisor):
         # Update time intervals for sensing and propagation
         self.dt_accel = self.getTime() - self.accel_read_last_time
         self.dt_gps = self.getTime() - self.gps_read_last_time
-        self.dt_propagate = self.getTime() - self.state_prop_last_time
-    
+
         # Data dictionary
         measured_data_raw = self.read_sensors().copy()
         measured_noisy_data = self.KF.add_noise(measured_data_raw.copy(), self.dt_gps, self.dt_accel, self.gps.getSamplingPeriod(), self.accelerometer.getSamplingPeriod())
 
         self.sensor_flag = 0
-        self.state_prop_last_time = self.getTime()
 
         if self.KF.use_accel_only and self.getTime() > 10.0:
+            
+            self.dt_propagate = self.dt_accel
+
             if np.round(self.dt_accel,3) >= self.accelerometer.getSamplingPeriod()/1000: 
                 # Set flag to always use accel as measurement
                 self.sensor_flag = 2
                 self.meas_state_accel = np.array([[measured_noisy_data['ax_global'], measured_noisy_data['ay_global'], measured_noisy_data['az_global']]]).transpose()
                 self.accel_read_last_time = self.getTime()
-                self.dt_accel = 0.0
+                # self.dt_gps = self.dt_accel
                 # print("Using only accelerometer ground truth")
             if np.round(self.dt_gps,3) >= self.gps.getSamplingPeriod()/1000:
-                self.meas_state_gps = np.array([[measured_noisy_data['x_global'], measured_noisy_data['y_global'], measured_noisy_data['z_global']]]).transpose()
-                self.gps_read_last_time = self.getTime()
+                self.gps_read_last_time = self.getTime() #Required to maintain ground truth state measured capability
+
         else:
+
+            self.dt_propagate = min(self.dt_accel, self.dt_gps)
+
             if np.round(self.dt_accel,3) >= self.accelerometer.getSamplingPeriod()/1000 and np.round(self.dt_gps,3) >= self.gps.getSamplingPeriod()/1000:
                 # print("Using GPS after measuring both sensors at: " + str(self.getTime()))
-                self.sensor_flag = 1 #Use GPS as default
+                self.sensor_flag = 3 #Use GPS as default
                 self.meas_state_accel = np.array([[measured_noisy_data['ax_global'], measured_noisy_data['ay_global'], measured_noisy_data['az_global']]]).transpose()
                 self.accel_read_last_time = self.getTime()
                 self.meas_state_gps = np.array([[measured_noisy_data['x_global'], measured_noisy_data['y_global'], measured_noisy_data['z_global']]]).transpose()
                 self.gps_read_last_time = self.getTime()
-                self.dt_gps = 0.0
             else:
                 if np.round(self.dt_gps,3) >= self.gps.getSamplingPeriod()/1000:
                     # print("Measured GPS at: " + str(self.getTime()))
                     self.sensor_flag = 1
                     self.meas_state_gps = np.array([[measured_noisy_data['x_global'], measured_noisy_data['y_global'], measured_noisy_data['z_global']]]).transpose()
                     self.gps_read_last_time = self.getTime()
-                    self.dt_gps = 0.0
+                    # self.dt_gps = 0.0
                 if np.round(self.dt_accel,3) >= self.accelerometer.getSamplingPeriod()/1000: 
                     # print("Measured Accelerometer at: " + str(self.getTime()))
                     self.sensor_flag = 2
                     self.meas_state_accel = np.array([[measured_noisy_data['ax_global'], measured_noisy_data['ay_global'], measured_noisy_data['az_global']]]).transpose()
                     self.accel_read_last_time = self.getTime()
-                    self.dt_accel = 0.0
+                    # self.dt_accel = 0.0
 
-        print("Current Time ACC: " + str(self.dt_accel))
-        print("Current Time GPS: " + str(self.dt_gps))
-        print("Current Time Prop: " + str(self.dt_propagate))
-        print("Sensor flag: " + str(self.sensor_flag))
+        # print("Current Time ACC: " + str(self.dt_accel))
+        # print("Current Time GPS: " + str(self.dt_gps))
+        # print("Current Time Prop: " + str(self.dt_propagate))
+        # print("Sensor flag: " + str(self.sensor_flag))
 
-        estimated_state, estimated_covariance = self.KF.KF_estimate(self.meas_state_gps, self.meas_state_accel, self.dt_gps, self.dt_accel, self.dt_propagate, self.sensor_flag)
+        estimated_state, estimated_covariance = self.KF.KF_estimate(self.meas_state_gps, self.meas_state_accel, self.dt_propagate, self.sensor_flag)
 
         x_g_est, v_x_g_est, a_x_g_est, y_g_est, v_y_g_est, a_y_g_est, z_g_est, v_z_g_est, a_z_g_est = estimated_state.flatten()
         KF_state_outputs = measured_noisy_data.copy()
@@ -267,15 +272,15 @@ class CrazyflieInDroneDome(Supervisor):
 
         self.KF.aggregate_states(measured_data_raw, measured_noisy_data, KF_state_outputs, self.getTime())
 
-        output_measurement = KF_state_outputs
-
         if self.KF.use_noisy_measurement:
-            if self.getTime() < 10.0:
+            if self.getTime() < 5.0:
                 output_measurement = measured_data_raw
             else:
-                output_measurement = measured_noisy_data
-        if self.KF.use_ground_truth_measurement:
-            output_measurement = measured_data_raw            
+                output_measurement = measured_noisy_data.copy()
+        elif self.KF.use_ground_truth_measurement:
+            output_measurement = measured_data_raw.copy()
+        else:
+            output_measurement = KF_state_outputs.copy()
 
         return output_measurement
     
@@ -308,6 +313,10 @@ class CrazyflieInDroneDome(Supervisor):
                 self.x_global_last = data['x_global']
                 self.y_global_last = data['y_global']
                 self.z_global_last = data['z_global']
+            else:
+                data['x_global'] = self.x_global_last
+                data['y_global'] = self.y_global_last
+                data['z_global'] = self.z_global_last
         else:
             self.vx_global = (data['x_global'] - self.x_global_last) / dt
             self.vy_global = (data['y_global'] - self.y_global_last) / dt
@@ -415,15 +424,15 @@ class CrazyflieInDroneDome(Supervisor):
 
     def step_KF(self, KF_data):
 
-        dt_ctrl = self.getTime() - self.PID_update_last_time
+        self.dt_ctrl = self.getTime() - self.PID_update_last_time
 
-        if np.round(dt_ctrl,3) >= self.ctrl_update_period/1000:
+        if np.round(self.dt_ctrl,3) >= self.ctrl_update_period/1000:
 
             pp_cmds = example.path_planning(KF_data)
 
             self.PID_update_last_time = self.getTime()
             # Low-level PID velocity control with fixed height
-            motorPower = self.PID_CF.pid(dt_ctrl, pp_cmds, KF_data['roll'], KF_data['pitch'],
+            motorPower = self.PID_CF.pid(self.dt_ctrl, pp_cmds, KF_data['roll'], KF_data['pitch'],
                                                             KF_data['yaw_rate'], KF_data['z_global'],
                                                             KF_data['v_forward'], KF_data['v_left'])
         
