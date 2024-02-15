@@ -50,7 +50,7 @@ def path_planning(sensor_data):
 
     # Hover at the final setpoint
     if index_current_setpoint == len(setpoints):
-        control_command = [0.0, 0.0, 0.0, height_desired]
+        control_command = [0.0, 0.0, height_desired, 0.0]
 
         if endtime is None:
             endtime = time.time()
@@ -68,7 +68,7 @@ def path_planning(sensor_data):
         index_current_setpoint += 1
         # Hover at the final setpoint
         if index_current_setpoint == len(setpoints):
-            current_setpoint = [0.0, 0.0, 0.0, height_desired]
+            current_setpoint = [0.0, 0.0, height_desired, 0.0]
             return current_setpoint
 
     return current_setpoint

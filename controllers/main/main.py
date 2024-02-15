@@ -10,7 +10,7 @@ import example
 import time, random
 
 exp_num = 1
-control_style = 'path_planner'
+control_style = 'path_planning'
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -463,6 +463,12 @@ if __name__ == '__main__':
             if exp_num == 0 or exp_num == 1:
                 if control_style == 'keyboard':
                     control_commands = drone.action_from_keyboard(sensor_data)
+                    set_x = sensor_data['x_global'] + control_commands[0]
+                    set_y = sensor_data['y_global'] + control_commands[1]
+                    set_yaw = sensor_data['yaw'] + control_commands[2]
+                    set_alt = control_commands[3]
+                    setpoint = [set_x, set_y, set_alt, set_yaw]
+
                 else:
                     setpoint = example.path_planning(sensor_data)
             else:
