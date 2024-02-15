@@ -3,7 +3,7 @@ Exercise 2: Kalman Filtering
 
 You have now already seen how to tune a cascaded PID controller to achieve accurate and fast waypoint flight with a quadrotor.
 Up to this point, the measurement data that you have used for PID control feedback is the ground-truth (or noise-free) 
-measurement that was sampled at every control step.
+measurement which was sampled at every control step.
 
 In reality, we are however faced with noisy sensor measurements and typically use a combination of mutliple sensors, 
 each measuring different quantities with different noise levels at different time intervals, to obtain the state feedback 
@@ -16,23 +16,24 @@ With this method, you will see that your quadrotor can stay on track in noisy, r
 Task description
 -----------------
 
-In this task, you will implement a Kalman Filter in **kalman_filter.py** and explore how it can significantly improve the 
-performance of a closed loop cascaded PID controller in a real-world scenario by combining sensor measurements, filtering 
-measurenemt noise and providing dynamically reasonable state estimates.
+In this task, you will implement a Kalman Filter in the file **kalman_filter.py** and explore how it can significantly improve the 
+performance of a closed loop cascaded PID controller in a real-world scenario.
 
 Besides the Gyroscope, for this exercise, the Crazyflie drone is 
 equipped with a GPS and an Accelerometer. 
 These provide the following translational sensor measurements for your implementation:
 - GPS: Global X,Y,Z position
-- Accelerometer: Body X,Y,Z accelerations (are transformed to global frame for reference in this exercise)
+- Accelerometer: Body X,Y,Z accelerations (are already transformed to global frame for your reference in this exercise)
 
-Each of the sensors in the simulation and the PID controller furthermore run at the following frequencies:
-- GPS: 62.5 Hz
-- Accelerometer: 125 Hz
-- PID Controller: 62.5 Hz
+Each of the sensors in the simulation and the PID controller furthermore run at the following individual time intervals:
+- GPS: 24 milliseconds
+- Accelerometer: 16 milliseconds
+- PID Controller: 16 milliseconds
 
-As we are considering real sensor data, the GPS and the Accelerometer measurements respectively posess a Gaussian noise with a 
-certain standard deviation, defined as std_GPS = 0.2 meters and std_ACCEL = 0.01 m/s².
+(Note: These do not correspond tot typical update rates of real sensors)
+
+As we are considering real sensor data, the GPS and the Accelerometer measurements posess a so-called "Gaussian" noise with a 
+certain standard deviation from the true measurement, defined respectively as std_GPS = 0.2 meters and std_ACCEL = 0.01 m/s².
 
 Let us first look at position and acceleration data obtained from these noisy measurements below:
 
@@ -47,11 +48,11 @@ When feeding these measurements directly into our cascaded PID controller, we th
 
 FIGURE (GIF of failed drone)
 
-As you will see later in this exercise, a pure integration of accleration measurements to yield velocities provides similarly unsatisfactory results.
+As you will see later in this exercise, relying on the integration of accleration measurements to yield velocities also yields unsatisfactory results.
 
 Therefore, to remedy this problem, given the noisy GPS and Acclerometer measurements and using 
 the provided theory from the lecture, you will implement and tune a Kalman Filter that returns 
-much better state estimates for three-dimensional position, velocity and acceleration:
+much better state estimates for three-dimensional position, velocity and acceleration, as shown in this Figure:
 
 FIGURE (Noise vs. KF)
 
@@ -63,54 +64,54 @@ Exercise
 
 Part 1 - Implementation
 ------------------------
-You will begin by implementing your Kalman Filer code in **kalman_filter.py**. 
+You will begin by implementing your Kalman Filer code in the file **kalman_filter.py**. 
 The state prediction vector is represented by a 9 x 1 column vector and must be ordered as: 
 [X Position, X Velocity, X Acceleration, Y Position, Y Velocity, Y Acceleration, Z Position, Z Velocity, Z Acceleration]
 
-Hint: For matrix multiplications with two-dimensional numpy arrays, use numpy.matmul 
-or the python operator "@" 
+Hint: For matrix multiplications with two-dimensional numpy arrays, use numpy.matmul or the python operator "@" 
 
-The function **initialize_KF** initializes the Kalman Filter parameters. In this function:
-1. Initialize the optimal state estimate **self.X_opt** and prediction covariance **self.P_opt**.
-2. Define the sensor measurement matrices **self.H_GPS** and **self.H_ACCEL**.
-3. Given the provided measurement noise standard deviations **noise_std_GPS** and **noise_std_ACCEL**, define the masurement uncertainty matrices **self.R_GPS** and **self.R_ACCEL**.
+1. First, go to the function **initialize_KF** which initializes the Kalman Filter parameters. 
 
-The function **KF_state_propagation** performs the propagation of the optimal states **self.X_opt** 
-and optimal prediction covariance **self.P_opt** over a specified time-interval **dt**. 
 In this function:
-1. Given the propagation time **dt** as the function input, define the transition matrix 
+a) Initialize the optimal state estimate **self.X_opt** and prediction covariance **self.P_opt**.
+b) Define the sensor measurement matrices **self.H_GPS** and **self.H_ACCEL**.
+c) Given the measurement noise standard deviation inputs **noise_std_GPS** and **noise_std_ACCEL**, define the masurement uncertainty matrices **self.R_GPS** and **self.R_ACCEL**.
+
+2. The function **KF_state_propagation** performs the propagation of the optimal state (**self.X_opt**) 
+and optimal prediction covariance (**self.P_opt**) obtained at the time of the last sensor measurement over a specified time-interval **dt**. 
+In this function:
+a) Given the propagation time **dt** as the function input, define the transition matrix 
 **A_trans** for a particle with constant accleration as seen in the lecture.
-2. As described in the lecture, update both the values of the state prediction **X_pred** and 
+b) As described in the lecture, update both the values of the state prediction **X_pred** and 
 prediction covariance **P_pred**, given the transition matrix **A_trans**, the process uncertainty
- matrix **Q_trans** (provided in the function), the previous optimal state **self.X_opt** and the 
- optimal prediction covariance **self.P_opt**.
-3. Return **X_pred** and **P_pred**.
+matrix **Q_trans** (provided for you in the function), the previous optimal state **self.X_opt** and the 
+optimal prediction covariance **self.P_opt**.
+c) Return **X_pred** and **P_pred**.
 
-The function **KF_sensor_fusion** performs the fusion of sensor measurements and calculates the new **self.X_opt** and **self.P_opt** once a sensor measurement is received. In this function:
-1. Calculate the Kalman Filter gain **K** as seen in the lecture, given the input measurement
+3. The function **KF_sensor_fusion** performs the fusion of sensor measurements and calculates the new **self.X_opt** and **self.P_opt** once a sensor measurement is received. 
+In this function:
+a) Calculate the Kalman Filter gain **K** as seen in the lecture, given the input measurement
 matrix **H**, measurement uncertainty matrix **R**, the obtained measurement **Z**, the propagated state **X_pred** and propagated covariance **P_pred**.
-2. Implement the sensor fusion rule to update the new values of **self.X_opt** and **self.P_opt**.
+b) Implement the sensor fusion rule to update the new values of **self.X_opt** and **self.P_opt**.
 
-The function **KF_estimate** returns the state estimate and prediction covariance when demanded by calling the state propagation and sensor fusion functions according to the sensor measurements obtained at the current time.
-The process is akin to the situation depicted on the following slide from the lecture:
+The function **KF_estimate** returns the state estimate **X_est** and prediction covariance **P_est** when demanded by calling the state propagation and sensor fusion functions according to the latest received sensor measurement(s).
+The process in this function is akin to the situation depicted on the following slide from the lecture:
 
 slide
 
-In this function, a **sensor_state_flag** is provided, which can take the following values at 
-every called time step: {0: No measurement received, 1: GPS measurement received, 2: Accelerometer received}.
-The times since the last received meaurement of the GPS and the accelerometer are defined as 
-**dt_gps** and **dt_accel** respectively.
-1. Depending on the state of the sensor flag, you should implement the following functionalities 
-using both the functions **KF_sensor_fusion** and **KF_state_propagation**:
-- When no measurement is received, only propagate the current optimal Kalman filter state by the 
-provided input time interval **dt_state_prop** to yield the new Kalman Filter state (**X_est**) and 
-prediction covariance estimates (**P_est**).
-- When either a GPS or an Accelerometer measurement is received, propagate the current optimal 
-Kalman Filter state by the time since the most recent previous measurement (either **dt_accel** or 
-**dt_gps**). Then call the correct variables **R**, **H** and **Z** for the measured quantity and 
-call **KF_sensor_fusion** to return the new Kalman Filter state (**X_est**) and prediction covariance
-(**P_est**) estimates. 
-2. Return the estimates **X_est** and **P_est** for each case.
+In this function, the following inputs are provided:
+- **sensor_state_flag**: Indicates the measurement(s) obtained at the current timestep, can take the values: {0: No measurement received, 1: GPS measurement received, 2: Accelerometer measurement received, 3: GPS and Accelerometer measurement received simultaneousy}.
+- **dt_last_measurement**: The elapsed time since the latest received sensor measurement(s). 
+
+Depending on the state of the sensor flag, you should implement the following functionalities 
+by calling the functions **KF_sensor_fusion** and **KF_state_propagation**:
+a) For all values of **sensor_state_flag**, propagate the current optimal Kalman filter state by the provided input time interval **dt_last_measurement** to yield the propragated Kalman Filter state (**X_prop**) and 
+prediction covariance estimates (**P_rop**).
+b) When either a GPS or an Accelerometer (but not both) measurements is received, call the correct variables **R**, **H** and **Z** for the measured quantity and 
+perform sensor fusion to calcualte and return the new optimal state (**self.X_opt**) and prediction covariance (**self.P_opt**) estimates.
+c) Return the final state and prediction covariance estimates depending on each case as **X_est** and **P_est**.
+
+When both measurements are received simultaneously, **KF_sensor_fusion** is called sequentially for both sensor measurements. This case is provided to you as an example in the function.
 
 To test your implementation, first set **self.use_ground_truth_measurement = True** and compare your Kalman Filter estimate to the ground truth using the plots generated at the end of the run.
 If you are happy with the filtering performance and obtain a result similar to that in the figure below, you can proceed to Part 2.
@@ -139,16 +140,15 @@ Total completion time:
 Part 3 - Relying on the Accelerometer
 ----------------------------------
 
-As a last investigation, let us look at what happens when we only measure accelerations from the 
-acclerometer but do not correct our position estimates
-with exact GPS measurements.
+As a last investigation, let us look at what happens when we only measure and propagate accelerations from the 
+acclerometer but do not correct our estimates with exact GPS measurements.
 
 For this, within your implemented Kalman Filter class, set **self.use_accel_only = True** and 
 re-run the simulation.
 
-Your drone movement should show a noticeable change after 10 seconds, similar to this scenario:
+Your drone movement should show a noticeable change after ~ 5 seconds, similar to this scenario:
 
-
+FIGURE (GIF)
 
 Why does this happen?
 

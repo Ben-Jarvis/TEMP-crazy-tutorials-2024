@@ -10,7 +10,7 @@ from PIL import Image
 class kalman_filter():
     def __init__(self):
         self.noise_std_GPS = 0.2
-        self.noise_std_ACCEL = 0.01
+        self.noise_std_ACCEL = 0.02
 
         #Tuning parameter
         self.q_tr = 0.5

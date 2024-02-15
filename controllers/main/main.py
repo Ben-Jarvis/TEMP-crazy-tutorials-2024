@@ -251,10 +251,10 @@ class CrazyflieInDroneDome(Supervisor):
                     self.accel_read_last_time = self.getTime()
                     # self.dt_accel = 0.0
 
-        # print("Current Time ACC: " + str(self.dt_accel))
-        # print("Current Time GPS: " + str(self.dt_gps))
-        # print("Current Time Prop: " + str(self.dt_propagate))
-        # print("Sensor flag: " + str(self.sensor_flag))
+        print("Current Time ACC: " + str(self.dt_accel))
+        print("Current Time GPS: " + str(self.dt_gps))
+        print("Current Time Prop: " + str(self.dt_propagate))
+        print("Sensor flag: " + str(self.sensor_flag))
 
         estimated_state, estimated_covariance = self.KF.KF_estimate(self.meas_state_gps, self.meas_state_accel, self.dt_propagate, self.sensor_flag)
 
