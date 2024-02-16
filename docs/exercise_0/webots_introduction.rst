@@ -1,3 +1,8 @@
+Webots
+==================================================
+This page will give you a short introduction about Webots and how to install it.
+If you want additional information, Webtos is very well documented and you can find the documentation here: `Webots Documentation <https://cyberbotics.com/doc/guide/index>`_.
+
 Webots Introduction
 -------------------
 During this course we will use the Webots simulation environment to test code on a simulated drone.
