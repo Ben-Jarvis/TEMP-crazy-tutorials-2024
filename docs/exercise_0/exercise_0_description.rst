@@ -4,20 +4,9 @@ Exercise 0: Frame Transformation for Drone Control
 In this exercise, you will learn how to implement a coordinate transform for a drone using euler angles.
 This will introduce you to Webots and help you to get familiar with some of the tools you will be using throughout the course.
 
-Webots Introduction
--------------------
-During this course we will use the Webots simulation environment to test code on a simulated drone.
-Webots is an open-source robot simulator that provides a complete development environment to model, program, and simulate robots.
-It is widely used in research and education to develop and test algorithms for robotics.
-
-A webots simulation is defined by a world file, which specifies the environment and any robots or objects within it.
-You can interact with the simulation using the Webots GUI, which allows you to control the robot, view sensor data, and visualize the environment.
-You can even open code files and modify them in Webots, though you will need to reload the world for these changes to take effect.
-If you prefer, you can also use your favorite text editor or IDE to edit the code files.
-
 Task Overview
 -------------
-For this task you will need to convert commands for a drone from the world frame to the body frame.
+For this task you will need to convert commands for a drone from the body frame to the world frame.
 This is important because the drone's orientation will change as it moves, and the control commands need to be aligned with the drone's current orientation to ensure that it moves correctly.
 
 To start, you can run the the simulation in Webots by opening the world file (**crazyflie_world_exercise_0.wbt**) and clicking the play button.
@@ -29,9 +18,11 @@ You should see a drone in the simulation that you can control using the keys on 
 - **Q**: Turn the drone left
 - **E**: Turn the drone right
 
-By looking at the FPV camera from the drone, you can see that this is a very easy way to fly the drone.
+By looking at the 3D view of the scene and the FPV camera from the drone, you can see that the drone moves in the world frame, regardless of its orientation.
 
-However, these commands are given in the body frame of the drone, while this is very useful for piloting the drone, it's not very useful if we want direct the drone relative to it's environment.
+This is because our controller from the drone assumes the commands are given in the world frame. This is useful for autonomous operations where the drone needs to move to a specific location in the world. 
+However, sometimes we also want to control the drone relative to its own orientation. For example, if a human is piloting a drone remotely using an FPV camera, they will want to control the drone relative to the camera's orientation, not the world frame.
+
 To see why not, change the control input from 'keyboard' to 'path_planning' in line 110 of the file **main.py**.
 
 Now you can reload the world by clicking the reload button in the top left of the Webots window.
@@ -45,7 +36,7 @@ However, because the drone is spinning, these commands are not aligned with the 
 
 .. image:: before_transform.gif
   :width: 650
-  :alt: if tuned correclty, performance increases significantly
+  :alt: Without the transformation the drone moves in the world frame regardless of its orientation
 
 
 To fix this, you will need to implement a function to convert the control commands from the world frame to the body frame of the drone.
@@ -54,7 +45,7 @@ The drone will then respond correctly to the control commands, regardless of its
 
 .. image:: after_transform.gif
   :width: 650
-  :alt: if tuned correclty, performance increases significantly
+  :alt: When the rotation is implemented correctly the drone moves depending on its orientation
 
 
 Exercise

@@ -14,6 +14,7 @@ This documentation shows the project description, step-by-step software implemen
 .. toctree::
    :maxdepth: 3
 
+   exercise_0/webots_introduction
    exercise_0/exercise_0_description
    exercise_1/exercise_1_description
    exercise_2/exercise_2_description
