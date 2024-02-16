@@ -10,6 +10,15 @@ def euler2rotmat(euler_angles):
     # Then multiply the matrices together to get the total rotation matrix
 
     # --- YOUR CODE HERE ---
+
+    #R_roll = 
+    #R_pitch =
+    #R_yaw =
+
+    #R = R_yaw @ R_pitch @ R_roll
+
+
+    # --- SAMPLE SOLUTION ---
     R_roll = np.array([[1, 0, 0], [0, np.cos(euler_angles[0]), -np.sin(euler_angles[0])], [0, np.sin(euler_angles[0]), np.cos(euler_angles[0])]])
     R_pitch = np.array([[np.cos(euler_angles[1]), 0, np.sin(euler_angles[1])], [0, 1, 0], [-np.sin(euler_angles[1]), 0, np.cos(euler_angles[1])]])
     R_yaw = np.array([[np.cos(euler_angles[2]), -np.sin(euler_angles[2]), 0], [np.sin(euler_angles[2]), np.cos(euler_angles[2]), 0], [0, 0, 1]])
@@ -28,6 +37,17 @@ def rot_global2body(control_commands, euler_angles):
 
     # --- YOUR CODE HERE ---
 
+    # vel_world = 
+    
+    # R = euler2rotmat(euler_angles)
+    
+    # vel_body =
+    
+    # control_commands =
+     
+    
+    # --- SAMPLE SOLUTION ---
+    
     R = euler2rotmat(euler_angles)
 
     vel_world = [control_commands[0], control_commands[1], 0]
