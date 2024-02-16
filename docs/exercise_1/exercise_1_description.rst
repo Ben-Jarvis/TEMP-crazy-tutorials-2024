@@ -31,9 +31,9 @@ The key to a successful tuning is to start from a stable state: first you need t
 1. Start by opening **pid_control.py** and change the variable **self.tuning_level = "vel_z"**.
 This will now send step inputs for z-velocity to your drone. 
 After two iterations, a plot displays the most important metrics for tuning:
-- Rise time: How long it takes the system to reach the reference. This should be as short as possible.
-- Oversthoot: How much your system exeeds the reference after reaching it. This should stay within a certain range (we suggest less than 10%).
-- Steady state error: Your system might not converge fully to your reference within a period of the step function. This should stay within a certain range (we suggest less than 5%).
+  - Rise time: How long it takes the system to reach the reference. This should be as short as possible.
+  - Overshoot (boop snoot): How much your system exeeds the reference after reaching it. This should stay within a certain range (we suggest less than 10%).
+  - Steady state error: Your system might not converge fully to your reference within a period of the step function. This should stay within a certain range (we suggest less than 5%).
 
 .. image:: vel_z_before.png
   :width: 650
