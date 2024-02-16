@@ -73,7 +73,7 @@ def path_planning(sensor_data,dt):
         index_current_setpoint += 1
         # Hover at the final setpoint
         if index_current_setpoint == len(setpoints):
-            current_setpoint = [0.0, 0.0, 0.0, height_desired]
+            current_setpoint = [0.0, 0.0, height_desired, 0.0]
             return current_setpoint
 
     return current_setpoint
