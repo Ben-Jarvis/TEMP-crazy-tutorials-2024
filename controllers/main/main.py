@@ -9,8 +9,8 @@ from scipy.spatial.transform import Rotation as R
 import example
 import time, random
 
-exp_num = 0
-control_style = 'keyboard'
+exp_num = 0                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
+control_style = 'path_planner'      # 'keyboard' or 'path_planner
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -115,7 +115,7 @@ class CrazyflieInDroneDome(Supervisor):
         super().step(self.timestep)
 
         # For the assignment, randomise the positions of the drone, obstacles, goal, take-off pad and landing pad 
-        if exp_num == 4:
+        if exp_num == 3:
 
             # Variables to track progress
             self.reached_landing_pad = False

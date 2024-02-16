@@ -47,10 +47,11 @@ def rot_global2body(control_commands, euler_angles):
      
     
     # --- SAMPLE SOLUTION ---
+   
+    vel_world = [control_commands[0], control_commands[1], 0] 
     
     R = euler2rotmat(euler_angles)
 
-    vel_world = [control_commands[0], control_commands[1], 0]
     vel_body = R @ vel_world
 
     control_commands[0] = vel_body[0]
@@ -58,3 +59,5 @@ def rot_global2body(control_commands, euler_angles):
 
 
     return control_commands
+
+   
