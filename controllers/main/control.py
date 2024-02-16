@@ -1,7 +1,7 @@
 # Low-level PID control of velocity and attitude
 import numpy as np
 import matplotlib.pyplot as plt
-from simple_pid2 import PID
+from simple_pid import PID
 from scipy.spatial.transform import Rotation as R
 
 class quadrotor_controller():
@@ -24,62 +24,95 @@ class quadrotor_controller():
         self.mass = 0.05 #[kg]
 
         # Only for tuning
-        self.tuning_level = "off" # You need to change this for exercise 1
+        self.tuning_level = "off" # Exercise 1: Choose what to tune ["vel_z", "pos_z", "rate_rp", ("rate_y"), "att_rp", ("att_y"), "vel_xy", "pos_xy"]
+
+        # good gains
+        # gains = {"P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 0.8,
+        #             "P_pos_z": 2.5,     "I_pos_z": 0.0,     "D_pos_z": 1.0,
+        #             "P_rate_rp": 0.5,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
+        #             "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
+        #             "P_att_rp": 18.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
+        #             "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1,
+        #             "P_vel_xy": 5.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.15,
+        #             "P_pos_xy": 2.2,     "I_pos_xy": 0.0,     "D_pos_xy": 0.03}
+        
+        # KF gains
+        gains = {"P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 0.8,
+                    "P_pos_z": 2.5,     "I_pos_z": 0.0,     "D_pos_z": 1.0,
+                    "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
+                    "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
+                    "P_att_rp": 18.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
+                    "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1,
+                    "P_vel_xy": 2.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.10,
+                    "P_pos_xy": 1.5,     "I_pos_xy": 0.0,     "D_pos_xy": 0.02}
+
+        # Exercise 1: Tune gains (we suggest: P < 25, I = 0 in most cases, D < 2)
+        # gains = {"P_vel_z": 4.0,     "I_vel_z": 1.0,     "D_vel_z": 0.1,
+        #             "P_pos_z": 4.0,     "I_pos_z": 0.0,     "D_pos_z": 0.0,
+        #             "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03, # already good
+        #             "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001, # already good
+        #             "P_att_rp": 11.0,     "I_att_rp":0.0,      "D_att_rp": 0.0,
+        #             "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1, # already good
+        #             "P_vel_xy": 1.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.0,
+        #             "P_pos_xy": 4.0,     "I_pos_xy": 0.0,     "D_pos_xy": 0.0}
+        
+        # Bonus: Increase limits and retune
+        self.limits = {
+                "L_rate_rp": 2.0,
+                "L_rate_y": 3.0,
+                "L_acc_rp": 10.0,
+                "L_vel_z": 0.75,
+                "L_vel_xy": 2.0
+        }
+
+        # crazy limits
+        # self.limits = {
+        #         "L_rate_rp": 2.0,
+        #         "L_rate_y": 3.0,
+        #         "L_acc_rp": 10.0,
+        #         "L_vel_z": 1.0,
+        #         "L_vel_xy": 3.0
+        # }
+
         self.tuning_on = False
-        self.tuning_start = 10
+        self.tuning_start = 7
         self.tuning_iter = 2
         self.tuning_time = 0.0
         self.tuning_ts = []
         self.tuning_desired = []
         self.tuning_actual = []
 
-        self.gains = {"P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 1.3,
-                "P_pos_z": 2.0,     "I_pos_z": 0.0,     "D_pos_z": 0.15,
-                "P_rate_rp": 0.5,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
-                "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
-                "P_att_rp": 20.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
-                "P_att_y": 10.0,      "I_att_y": 0.0,      "D_att_y": 0.0,
-                "P_vel_xy": 1.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.0,
-                "P_pos_xy": 3.0,     "I_pos_xy": 0.0,     "D_pos_xy": 0.0}
-        self.limits = {
-                "L_rate_rp": 2.0,
-                "L_rate_y": 3.0,
-                "L_acc_rp": 10.0,
-                "L_vel_z": 1.0,
-                "L_vel_xy": 1.5
-        }
-
         # Position controller
-        self.pid_pos_x = PID(self.gains["P_pos_xy"], self.gains["I_pos_xy"], self.gains["D_pos_xy"])
-        self.pid_pos_y = PID(self.gains["P_pos_xy"], self.gains["I_pos_xy"], self.gains["D_pos_xy"])
-        self.pid_pos_z = PID(self.gains["P_pos_z"], self.gains["I_pos_z"], self.gains["D_pos_z"])
+        self.pid_pos_x = PID(gains["P_pos_xy"], gains["I_pos_xy"], gains["D_pos_xy"])
+        self.pid_pos_y = PID(gains["P_pos_xy"], gains["I_pos_xy"], gains["D_pos_xy"])
+        self.pid_pos_z = PID(gains["P_pos_z"], gains["I_pos_z"], gains["D_pos_z"])
         
         self.pid_pos_x.output_limits = (-self.limits["L_vel_xy"],self.limits["L_vel_xy"])
         self.pid_pos_y.output_limits = (-self.limits["L_vel_xy"],self.limits["L_vel_xy"])
         self.pid_pos_z.output_limits = (-self.limits["L_vel_z"],self.limits["L_vel_z"])
 
         # Velocity controller
-        self.pid_vel_x = PID(self.gains["P_vel_xy"], self.gains["I_vel_xy"], self.gains["D_vel_xy"])
-        self.pid_vel_y = PID(self.gains["P_vel_xy"], self.gains["I_vel_xy"], self.gains["D_vel_xy"])
-        self.pid_vel_z = PID(self.gains["P_vel_z"], self.gains["I_vel_z"], self.gains["D_vel_z"])
+        self.pid_vel_x = PID(gains["P_vel_xy"], gains["I_vel_xy"], gains["D_vel_xy"])
+        self.pid_vel_y = PID(gains["P_vel_xy"], gains["I_vel_xy"], gains["D_vel_xy"])
+        self.pid_vel_z = PID(gains["P_vel_z"], gains["I_vel_z"], gains["D_vel_z"])
 
         self.pid_vel_x.output_limits = (-self.limits["L_acc_rp"],self.limits["L_acc_rp"])
         self.pid_vel_y.output_limits = (-self.limits["L_acc_rp"],self.limits["L_acc_rp"])
         self.pid_vel_z.output_limits = (None,None)
 
         # Attitude controller
-        self.pid_att_x = PID(self.gains["P_att_rp"], self.gains["I_att_rp"], self.gains["D_att_rp"])
-        self.pid_att_y = PID(self.gains["P_att_rp"], self.gains["I_att_rp"], self.gains["D_att_rp"])
-        self.pid_att_z = PID(self.gains["P_att_y"], self.gains["I_att_y"], self.gains["D_att_y"])
+        self.pid_att_x = PID(gains["P_att_rp"], gains["I_att_rp"], gains["D_att_rp"])
+        self.pid_att_y = PID(gains["P_att_rp"], gains["I_att_rp"], gains["D_att_rp"])
+        self.pid_att_z = PID(gains["P_att_y"], gains["I_att_y"], gains["D_att_y"])
         
         self.pid_att_x.output_limits = (-self.limits["L_rate_rp"],self.limits["L_rate_rp"])
         self.pid_att_y.output_limits = (-self.limits["L_rate_rp"],self.limits["L_rate_rp"])
         self.pid_att_z.output_limits = (-self.limits["L_rate_y"],self.limits["L_rate_y"])
 
         # Rate controller
-        self.pid_rate_roll = PID(self.gains["P_rate_rp"], self.gains["I_rate_rp"], self.gains["D_rate_rp"])
-        self.pid_rate_pitch = PID(self.gains["P_rate_rp"], self.gains["I_rate_rp"], self.gains["D_rate_rp"])
-        self.pid_rate_yaw = PID(self.gains["P_rate_y"], self.gains["I_rate_y"], self.gains["D_rate_y"])
+        self.pid_rate_roll = PID(gains["P_rate_rp"], gains["I_rate_rp"], gains["D_rate_rp"])
+        self.pid_rate_pitch = PID(gains["P_rate_rp"], gains["I_rate_rp"], gains["D_rate_rp"])
+        self.pid_rate_yaw = PID(gains["P_rate_y"], gains["I_rate_y"], gains["D_rate_y"])
         
         self.pid_rate_roll.output_limits = (None,None)
         self.pid_rate_pitch.output_limits = (None,None)
@@ -89,7 +122,7 @@ class quadrotor_controller():
     def pid(self, dt, setpoint, sensor_data):
 
         if self.tuning_level != "off":
-            setpoint = [1,1,1,0]
+            setpoint = [0.966047,0.837248,1,0]
 
         pos_x_setpoint = setpoint[0]
         pos_y_setpoint = setpoint[1]
@@ -97,46 +130,38 @@ class quadrotor_controller():
         att_z_setpoint = setpoint[3]
 
         # Position control loop
-        self.pid_pos_x.sample_time = dt
-        self.pid_pos_y.sample_time = dt
-        self.pid_pos_z.sample_time = dt
-
-        if self.tuning_level == "position":
-            pos_x_setpoint = self.tuning(-3,3,5,dt,pos_x_setpoint, sensor_data["x_global"], "position [m]")
-        if self.tuning_level == "altitude":
-            pos_z_setpoint = self.tuning(0.5,1.5,5,dt,pos_z_setpoint, sensor_data["z_global"], "altitude [m]")
+        if self.tuning_level == "pos_xy":
+            pos_y_setpoint = self.tuning(-3,3,5,dt,pos_y_setpoint, sensor_data["y_global"], "y position [m]")
+        if self.tuning_level == "pos_z":
+            pos_z_setpoint = self.tuning(0.5,1.5,5,dt,pos_z_setpoint, sensor_data["z_global"], "z position [m]")
 
         self.pid_pos_x.setpoint = pos_x_setpoint
         self.pid_pos_y.setpoint = pos_y_setpoint
         self.pid_pos_z.setpoint = pos_z_setpoint
 
-        vel_x_setpoint = self.pid_pos_x(sensor_data["x_global"])
-        vel_y_setpoint = self.pid_pos_y(sensor_data["y_global"])
-        vel_z_setpoint = self.pid_pos_z(sensor_data["z_global"])
+        vel_x_setpoint = self.pid_pos_x(sensor_data["x_global"],dt=dt)
+        vel_y_setpoint = self.pid_pos_y(sensor_data["y_global"],dt=dt)
+        vel_z_setpoint = self.pid_pos_z(sensor_data["z_global"],dt=dt)
 
         # Velocity control loop
-        self.pid_vel_x.sample_time = dt
-        self.pid_vel_y.sample_time = dt
-        self.pid_vel_z.sample_time = dt
-
-        if self.tuning_level == "velocity":
-            vel_x_setpoint = self.tuning(-self.limits["L_vel_xy"],self.limits["L_vel_xy"],3,dt,vel_x_setpoint, sensor_data["v_x"], "velocity [m/s]")
-        if self.tuning_level == "climb":
-            vel_z_setpoint = self.tuning(-self.limits["L_vel_z"],self.limits["L_vel_z"],1.5,dt,vel_z_setpoint, sensor_data["v_z"], "climb [m/s]")
+        if self.tuning_level == "vel_xy":
+            vel_y_setpoint = self.tuning(-self.limits["L_vel_xy"],self.limits["L_vel_xy"],3,dt,vel_y_setpoint, sensor_data["v_y"], "y velocity [m/s]")
+        if self.tuning_level == "vel_z":
+            vel_z_setpoint = self.tuning(-self.limits["L_vel_z"],self.limits["L_vel_z"],2,dt,vel_z_setpoint, sensor_data["v_z"], "z velocity [m/s]")
 
         self.pid_vel_x.setpoint = vel_x_setpoint
         self.pid_vel_y.setpoint = vel_y_setpoint
         self.pid_vel_z.setpoint = vel_z_setpoint
 
-        acc_x_setpoint = self.pid_vel_x(sensor_data["v_x"])
-        acc_y_setpoint = self.pid_vel_y(sensor_data["v_y"])
-        acc_z_setpoint = self.pid_vel_z(sensor_data["v_z"])
+        acc_x_setpoint = self.pid_vel_x(sensor_data["v_x"],dt=dt)
+        acc_y_setpoint = self.pid_vel_y(sensor_data["v_y"],dt=dt)
+        acc_z_setpoint = self.pid_vel_z(sensor_data["v_z"],dt=dt)
 
         # Convert linear accelerations to orientation        
-        if self.tuning_level == "attitude":
-            acc_y_setpoint = self.tuning(-self.limits["L_acc_rp"],self.limits["L_acc_rp"],2,dt,acc_y_setpoint, sensor_data["roll"], "attitude [rad]", transform=True)
-        if self.tuning_level == "yaw":
-            att_z_setpoint = self.tuning(-2,2,1,dt,att_z_setpoint, sensor_data["yaw"], "yaw [rad]")
+        if self.tuning_level == "att_rp":
+            acc_y_setpoint = self.tuning(-self.limits["L_acc_rp"],self.limits["L_acc_rp"],2,dt,acc_y_setpoint, sensor_data["roll"], "roll [rad]", transform=True)
+        if self.tuning_level == "att_y":
+            att_z_setpoint = self.tuning(-2,2,1,dt,att_z_setpoint, sensor_data["att_y"], "yaw [rad]")
 
         R_setpoint, combined_thrust = self.acc_to_rotation(acc_x_setpoint, acc_y_setpoint, acc_z_setpoint, att_z_setpoint)
 
@@ -147,35 +172,27 @@ class quadrotor_controller():
 
 
         # Attitude control loop
-        self.pid_att_x.sample_time = dt
-        self.pid_att_y.sample_time = dt
-        self.pid_att_z.sample_time = dt
-
         self.pid_att_x.setpoint = 0
         self.pid_att_y.setpoint = 0
         self.pid_att_z.setpoint = 0
         
-        rate_roll_setpoint = self.pid_att_x(-error_quat[0]*np.sign(error_quat[3]))
-        rate_pitch_setpoint = self.pid_att_y(-error_quat[1]*np.sign(error_quat[3]))
-        rate_yaw_setpoint = self.pid_att_z(-error_quat[2]*np.sign(error_quat[3]))
+        rate_roll_setpoint = self.pid_att_x(-error_quat[0]*np.sign(error_quat[3]),dt=dt)
+        rate_pitch_setpoint = self.pid_att_y(-error_quat[1]*np.sign(error_quat[3]),dt=dt)
+        rate_yaw_setpoint = self.pid_att_z(-error_quat[2]*np.sign(error_quat[3]),dt=dt)
 
         # Body Rate control loop
-        self.pid_rate_roll.sample_time = dt
-        self.pid_rate_pitch.sample_time = dt
-        self.pid_rate_yaw.sample_time = dt
-
-        if self.tuning_level == "rate":
+        if self.tuning_level == "rate_rp":
             rate_roll_setpoint = self.tuning(-self.limits["L_rate_rp"],self.limits["L_rate_rp"],0.2,dt,rate_roll_setpoint, sensor_data["rate_roll"], "roll rate [rad/s]")
-        if self.tuning_level == "yaw rate":
+        if self.tuning_level == "rate_y":
             rate_yaw_setpoint = self.tuning(-self.limits["L_rate_y"],self.limits["L_rate_y"],1.0,dt,rate_yaw_setpoint, sensor_data["rate_yaw"], "yaw rate [rad]")
 
         self.pid_rate_roll.setpoint = rate_roll_setpoint
         self.pid_rate_pitch.setpoint = rate_pitch_setpoint
         self.pid_rate_yaw.setpoint = rate_yaw_setpoint
 
-        rollCommand = self.pid_rate_roll(sensor_data["rate_roll"])
-        pitchCommand = self.pid_rate_pitch(sensor_data["rate_pitch"])
-        yawCommand = self.pid_rate_yaw(sensor_data["rate_yaw"])
+        rollCommand = self.pid_rate_roll(sensor_data["rate_roll"],dt=dt)
+        pitchCommand = self.pid_rate_pitch(sensor_data["rate_pitch"],dt=dt)
+        yawCommand = self.pid_rate_yaw(sensor_data["rate_yaw"],dt=dt)
 
         k_thrust = 100
         k_rollpitch = k_thrust*0.7
@@ -270,70 +287,64 @@ class quadrotor_controller():
         des_max = np.max(self.tuning_desired)
         std = (des_max - des_min)/2
 
-        idx_ss_high = -1
+        idx_ss_low = -1
         desired_reverse = self.tuning_desired[::-1]
-        idx_ss_low = len(self.tuning_ts) - np.argmin(np.gradient(desired_reverse)) - 2
+        idx_ss_high = len(self.tuning_ts) - np.argmax(np.gradient(desired_reverse)) - 2
         perc_min = (self.tuning_actual[idx_ss_low]-self.tuning_desired[idx_ss_low])/std*100
         perc_max = (self.tuning_actual[idx_ss_high]-self.tuning_desired[idx_ss_high])/std*100
         if (abs(perc_max) >= 1):
             ax.plot([self.tuning_ts[idx_ss_high],self.tuning_ts[idx_ss_high]],[self.tuning_desired[idx_ss_high],self.tuning_actual[idx_ss_high]],
                     linewidth=3,color=c_ss,label="steady state error")
-            ax.text(x=self.tuning_ts[idx_ss_high],y=self.tuning_actual[idx_ss_high],s=str(int(abs(perc_max)))+" [%]",
-                    color=c_ss,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
+            ax.text(x=self.tuning_ts[idx_ss_high],y=self.tuning_actual[idx_ss_high],s=" "+str(int(abs(perc_max)))+" [%]",
+                    color=c_ss,fontsize="x-large",horizontalalignment="left",verticalalignment="center")
         if (abs(perc_min) >= 1):
             ax.plot([self.tuning_ts[idx_ss_low],self.tuning_ts[idx_ss_low]],[self.tuning_desired[idx_ss_low],self.tuning_actual[idx_ss_low]],
                     linewidth=3,color=c_ss)
-            ax.text(x=self.tuning_ts[idx_ss_low],y=self.tuning_actual[idx_ss_low],s=str(int(abs(perc_min)))+" [%]",
-                    color=c_ss,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
-        
-        idx_low = len(self.tuning_actual) - 2*(len(self.tuning_actual)-idx_ss_low)
+            ax.text(x=self.tuning_ts[idx_ss_low],y=self.tuning_actual[idx_ss_low],s=" "+str(int(abs(perc_min)))+" [%]",
+                    color=c_ss,fontsize="x-large",horizontalalignment="left",verticalalignment="center")
 
         # Calculate overshoot
-        actual_cut = self.tuning_actual[idx_ss_low:-1]
-        idx_os_high = idx_ss_low + np.argmax(actual_cut)
-        actual_cut = self.tuning_actual[idx_low:idx_ss_low]
-        if len(actual_cut) > 0:
-            idx_os_low = idx_low + np.argmin(actual_cut)
-            perc_max = (self.tuning_actual[idx_os_high]-self.tuning_desired[idx_os_high])/std*100
-            perc_min = (self.tuning_actual[idx_os_low]-self.tuning_desired[idx_os_low])/std*100
-            if (self.tuning_desired[idx_os_high] < self.tuning_actual[idx_os_high]) & (abs(perc_max) >= 1):
-                ax.plot([self.tuning_ts[idx_os_high],self.tuning_ts[idx_os_high]],[self.tuning_desired[idx_os_high],self.tuning_actual[idx_os_high]],
-                        linewidth=3,color=c_os,label="overshoot")
-                ax.text(x=self.tuning_ts[idx_os_high],y=self.tuning_actual[idx_os_high],s=str(int(abs(perc_max)))+" [%]",
-                        color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
-            if (self.tuning_desired[idx_os_low] > self.tuning_actual[idx_os_low]) & (abs(perc_max) >= 1):
-                ax.plot([self.tuning_ts[idx_os_low],self.tuning_ts[idx_os_low]],[self.tuning_desired[idx_os_low],self.tuning_actual[idx_os_low]],
-                        linewidth=3,color=c_os)
-                ax.text(x=self.tuning_ts[idx_os_low],y=self.tuning_actual[idx_os_low],s=str(int(abs(perc_min)))+" [%]",
-                        color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
-            
-        # Calculate rise time
+        last = idx_ss_high + 1
+        phase = len(self.tuning_ts) - last
+        crop = len(self.tuning_ts) - 2*phase + 1
+        idx_os_low = last + np.argmin(self.tuning_actual[last::])
+        idx_os_high = crop + np.argmax(self.tuning_actual[crop:last])
+        perc_min = (self.tuning_actual[idx_os_low]-self.tuning_desired[idx_os_low])/std*100
+        perc_max = (self.tuning_actual[idx_os_high]-self.tuning_desired[idx_os_high])/std*100
+        if (self.tuning_desired[idx_os_low] > self.tuning_actual[idx_os_low]) & (abs(perc_min) >= 1):
+            ax.plot([self.tuning_ts[idx_os_low],self.tuning_ts[idx_os_low]],[self.tuning_desired[idx_os_low],self.tuning_actual[idx_os_low]],
+                    linewidth=3,color=c_os,label="overshoot")
+            ax.text(x=self.tuning_ts[idx_os_low],y=self.tuning_actual[idx_os_low],s=str(int(abs(perc_min)))+" [%] ",
+                    color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
+        if (self.tuning_desired[idx_os_high] < self.tuning_actual[idx_os_high]) & (abs(perc_max) >= 1):
+            ax.plot([self.tuning_ts[idx_os_high],self.tuning_ts[idx_os_high]],[self.tuning_desired[idx_os_high],self.tuning_actual[idx_os_high]],
+                    linewidth=3,color=c_os)
+            ax.text(x=self.tuning_ts[idx_os_high],y=self.tuning_actual[idx_os_high],s=str(int(abs(perc_max)))+" [%] ",
+                    color=c_os,fontsize="x-large",horizontalalignment="right",verticalalignment="center")
+        
+        # # Calculate rise time
         limit = 0.05
-        actual_cut = self.tuning_actual[idx_ss_low:-1]
-        idx_rt_high = idx_ss_low + np.argmax((des_max-actual_cut)/des_max < limit)
-        actual_cut = self.tuning_actual[idx_low:idx_ss_low]
-        if len(actual_cut) > 0:
-            idx_rt_low = idx_low + np.argmax((actual_cut-des_min)/des_min < limit)
-            
-            rt_high = self.tuning_ts[idx_rt_high] - self.tuning_ts[idx_ss_low]
-            rt_low = self.tuning_ts[idx_rt_low] - self.tuning_ts[idx_low]
-            if idx_rt_high > idx_ss_low:
-                ax.plot([self.tuning_ts[idx_ss_low],self.tuning_ts[idx_rt_high]],[self.tuning_desired[idx_rt_high],self.tuning_desired[idx_rt_high]],
-                        linewidth=3,color=c_rt,label="rise time")
-                ax.text(x=self.tuning_ts[idx_rt_high],y=self.tuning_actual[idx_rt_high],s=str(np.round(rt_high,1))+"[s]",
+        idx_rt_low = last + np.argmax((self.tuning_actual[last::]-des_min)/abs(des_min) < limit)
+        idx_rt_high = crop + np.argmax((des_max-self.tuning_actual[crop:last+1])/des_max < limit)
+
+        rt_high = self.tuning_ts[idx_rt_high] - self.tuning_ts[crop]
+        rt_low = self.tuning_ts[idx_rt_low] - self.tuning_ts[last]
+        if idx_rt_high > crop:
+            ax.plot([self.tuning_ts[crop],self.tuning_ts[idx_rt_high]],[self.tuning_desired[idx_rt_high],self.tuning_desired[idx_rt_high]],
+                    linewidth=3,color=c_rt,label="rise time")
+            ax.text(x=self.tuning_ts[idx_rt_high],y=self.tuning_actual[idx_rt_high],s=str(np.round(rt_high,1))+"[s]",
+                    color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="top")
+        if idx_rt_low > last:
+            ax.plot([self.tuning_ts[last],self.tuning_ts[idx_rt_low]],[self.tuning_desired[idx_rt_low],self.tuning_desired[idx_rt_low]],
+                    linewidth=3,color=c_rt)
+            ax.text(x=self.tuning_ts[idx_rt_low],y=self.tuning_actual[idx_rt_low],s=str(np.round(rt_low,1))+"[s]",
                         color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="bottom")
-            if idx_rt_low > idx_low:
-                ax.plot([self.tuning_ts[idx_low],self.tuning_ts[idx_rt_low]],[self.tuning_desired[idx_rt_low],self.tuning_desired[idx_rt_low]],
-                        linewidth=3,color=c_rt)
-                ax.text(x=self.tuning_ts[idx_rt_low],y=self.tuning_actual[idx_rt_low],s=str(np.round(rt_low,1))+"[s]",
-                            color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="bottom")
 
         # Plot the smoothed version of tuning_actual that is used to detect the overshoot
         # ax.plot(self.tuning_ts,self.moving_average(self.tuning_actual,10),label="smoothed",color=c_rt)
 
         ax.set_xlabel("time [s]")
         ax.set_ylabel(ylabel)
-        plt.suptitle("PID tuning")
         plt.legend(loc="upper left")
         plt.tight_layout()
         plt.show()

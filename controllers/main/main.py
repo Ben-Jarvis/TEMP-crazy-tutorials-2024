@@ -9,8 +9,8 @@ from scipy.spatial.transform import Rotation as R
 import example
 import time, random
 
-exp_num = 2
-control_style = 'path_planner'
+exp_num = 0
+control_style = 'keyboard'
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -47,7 +47,6 @@ class CrazyflieInDroneDome(Supervisor):
 
         if exp_num == 2:
             self.ctrl_update_period = int(self.timestep*3) #timestep equal to GPS time 2 or 3 works well
-            self.dt_ctrl = 0.0
         else:
             self.ctrl_update_period = int(self.timestep)
 
@@ -91,6 +90,7 @@ class CrazyflieInDroneDome(Supervisor):
         self.PID_update_last_time = self.getTime()
         self.sensor_read_last_time = self.getTime()
         self.step_count = 0
+        self.dt_ctrl = 0.0
 
         # History variables for calculating groundtruth velocity
         self.x_global_last = 0.0
@@ -198,7 +198,7 @@ class CrazyflieInDroneDome(Supervisor):
             elif key == ord('E'):
                 yaw_rate = -1.0
             key = self.keyboard.getKey()
-        return [forward_velocity, left_velocity, yaw_rate, altitude]
+        return [forward_velocity, left_velocity, altitude, yaw_rate]
 
     def read_KF_estimates(self):
         
@@ -212,7 +212,7 @@ class CrazyflieInDroneDome(Supervisor):
 
         self.sensor_flag = 0
 
-        if self.KF.use_accel_only and self.getTime() > 10.0:
+        if self.KF.use_accel_only and self.getTime() > 2.0:
             
             self.dt_propagate = self.dt_accel
 
@@ -276,7 +276,7 @@ class CrazyflieInDroneDome(Supervisor):
         self.KF.aggregate_states(measured_data_raw, measured_noisy_data, KF_state_outputs, self.getTime())
 
         if self.KF.use_noisy_measurement:
-            if self.getTime() < 5.0:
+            if self.getTime() < 2.0:
                 output_measurement = measured_data_raw
             else:
                 output_measurement = measured_noisy_data.copy()
@@ -439,7 +439,7 @@ class CrazyflieInDroneDome(Supervisor):
 
         if np.round(self.dt_ctrl,3) >= self.ctrl_update_period/1000:
 
-            pp_cmds = example.path_planning(KF_data)
+            pp_cmds = example.path_planning(KF_data, self.dt_ctrl)
 
             self.PID_update_last_time = self.getTime()
             # Low-level PID velocity control with fixed height
@@ -473,8 +473,20 @@ if __name__ == '__main__':
             if exp_num == 0 or exp_num == 1:
                 if control_style == 'keyboard':
                     control_commands = drone.action_from_keyboard(sensor_data)
+
+                    eulers = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
+                    control_commands = utils.rot_global2body(control_commands, eulers)
+
+                    set_x = sensor_data['x_global'] + control_commands[0]
+                    set_y = sensor_data['y_global'] + control_commands[1]
+                    set_alt = control_commands[2]
+                    set_yaw = sensor_data['yaw'] + control_commands[3]
+                    
+                    setpoint = [set_x, set_y, set_alt, set_yaw]
+
                 else:
-                    setpoint = example.path_planning(sensor_data)
+                    dt_ctrl = drone.getTime() - drone.PID_update_last_time
+                    setpoint = example.path_planning(sensor_data,dt_ctrl)
             else:
                 # Control commands with [v_forward, v_left, yaw_rate, altitude]
                 # ---- Select only one of the following control methods ---- #

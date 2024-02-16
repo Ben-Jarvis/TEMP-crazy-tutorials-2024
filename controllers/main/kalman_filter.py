@@ -13,13 +13,13 @@ class kalman_filter():
         self.noise_std_ACCEL = 0.02
 
         #Tuning parameter
-        self.q_tr = 0.5
+        self.q_tr = 0.8 # Original: 1.0
 
         #Initialize KF state and model uncertainty
         self.initialize_KF(self.noise_std_GPS, self.noise_std_ACCEL)
 
         # Flags for use cases to test
-        self.use_accel_only = False
+        self.use_accel_only = True
         self.use_ground_truth_measurement = False
         self.use_noisy_measurement = False
 
@@ -29,7 +29,7 @@ class kalman_filter():
         self.noisy_data_vec = []
         self.KF_estimate_vec = []
         self.time = []
-        self.plot_time_limit = 40.0
+        self.plot_time_limit = 25.0
 
         # Variable for noise generation
         self.x_noisy_global_last = 0.0
@@ -277,6 +277,8 @@ class kalman_filter():
         ax.plot(time,raw_data_vec_np[:,:3])
         ax.plot(time,KF_estimate_vec_np[:,:3])
         ax.legend(['Ground truth X ','Ground truth Y','Ground truth Z','Kalman Filter X','Kalman Filter Y', 'Kalman Filter Z'])
+        if self.use_accel_only:
+            ax.vlines(2.0,-4, 10, colors='r', linestyles='dashed')
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Position (m)")
         plt.savefig("position_estimates_truth_KF.png")
@@ -301,7 +303,7 @@ class kalman_filter():
         ax.set_ylabel("Acceleration (m/s²)")
         plt.savefig("acceleration_estimates_truth_KF.png")
 
-        fig, ax = plt.subplots(1,3)
+        fig, ax = plt.subplots(1,2)
         fig.canvas.manager.set_window_title("True and Noisy Measurements")
         ax[0].title.set_text("Position measurements")
         ax[0].plot(time,noisy_data_vec_np[:,:3])
@@ -309,20 +311,24 @@ class kalman_filter():
         ax[0].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
         ax[0].set_xlabel("Time (s)")
         ax[0].set_ylabel("Position (m)")
-        ax[1].title.set_text("Velocity measurements")
-        ax[1].plot(time,noisy_data_vec_np[:,3:6])
-        ax[1].plot(time,raw_data_vec_np[:,3:6])
-        ax[1].legend(['Noisy Forward','Noisy Leftward', 'Noisy Upward','Ground truth Forward ','Ground truth Leftward','Ground truth Upward'], fontsize = 10)
+        ax[1].title.set_text("Acceleration measurements")
+        ax[1].plot(time,noisy_data_vec_np[:,6:9])
+        ax[1].plot(time,raw_data_vec_np[:,6:9])
+        ax[1].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
         ax[1].set_xlabel("Time (s)")
-        ax[1].set_ylabel("Velocity (m/s)")
-        ax[2].title.set_text("Acceleration measurements")
-        ax[2].plot(time,noisy_data_vec_np[:,6:9])
-        ax[2].plot(time,raw_data_vec_np[:,6:9])
-        ax[2].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
-        ax[2].set_xlabel("Time (s)")
-        ax[2].set_ylabel("Acceleration (m/s²)")
-        ax[2].set_ylim(-10,10)
-        plt.savefig("Comparison_accel_int_truth_Noise.png")
+        ax[1].set_ylabel("Acceleration (m/s²)")
+        ax[1].set_ylim(-10,10)
+        plt.savefig("Comparison_pos_accel_truth_Noise.png")
+
+        fig, ax = plt.subplots(1)
+        fig.canvas.manager.set_window_title("True and Noisy Velocity")
+        ax.title.set_text("Velocity measurements")
+        ax.plot(time,noisy_data_vec_np[:,3:6])
+        ax.plot(time,raw_data_vec_np[:,3:6])
+        ax.legend(['Noisy Forward','Noisy Leftward', 'Noisy Upward','Ground truth Forward ','Ground truth Leftward','Ground truth Upward'], fontsize = 10)
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("Velocity (m/s)")
+        plt.savefig("Comparison_velocity_truth_Noise.png")
         
         # plt.figure(1)
         # plt.plot(time,raw_data_vec_np[:,:3])

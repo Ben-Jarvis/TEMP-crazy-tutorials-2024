@@ -30,31 +30,43 @@ Each of the sensors in the simulation and the PID controller furthermore run at 
 - Accelerometer: 16 milliseconds
 - PID Controller: 16 milliseconds
 
-(Note: These do not correspond tot typical update rates of real sensors)
-
 As we are considering real sensor data, the GPS and the Accelerometer measurements posess a so-called "Gaussian" noise with a 
 certain standard deviation from the true measurement, defined respectively as std_GPS = 0.2 meters and std_ACCEL = 0.01 m/s².
 
+(Note: These do not correspond to typical update rates and noise variations of sensors you may find in reality)
+
 Let us first look at position and acceleration data obtained from these noisy measurements below:
 
-FIGURE (Noisy position and acceleration)
+.. FIGURE (Noisy position and acceleration)
+
+.. image:: True_and_Noisy_Measurements_POS_ACCEL_USE.png
+  :width: 650
+  :alt: Noisy and Ground truth measurements obtained from GPS and Accelerometer
 
 To obtain the missing velocity measurements which are required for our PID controller, in a manner similar to the previous exercise, we can start by differentiating the noisy GPS position over every control interval. 
 By comparing this estimate to the ground-truth velocity as shown below, we however observe that the velocity estimates are even noisier than the position measurements and far from accurate:
 
-FIGURE (Figure of velocity noise)
+.. FIGURE (Figure of velocity noise)
+
+.. image:: Comparison_velocity_truth_Noise.png
+  :width: 650
+  :alt: Noisy and ground truth velocity measurements derived from GPS data
 
 When feeding these measurements directly into our cascaded PID controller, we then see the catastrophic results:
 
-FIGURE (GIF of failed drone)
+.. image:: crazyflie_world_excercise_2_noisy_feedback.gif
+  :width: 650
+  :alt: Noisy and ground truth velocity measurements derived from GPS data
 
 As you will see later in this exercise, relying on the integration of accleration measurements to yield velocities also yields unsatisfactory results.
 
 Therefore, to remedy this problem, given the noisy GPS and Acclerometer measurements and using 
 the provided theory from the lecture, you will implement and tune a Kalman Filter that returns 
-much better state estimates for three-dimensional position, velocity and acceleration, as shown in this Figure:
+much better state estimates for three-dimensional position, velocity and acceleration, yielding better performance despite noise:
 
-FIGURE (Noise vs. KF)
+  .. image:: position_estimates_noise_KF_GOOD.png
+  :width: 650
+  :alt: Noisy and Kalman filter position estimates for drone parcours flight
 
 Your drone should then remain in flight throughout the parcours and you can modify process 
 parameters to improve the performance of your controller with the Kalman Filter!
@@ -95,9 +107,6 @@ matrix **H**, measurement uncertainty matrix **R**, the obtained measurement **Z
 b) Implement the sensor fusion rule to update the new values of **self.X_opt** and **self.P_opt**.
 
 The function **KF_estimate** returns the state estimate **X_est** and prediction covariance **P_est** when demanded by calling the state propagation and sensor fusion functions according to the latest received sensor measurement(s).
-The process in this function is akin to the situation depicted on the following slide from the lecture:
-
-slide
 
 In this function, the following inputs are provided:
 - **sensor_state_flag**: Indicates the measurement(s) obtained at the current timestep, can take the values: {0: No measurement received, 1: GPS measurement received, 2: Accelerometer measurement received, 3: GPS and Accelerometer measurement received simultaneousy}.
@@ -116,7 +125,13 @@ When both measurements are received simultaneously, **KF_sensor_fusion** is call
 To test your implementation, first set **self.use_ground_truth_measurement = True** and compare your Kalman Filter estimate to the ground truth using the plots generated at the end of the run.
 If you are happy with the filtering performance and obtain a result similar to that in the figure below, you can proceed to Part 2.
 
-FIGURE (Filter Peformance compared with Ground truth)
+.. image:: position_estimates_noise_KF_GT.png
+  :width: 650
+  :alt: Noisy and Kalman filter position estimates for drone parcours flight
+
+.. image:: velocity_estimates_noise_KF_GT.png
+  :width: 650
+  :alt: Noisy and Kalman filter velocity estimates for drone parcours flight
 
 Part 2 - Deployment and Tuning
 ------------------------------
@@ -131,14 +146,16 @@ In simpler words:
 
 Starting with **self.q_tr = 0**, increase **self.q_tr** by small increments and investigate how this affects the behavior of the drone in the parcours.
 
-When you feel you have reached satisfactory performance and a low run completion time, you can compare your result to the performance below:
+When you feel you have reached satisfactory performance and a low run completion time, you can compare your result to the run and run-time below:
 
-FIGURE (KF run performance)
+.. image:: crazyflie_world_excercise_2_KF_success_new_PID.gif
+  :width: 650
+  :alt: Performance of drone parcours flight with Kalman Filter estimate
 
-Total completion time: 
+Total completion time: 14.1 seconds
 
-Part 3 - Relying on the Accelerometer
-----------------------------------
+Part 3 - Relying on the Accelerometer (BONUS)
+-------------------------------------------
 
 As a last investigation, let us look at what happens when we only measure and propagate accelerations from the 
 acclerometer but do not correct our estimates with exact GPS measurements.
@@ -148,7 +165,13 @@ re-run the simulation.
 
 Your drone movement should show a noticeable change after ~ 5 seconds, similar to this scenario:
 
-FIGURE (GIF)
+.. image:: crazyflie_world_excercise_2_ACCEL_DRIFT.gif
+  :width: 650
+  :alt: Drone parcours flight with Kalman Filter estimate using only the accerlometer
+
+.. image:: position_estimates_truth_KF_ACCEL.png
+  :width: 650
+  :alt: Performance of drone parcours flight with Kalman Filter estimate using only the accerlometer
 
 Why does this happen?
 
