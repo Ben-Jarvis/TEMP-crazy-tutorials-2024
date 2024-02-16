@@ -5,7 +5,7 @@ In this exercise, you will learn how to tune a cascaded PID controller for the C
 As seen in the lecture, it takes a position and yaw setpoint as an input and generates pwm signals for the motors as output:
 
 .. image:: pid.png
-  :width: 650
+  :width: 450
   :alt: PID controller
 
 Task overview
@@ -40,13 +40,13 @@ After two iterations, a plot displays the most important metrics for tuning:
   :alt: altitude tracking before tuning
 
 As a general rule of thumb, we propose the following strategy: 
-- Start with a small P and I,D = 0.
-- Increase P until you see an overshoot.
-- Increase D until the overshoot vanishes (D is usually smaller than P).
-- Repeat last two steps until increasing D does no longer stabilize your system.
-- Reduce P by 20% value and adapt D accordingly.
-- If nescessary, increase I to counteract steady state error.
-- I gains should only be used on the lowest level.
+  - Start with a small P and I,D = 0.
+  - Increase P until you see an overshoot.
+  - Increase D until the overshoot vanishes (D is usually smaller than P).
+  - Repeat last two steps until increasing D does no longer stabilize your system.
+  - Reduce P by 20% value and adapt D accordingly.
+  - If nescessary, increase I to counteract steady state error.
+  - I gains should only be used on the lowest level.
 
 This should lead you to similar performance:
 
@@ -56,12 +56,12 @@ This should lead you to similar performance:
 
 2. Now you can do the same for z-position by switching **self.tuning_level = "pos_z"**. Once you are done, your drone can hover in a stable manner, allowing tuning the other gains.
 3. A cascaded controller always needs to be tuned from the bottom up. The gains in brackets are already at good values to save you time, so you can skip those if you want.
-- **self.tuning_level = "rate_rp"**
-- (**self.tuning_level = "rate_y"**)
-- **self.tuning_level = "att_rp"**
-- (**self.tuning_level = "att_y"**)
-- **self.tuning_level = "vel_xy"**
-- **self.tuning_level = "pos_xy"**
+  - **self.tuning_level = "rate_rp"**
+  - (**self.tuning_level = "rate_y"**)
+  - **self.tuning_level = "att_rp"**
+  - (**self.tuning_level = "att_y"**)
+  - **self.tuning_level = "vel_xy"**
+  - **self.tuning_level = "pos_xy"**
 
 Once you are happy with your gains, disable tuning (**self.tuning_level = "off"**) and tell an assistant the time it takes your CrazyFlie to finish the parcour.
 We will keep a live score board during the exercise.
