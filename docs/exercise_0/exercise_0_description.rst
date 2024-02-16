@@ -11,12 +11,12 @@ This is important because the drone's orientation will change as it moves, and t
 
 To start, you can run the the simulation in Webots by opening the world file (**crazyflie_world_exercise_0.wbt**) and clicking the play button.
 You should see a drone in the simulation that you can control using the keys on your keyboard as follows:
-- **W**: Move the drone forward
-- **S**: Move the drone backward
-- **A**: Move the drone left
-- **D**: Move the drone right
-- **Q**: Turn the drone left
-- **E**: Turn the drone right
+  - **W**: Move the drone forward
+  - **S**: Move the drone backward
+  - **A**: Move the drone left
+  - **D**: Move the drone right
+  - **Q**: Turn the drone left
+  - **E**: Turn the drone right
 
 By looking at the 3D view of the scene and the FPV camera from the drone, you can see that the drone moves in the world frame, regardless of its orientation.
 
