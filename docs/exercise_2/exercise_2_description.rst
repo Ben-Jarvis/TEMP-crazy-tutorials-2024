@@ -132,11 +132,11 @@ When both measurements are received simultaneously, **KF_sensor_fusion** is call
 To test your implementation, first set **self.use_ground_truth_measurement = True** and compare your Kalman Filter estimate to the ground truth using the plots generated at the end of the run.
 If you are happy with the filtering performance and obtain a result similar to that in the figure below, you can proceed to Part 2.
 
-.. image:: position_estimates_noise_KF_GT.png
+.. image:: position_estimates_truth_KF_GT.png
   :width: 650
   :alt: Noisy and Kalman filter position estimates for drone parcours flight
 
-.. image:: velocity_estimates_noise_KF_GT.png
+.. image:: velocity_estimates_truth_KF_GT.png
   :width: 650
   :alt: Noisy and Kalman filter velocity estimates for drone parcours flight
 
