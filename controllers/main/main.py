@@ -464,7 +464,8 @@ if __name__ == '__main__':
                 if control_style == 'keyboard':
                     control_commands = drone.action_from_keyboard(sensor_data)
                 else:
-                    setpoint = example.path_planning(sensor_data)
+                    dt_ctrl = drone.getTime() - drone.PID_update_last_time
+                    setpoint = example.path_planning(sensor_data,dt_ctrl)
             else:
                 # Control commands with [v_forward, v_left, yaw_rate, altitude]
                 # ---- Select only one of the following control methods ---- #

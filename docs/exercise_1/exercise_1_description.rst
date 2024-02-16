@@ -2,27 +2,24 @@ Exercise 1: Cascaded PID control
 ==================================
 
 In this exercise, you will learn how to tune a cascaded PID controller for the CrazyFlie (**pid_control.py**). 
-It uses a simplistic version of the controller seen in the lecture:
-On the highest level, it receives a linear velocity command, a desired yaw rate as well as an attitude reference.
-The first two then get converted into desired roll and pitch commands.
-This leads to the final layer, where roll, pitch, yaw_rate and attitude commands are passed through a mixer and lead to motor inputs.
+As seen in the lecture, it takes a position and yaw setpoint as an input and generates pwm signals for the motors as output:
 
 .. image:: pid.png
   :width: 650
-  :alt: the PID controller used on the CrazyFlie
+  :alt: PID controller
 
 Task overview
 -------------
 
-For this task you will learn how to systematically tune each layer of the cascaded controller and thus improve the overall control performance.
+For this task you will learn how to systematically tune each layer of the cascaded controller and thus improve the overall performance.
 To start, you can run the simulation on webots (**crazyflie_world_excercise_1**) and you should see a badly tuned controller flying through a parcour, marked by four spheres.
-Note that webots tells you how long it takes the drone to complete the task: With the initial gains it takes roughly 24.5s. 
+Note that webots tells you how long it takes the drone to complete the task: With the initial gains this is roughly 18 s. 
 
 .. image:: square_before.gif
   :width: 650
   :alt: initial gains lead to bad performance
 
-If tuned successfully, you will end up with a much better performance, completing the parcour within roughly 20s.
+If tuned well, you will end up with a much better performance, completing the parcour below 12 s.
 
 .. image:: square_after.gif
   :width: 650
@@ -30,48 +27,51 @@ If tuned successfully, you will end up with a much better performance, completin
 
 Exercise
 ---------
-The key to a successful tuning is to start from a stable state. First you need to make sure that your drone can keep an altitude.
-Start by opening **pid_control.py** and change the variable **self.tuning_level = "altitude"**.
-This will now send step inputs as an altitude reference to your drone, which it will try to track. 
+The key to a successful tuning is to start from a stable state: first you need to make sure that your drone can keep an altitude. This requires tuning the PID responsible for z-velocity as well as the one for z-position.
+1. Start by opening **pid_control.py** and change the variable **self.tuning_level = "vel_z"**.
+This will now send step inputs for z-velocity to your drone. 
 After two iterations, a plot displays the most important metrics for tuning:
 - Rise time: How long it takes the system to reach the reference. This should be as short as possible.
 - Oversthoot: How much your system exeeds the reference after reaching it. This should stay within a certain range (we suggest less than 10%).
-- Steady state error: Your system might not converge fully to your reference. This should stay within a certain range (we suggest less than 5%).
+- Steady state error: Your system might not converge fully to your reference within a period of the step function. This should stay within a certain range (we suggest less than 5%).
 
-.. image:: altitude_before.png
+.. image:: vel_z_before.png
   :width: 650
   :alt: altitude tracking before tuning
 
 As a general rule of thumb, we propose the following strategy: 
 - Start with a small P and I,D = 0.
-- If an offset term exists (e.g. to provide constant thrust to fight gravity), increase it until you get symmetric behaviour
 - Increase P until you see an overshoot.
-- Increase D until the overshoot vanishes.
+- Increase D until the overshoot vanishes (D is usually smaller than P).
 - Repeat last two steps until increasing D does no longer stabilize your system.
-- Reduce P to last stable value and adapt D accordingly.
+- Reduce P by 20% value and adapt D accordingly.
 - If nescessary, increase I to counteract steady state error.
+- I gains should only be used on the lowest level.
 
 This should lead you to similar performance:
 
-.. image:: altitude_after.png
+.. image:: vel_z_after.png
   :width: 650
   :alt: altitude tracking after tuning
 
-If your drone successful tracks altitude, you should tune the cascaded controller from the bottom up:
-- **self.tuning_level = "attitude"**
-- **self.tuning_level = "yawrate"**
-- **self.tuning_level = "velocity"**
+2. Now you can do the same for z-position by switching **self.tuning_level = "pos_z"**. Once you are done, your drone can hover in a stable manner, allowing tuning the other gains.
+3. A cascaded controller always needs to be tuned from the bottom up. The gains in brackets are already at good values to save you time, so you can skip those if you want.
+- **self.tuning_level = "rate_rp"**
+- (**self.tuning_level = "rate_y"**)
+- **self.tuning_level = "att_rp"**
+- (**self.tuning_level = "att_y"**)
+- **self.tuning_level = "vel_xy"**
+- **self.tuning_level = "pos_xy"**
 
-Once you are happy with your gains, disable tuning (**self.tuning_level = "off"**) and tell an assistant your gains and the time it takes your CrazyFlie to finish the parcour.
+Once you are happy with your gains, disable tuning (**self.tuning_level = "off"**) and tell an assistant the time it takes your CrazyFlie to finish the parcour.
 We will keep a live score board during the exercise.
 
 Bonus challenge
 ---------------
-The references that are sent through the cascaded control architecture are capped to make your drone more stable (e.g. when you request 1 [rad] in roll, it still send a maximum reference of 0.5 [rad]).
-For faster flight, you can increase the maximum reference by adapting **max_velocity**, **max_attitude** and **max_yawrate**.
-If you really want to push your drone to the limit, you can even increase the cap on the motor commands by adapting **max_command_attitude** and **max_command_attitude**.
+The references that are sent through the cascaded control architecture are capped to make your drone more stable (e.g. when you request a roll rate of 3 [rad/s], it still send a maximum reference of 2 [rad/s]).
+For faster flight, you can increase the maximum reference by adapting **self.limits**. You might have to adjust your gains to adapt to the new limits.
 
-Our best time is 13.9s. Let the fastest drone win!
+Our best time is 9.5 s. Let the fastest drone win!
 
 ====================================================================================
 Any questions about the exercise, please contact Simon Jeger (simon.jeger@epfl.ch).

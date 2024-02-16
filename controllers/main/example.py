@@ -6,8 +6,9 @@ import time
 # Global variables
 on_ground = True
 height_desired = 0.5
-starttime = 0
-endtime = None
+timer = None
+startpos = None
+timer_done = None
 
 # Obstacle avoidance with range sensors
 def obstacle_avoidance(sensor_data):
@@ -32,35 +33,39 @@ def obstacle_avoidance(sensor_data):
     return control_command
 
 # Coverage path planning
-setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, 1.0], [5.0, 3.0, 1.5, 2.0], [5.0, 0.0, 0.25, 3.0], [0.0, 0.0, 1.0, 0.0]]
+setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
 index_current_setpoint = 0
-def path_planning(sensor_data):
-    global on_ground, height_desired, index_current_setpoint, setpoints, starttime, endtime
+def path_planning(sensor_data,dt):
+    global on_ground, height_desired, index_current_setpoint, setpoints, timer, timer_done, startpos
 
     # Take off
+    if startpos is None:
+        startpos = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global']]
     if on_ground and sensor_data['z_global'] < 0.49:
-        current_setpoint = [1.0, 1.0, height_desired, 0.0]
+        current_setpoint = [startpos[0], startpos[1], height_desired, 0.0]
         return current_setpoint
     else:
         on_ground = False
 
     # Start timer
-    if index_current_setpoint == 0:
-        starttime = time.time()
-
+    if (index_current_setpoint == 1) & (timer is None):
+        timer = 0
+        print("Time recording started")
+    if timer is not None:
+        timer += dt
     # Hover at the final setpoint
     if index_current_setpoint == len(setpoints):
-        control_command = [0.0, 0.0, 0.0, height_desired]
+        control_command = [startpos[0], startpos[1], startpos[2]-0.05, 0.0]
 
-        if endtime is None:
-            endtime = time.time()
-            print("Path planing took " + str(np.round(endtime - starttime,1)) + " [s] from start to finish")
+        if timer_done is None:
+            timer_done = True
+            print("Path planing took " + str(np.round(timer,1)) + " [s]")
         return control_command
 
     # Get the goal position and drone position
     current_setpoint = setpoints[index_current_setpoint]
     x_drone, y_drone, z_drone, yaw_drone = sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global'], sensor_data['yaw']
-    distance_drone_to_goal = np.linalg.norm([current_setpoint[0] - x_drone, current_setpoint[1] - y_drone, current_setpoint[2] - z_drone, current_setpoint[3] - yaw_drone])
+    distance_drone_to_goal = np.linalg.norm([current_setpoint[0] - x_drone, current_setpoint[1] - y_drone, current_setpoint[2] - z_drone, current_setpoint[3] - yaw_drone%(2*np.pi)])
 
     # When the drone reaches the goal setpoint, e.g., distance < 0.1m
     if distance_drone_to_goal < 0.1:
