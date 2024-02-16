@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from pid_control import pid_velocity_fixed_height_controller as pid
+from control import quadrotor_controller as pid
 import matplotlib.pyplot as plt
 import pandas as pd
 from PIL import Image
@@ -213,6 +213,9 @@ class kalman_filter():
                 self.y_noisy_global_last = noisy_sensor_data['y_global']
                 self.z_noisy_global_last = noisy_sensor_data['z_global']
 
+        noisy_sensor_data['v_x'] = self.v_x_noisy
+        noisy_sensor_data['v_y'] = self.v_y_noisy
+        noisy_sensor_data['v_z'] = self.v_z_noisy
         noisy_sensor_data['v_forward'] =  self.v_x_noisy * np.cos(noisy_sensor_data['yaw']) + self.v_y_noisy * np.sin(noisy_sensor_data['yaw'])
         noisy_sensor_data['v_left'] = -self.v_x_noisy * np.sin(noisy_sensor_data['yaw']) + self.v_y_noisy * np.cos(noisy_sensor_data['yaw'])
         noisy_sensor_data['v_down'] = self.v_z_noisy

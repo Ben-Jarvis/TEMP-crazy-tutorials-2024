@@ -2,7 +2,7 @@
 
 import numpy as np
 from controller import Supervisor, Keyboard
-from pid_control import pid_velocity_fixed_height_controller
+from control import quadrotor_controller
 from kalman_filter import kalman_filter as KF
 import utils
 from scipy.spatial.transform import Rotation as R
@@ -10,7 +10,7 @@ import example
 import time, random
 
 exp_num = 2
-control_style = 'path_planning'
+control_style = 'path_planner'
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -87,7 +87,7 @@ class CrazyflieInDroneDome(Supervisor):
         self.laser_down.enable(self.timestep)
         
         # Crazyflie velocity PID controller
-        self.PID_CF = pid_velocity_fixed_height_controller()
+        self.PID_CF = quadrotor_controller()
         self.PID_update_last_time = self.getTime()
         self.sensor_read_last_time = self.getTime()
         self.step_count = 0
@@ -105,11 +105,11 @@ class CrazyflieInDroneDome(Supervisor):
         self.keyboard.enable(self.timestep)
 
         # Set a random initial yaw of the drone
-        drone = super().getSelf()
-        init_yaw_drone = random.uniform(-np.pi, np.pi)
-        # init_yaw_drone = np.pi/6
-        rotation_field = drone.getField('rotation')
-        rotation_field.setSFRotation([0, 0, 1, init_yaw_drone])
+        # drone = super().getSelf()
+        # init_yaw_drone = random.uniform(-np.pi, np.pi)
+        # # init_yaw_drone = np.pi/6
+        # rotation_field = drone.getField('rotation')
+        # rotation_field.setSFRotation([0, 0, 1, init_yaw_drone])
 
         # Simulation step update
         super().step(self.timestep)
@@ -251,10 +251,10 @@ class CrazyflieInDroneDome(Supervisor):
                     self.accel_read_last_time = self.getTime()
                     # self.dt_accel = 0.0
 
-        print("Current Time ACC: " + str(self.dt_accel))
-        print("Current Time GPS: " + str(self.dt_gps))
-        print("Current Time Prop: " + str(self.dt_propagate))
-        print("Sensor flag: " + str(self.sensor_flag))
+        # print("Current Time ACC: " + str(self.dt_accel))
+        # print("Current Time GPS: " + str(self.dt_gps))
+        # print("Current Time Prop: " + str(self.dt_propagate))
+        # print("Sensor flag: " + str(self.sensor_flag))
 
         estimated_state, estimated_covariance = self.KF.KF_estimate(self.meas_state_gps, self.meas_state_accel, self.dt_propagate, self.sensor_flag)
 
@@ -263,6 +263,9 @@ class CrazyflieInDroneDome(Supervisor):
         KF_state_outputs['x_global'] = x_g_est
         KF_state_outputs['y_global'] = y_g_est
         KF_state_outputs['z_global'] = z_g_est
+        KF_state_outputs['v_x'] = v_x_g_est
+        KF_state_outputs['v_y'] = v_y_g_est
+        KF_state_outputs['v_z'] = v_z_g_est
         KF_state_outputs['v_forward'] = v_x_g_est * np.cos(KF_state_outputs['yaw']) + v_y_g_est * np.sin(KF_state_outputs['yaw'])
         KF_state_outputs['v_left'] = -v_x_g_est * np.sin(KF_state_outputs['yaw']) + v_y_g_est * np.cos(KF_state_outputs['yaw'])
         KF_state_outputs['v_down'] = v_z_g_est
@@ -304,6 +307,11 @@ class CrazyflieInDroneDome(Supervisor):
         data['pitch'] = self.imu.getRollPitchYaw()[1]
         data['yaw'] = self.imu.getRollPitchYaw()[2]
 
+        data['q_x'] = self.imu.getQuaternion()[0]
+        data['q_y'] = self.imu.getQuaternion()[1]
+        data['q_z'] = self.imu.getQuaternion()[2]
+        data['q_w'] = self.imu.getQuaternion()[3]
+
         # Velocity
         if exp_num == 2:
             if np.round(self.dt_gps,3) >= self.gps_update_period/1000:
@@ -325,6 +333,9 @@ class CrazyflieInDroneDome(Supervisor):
             self.y_global_last = data['y_global']
             self.z_global_last = data['z_global']
 
+        data['v_x'] = self.vx_global
+        data['v_y'] = self.vy_global
+        data['v_z'] = self.vz_global
 
         data['v_forward'] =  self.vx_global * np.cos(data['yaw']) + self.vy_global * np.sin(data['yaw'])
         data['v_left'] =  -self.vx_global * np.sin(data['yaw']) + self.vy_global * np.cos(data['yaw'])
@@ -352,7 +363,9 @@ class CrazyflieInDroneDome(Supervisor):
         data['range_down'] = self.laser_down.getValue() / 1000.0
 
         # Yaw rate
-        data['yaw_rate'] = self.gyro.getValues()[2]
+        data['rate_roll'] = self.gyro.getValues()[0]
+        data['rate_pitch'] = self.gyro.getValues()[1]
+        data['rate_yaw'] = self.gyro.getValues()[2]
 
         return data
 
@@ -401,15 +414,13 @@ class CrazyflieInDroneDome(Supervisor):
         self.simulationReset()
         super().step(self.timestep)
 
-    def step(self, control_commands, sensor_data):
+    def step(self, setpoint, sensor_data):
         
         dt_ctrl = self.getTime() - self.PID_update_last_time
         # Time interval for PID control
         self.PID_update_last_time = self.getTime()
         # Low-level PID velocity control with fixed height
-        motorPower = self.PID_CF.pid(dt_ctrl, control_commands, sensor_data['roll'], sensor_data['pitch'],
-                                                                sensor_data['yaw_rate'], sensor_data['z_global'],
-                                                                sensor_data['v_forward'], sensor_data['v_left'])
+        motorPower = self.PID_CF.pid(dt_ctrl, setpoint, sensor_data)
             
         # Update motor command
         self.m1_motor.setVelocity(-motorPower[0])
@@ -432,9 +443,7 @@ class CrazyflieInDroneDome(Supervisor):
 
             self.PID_update_last_time = self.getTime()
             # Low-level PID velocity control with fixed height
-            motorPower = self.PID_CF.pid(self.dt_ctrl, pp_cmds, KF_data['roll'], KF_data['pitch'],
-                                                            KF_data['yaw_rate'], KF_data['z_global'],
-                                                            KF_data['v_forward'], KF_data['v_left'])
+            motorPower = self.PID_CF.pid(self.dt_ctrl, pp_cmds, KF_data)
         
             # Update motor command
             self.m1_motor.setVelocity(-motorPower[0])
@@ -465,7 +474,7 @@ if __name__ == '__main__':
                 if control_style == 'keyboard':
                     control_commands = drone.action_from_keyboard(sensor_data)
                 else:
-                    control_commands = example.path_planning(sensor_data)
+                    setpoint = example.path_planning(sensor_data)
             else:
                 # Control commands with [v_forward, v_left, yaw_rate, altitude]
                 # ---- Select only one of the following control methods ---- #
@@ -474,8 +483,8 @@ if __name__ == '__main__':
                 # Check if the drone has reached the goal
                 drone.check_goal(sensor_data)
             
-            control_commands = utils.rot_global2body(control_commands, [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']])
-            drone.step(control_commands, sensor_data)
+            # control_commands = utils.rot_global2body(control_commands, [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']])
+            drone.step(setpoint, sensor_data)
         else:
             state_data = drone.read_KF_estimates()
             drone.step_KF(state_data)

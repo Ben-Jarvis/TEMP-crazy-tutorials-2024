@@ -32,15 +32,15 @@ def obstacle_avoidance(sensor_data):
     return control_command
 
 # Coverage path planning
-setpoints = [[0.0, 0.0, 1.0], [0.0, 3.0, 1.25], [5.0, 3.0, 1.5], [5.0, 0.0, 0.25], [0.0, 0.0, 1.0]]
+setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, 1.0], [5.0, 3.0, 1.5, 2.0], [5.0, 0.0, 0.25, 3.0], [0.0, 0.0, 1.0, 0.0]]
 index_current_setpoint = 0
 def path_planning(sensor_data):
     global on_ground, height_desired, index_current_setpoint, setpoints, starttime, endtime
 
     # Take off
     if on_ground and sensor_data['z_global'] < 0.49:
-        control_command = [0.0, 0.0, 0.0, height_desired]
-        return control_command
+        current_setpoint = [1.0, 1.0, height_desired, 0.0]
+        return current_setpoint
     else:
         on_ground = False
 
@@ -58,9 +58,9 @@ def path_planning(sensor_data):
         return control_command
 
     # Get the goal position and drone position
-    x_goal, y_goal, z_goal = setpoints[index_current_setpoint]
-    x_drone, y_drone, z_drone = sensor_data['x_global'], sensor_data['y_global'], sensor_data['range_down']
-    distance_drone_to_goal = np.linalg.norm([x_goal - x_drone, y_goal- y_drone, z_goal- z_drone])
+    current_setpoint = setpoints[index_current_setpoint]
+    x_drone, y_drone, z_drone, yaw_drone = sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global'], sensor_data['yaw']
+    distance_drone_to_goal = np.linalg.norm([current_setpoint[0] - x_drone, current_setpoint[1] - y_drone, current_setpoint[2] - z_drone, current_setpoint[3] - yaw_drone])
 
     # When the drone reaches the goal setpoint, e.g., distance < 0.1m
     if distance_drone_to_goal < 0.1:
@@ -68,16 +68,10 @@ def path_planning(sensor_data):
         index_current_setpoint += 1
         # Hover at the final setpoint
         if index_current_setpoint == len(setpoints):
-            control_command = [0.0, 0.0, 0.0, height_desired]
-            return control_command
+            current_setpoint = [0.0, 0.0, 0.0, height_desired]
+            return current_setpoint
 
-    # Calculate the control command based on current goal setpoint
-    x_goal, y_goal, z_goal = setpoints[index_current_setpoint]
-    x_drone, y_drone = sensor_data['x_global'], sensor_data['y_global']
-    gain = 2
-    v_x, v_y, yawrate = (x_goal - x_drone)*gain, (y_goal - y_drone)*gain, -sensor_data['yaw']*gain
-    control_command = [v_x, v_y, yawrate, z_goal]
-    return control_command
+    return current_setpoint
     
 # Occupancy map based on distance sensor
 min_x, max_x = 0, 5.0 # meter
@@ -111,7 +105,7 @@ def occupancy_map(sensor_data):
             idx_x = int(np.round((pos_x - min_x + dist*np.cos(yaw_sensor))/res_pos,0))
             idx_y = int(np.round((pos_y - min_y + dist*np.sin(yaw_sensor))/res_pos,0))
 
-            # make sure the point is within the map
+            # make sure the current_setpoint is within the map
             if idx_x < 0 or idx_x >= map.shape[0] or idx_y < 0 or idx_y >= map.shape[1] or dist > range_max:
                 break
 
