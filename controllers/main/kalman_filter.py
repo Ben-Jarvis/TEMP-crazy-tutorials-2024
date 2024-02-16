@@ -19,7 +19,7 @@ class kalman_filter():
         self.initialize_KF(self.noise_std_GPS, self.noise_std_ACCEL)
 
         # Flags for use cases to test
-        self.use_accel_only = True
+        self.use_accel_only = False
         self.use_ground_truth_measurement = False
         self.use_noisy_measurement = False
 

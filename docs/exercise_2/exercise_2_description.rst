@@ -31,7 +31,7 @@ Each of the sensors in the simulation and the PID controller furthermore run at 
 - PID Controller: 16 milliseconds
 
 As we are considering real sensor data, the GPS and the Accelerometer measurements posess a so-called "Gaussian" noise with a 
-certain standard deviation from the true measurement, defined respectively as std_GPS = 0.2 meters and std_ACCEL = 0.01 m/s².
+certain standard deviation from the true measurement, defined respectively as std_GPS = 0.2 meters and std_ACCEL = 0.02 m/s².
 
 (Note: These do not correspond to typical update rates and noise variations of sensors you may find in reality)
 
@@ -65,8 +65,8 @@ the provided theory from the lecture, you will implement and tune a Kalman Filte
 much better state estimates for three-dimensional position, velocity and acceleration, yielding better performance despite noise:
 
   .. image:: position_estimates_noise_KF_GOOD.png
-  :width: 650
-  :alt: Noisy and Kalman filter position estimates for drone parcours flight
+    :width: 650
+    :alt: Noisy and Kalman filter position estimates for drone parcours flight
 
 Your drone should then remain in flight throughout the parcours and you can modify process 
 parameters to improve the performance of your controller with the Kalman Filter!
