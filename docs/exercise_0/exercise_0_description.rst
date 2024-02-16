@@ -1,4 +1,4 @@
-Exercise 0: Frame Transformation for Drone Control
+Exercise 0: Coordinate Transformations
 ==================================================
 
 In this exercise, you will learn how to implement a coordinate transform for a drone using euler angles.
@@ -31,8 +31,8 @@ Now you can reload the world by clicking the reload button in the top left of th
   :width: 650
   :alt: Overview of the frame transformation process
 
-Now you will see the drone try to move to each of the yellow spheres in the world.
-However, because the drone is spinning, these commands are not aligned with the drone's orientation, and the drone will not move as expected. Instead moving in a circle around the starting position.
+Now you will see the drone try to follow your commands in the world frame.
+Because these commands are in the world frame, the drone will move in the global x and y directions regardless of its orientation. By looking at the FPV camera, you can see that this is not an intuitive way to control the drone.
 
 .. image:: before_transform.gif
   :width: 650
@@ -41,7 +41,7 @@ However, because the drone is spinning, these commands are not aligned with the 
 
 To fix this, you will need to implement a function to convert the control commands from the world frame to the body frame of the drone.
 This will involve using the drone's current orientation, which is given as a set of Euler angles, to calculate a rotation matrix that can be used to transform the control commands.
-The drone will then respond correctly to the control commands, regardless of its orientation and can even reach the yellow spheres while spinning.
+The drone will then respond correctly to the control commands, regardless of its orientation and you can perform complex manouevres while yawing.
 
 .. image:: after_transform.gif
   :width: 650
