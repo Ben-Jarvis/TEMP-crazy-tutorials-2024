@@ -10,7 +10,7 @@ import example
 import time, random
 
 exp_num = 0                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
-control_style = 'path_planner'      # 'keyboard' or 'path_planner
+control_style = 'keyboard'      # 'keyboard' or 'path_planner
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -47,29 +47,25 @@ class CrazyflieInDroneDome(Supervisor):
 
         if exp_num == 2:
             self.ctrl_update_period = int(self.timestep*3) #timestep equal to GPS time 2 or 3 works well
+            self.gps_update_period = int(self.timestep*3) # 2*timestep
+            self.accel_update_period = int(self.timestep*2) # 1*timestep
         else:
-            self.ctrl_update_period = int(self.timestep)
+            self.ctrl_update_period = self.timestep
+            self.gps_update_period = self.timestep
+            self.accel_update_period = self.timestep
 
         # Sensors
 
         #Update rates for excercise 2 (Kalman filter)
-
-        self.gps_update_period = int(self.timestep*3) # 2*timestep
-        self.accel_update_period = int(self.timestep*2) # 1*timestep
 
         self.g = 9.81 #Used for accelerometer Z-direction correction
 
         self.imu = self.getDevice('inertial unit')
         self.imu.enable(self.timestep)
         self.gps = self.getDevice('gps')
-        
-        if exp_num == 2:
-            self.accelerometer = self.getDevice('accelerometer')
-            self.gps.enable(self.gps_update_period)
-            self.accelerometer.enable(self.accel_update_period)
-        else:
-            self.gps.enable(self.timestep)
-
+        self.gps.enable(self.gps_update_period)
+        self.accelerometer = self.getDevice('accelerometer')
+        self.accelerometer.enable(self.accel_update_period)
         self.gyro = self.getDevice('gyro')
         self.gyro.enable(self.timestep)
         self.camera = self.getDevice('cf_camera')
@@ -213,48 +209,38 @@ class CrazyflieInDroneDome(Supervisor):
         self.sensor_flag = 0
 
         if self.KF.use_accel_only and self.getTime() > 2.0:
+            #Only propagate and measure accelerometer
             
             self.dt_propagate = self.dt_accel
 
             if np.round(self.dt_accel,3) >= self.accelerometer.getSamplingPeriod()/1000: 
-                # Set flag to always use accel as measurement
                 self.sensor_flag = 2
                 self.meas_state_accel = np.array([[measured_noisy_data['ax_global'], measured_noisy_data['ay_global'], measured_noisy_data['az_global']]]).transpose()
                 self.accel_read_last_time = self.getTime()
-                # self.dt_gps = self.dt_accel
-                # print("Using only accelerometer ground truth")
             if np.round(self.dt_gps,3) >= self.gps.getSamplingPeriod()/1000:
                 self.gps_read_last_time = self.getTime() #Required to maintain ground truth state measured capability
 
         else:
 
+            #Propagate and measure for both accelerometer and GPS
+
             self.dt_propagate = min(self.dt_accel, self.dt_gps)
 
             if np.round(self.dt_accel,3) >= self.accelerometer.getSamplingPeriod()/1000 and np.round(self.dt_gps,3) >= self.gps.getSamplingPeriod()/1000:
-                # print("Using GPS after measuring both sensors at: " + str(self.getTime()))
-                self.sensor_flag = 3 #Use GPS as default
+                self.sensor_flag = 3
                 self.meas_state_accel = np.array([[measured_noisy_data['ax_global'], measured_noisy_data['ay_global'], measured_noisy_data['az_global']]]).transpose()
                 self.accel_read_last_time = self.getTime()
                 self.meas_state_gps = np.array([[measured_noisy_data['x_global'], measured_noisy_data['y_global'], measured_noisy_data['z_global']]]).transpose()
                 self.gps_read_last_time = self.getTime()
             else:
                 if np.round(self.dt_gps,3) >= self.gps.getSamplingPeriod()/1000:
-                    # print("Measured GPS at: " + str(self.getTime()))
                     self.sensor_flag = 1
                     self.meas_state_gps = np.array([[measured_noisy_data['x_global'], measured_noisy_data['y_global'], measured_noisy_data['z_global']]]).transpose()
                     self.gps_read_last_time = self.getTime()
-                    # self.dt_gps = 0.0
                 if np.round(self.dt_accel,3) >= self.accelerometer.getSamplingPeriod()/1000: 
-                    # print("Measured Accelerometer at: " + str(self.getTime()))
                     self.sensor_flag = 2
                     self.meas_state_accel = np.array([[measured_noisy_data['ax_global'], measured_noisy_data['ay_global'], measured_noisy_data['az_global']]]).transpose()
                     self.accel_read_last_time = self.getTime()
-                    # self.dt_accel = 0.0
-
-        # print("Current Time ACC: " + str(self.dt_accel))
-        # print("Current Time GPS: " + str(self.dt_gps))
-        # print("Current Time Prop: " + str(self.dt_propagate))
-        # print("Sensor flag: " + str(self.sensor_flag))
 
         estimated_state, estimated_covariance = self.KF.KF_estimate(self.meas_state_gps, self.meas_state_accel, self.dt_propagate, self.sensor_flag)
 
@@ -273,6 +259,7 @@ class CrazyflieInDroneDome(Supervisor):
         KF_state_outputs['ay_global'] = a_y_g_est
         KF_state_outputs['az_global'] = a_z_g_est
 
+        # Call appending of states over run
         self.KF.aggregate_states(measured_data_raw, measured_noisy_data, KF_state_outputs, self.getTime())
 
         if self.KF.use_noisy_measurement:
@@ -312,6 +299,10 @@ class CrazyflieInDroneDome(Supervisor):
         data['q_z'] = self.imu.getQuaternion()[2]
         data['q_w'] = self.imu.getQuaternion()[3]
 
+        ax_body = self.accelerometer.getValues()[0]
+        ay_body = self.accelerometer.getValues()[1]
+        az_body = self.accelerometer.getValues()[2] 
+
         # Velocity
         if exp_num == 2:
             if np.round(self.dt_gps,3) >= self.gps_update_period/1000:
@@ -341,19 +332,15 @@ class CrazyflieInDroneDome(Supervisor):
         data['v_left'] =  -self.vx_global * np.sin(data['yaw']) + self.vy_global * np.cos(data['yaw'])
         data['v_down'] =  self.vz_global
 
-        if exp_num == 2:
-            ax_body = self.accelerometer.getValues()[0]
-            ay_body = self.accelerometer.getValues()[1]
-            az_body = self.accelerometer.getValues()[2] 
+        #Accleration from body to global frame
+        r = R.from_euler('xyz', [data['roll'], data['pitch'], data['yaw']])
+        R_T = r.as_matrix()
 
-            r = R.from_euler('xyz', [data['roll'], data['pitch'], data['yaw']])
-            R_T = r.as_matrix()
+        a_global = (R_T @ np.array([[ax_body, ay_body, az_body]]).transpose()).flatten()
 
-            a_global = (R_T @ np.array([[ax_body, ay_body, az_body]]).transpose()).flatten()
-
-            data['ax_global'] = a_global[0]
-            data['ay_global'] = a_global[1]
-            data['az_global'] = a_global[2] - self.g     
+        data['ax_global'] = a_global[0]
+        data['ay_global'] = a_global[1]
+        data['az_global'] = a_global[2] - self.g     
 
         # Range sensor
         data['range_front'] = self.range_front.getValue() / 1000.0
@@ -462,58 +449,52 @@ if __name__ == '__main__':
 
     # Initialize the drone
     drone = CrazyflieInDroneDome()
+    assert control_style in ['keyboard','path_planner'], "Variable control_style must either be 'keyboard' or 'path_planner'"
+    assert exp_num in [0,1,2,3], "Exp_num must be a value between 0 and 3"
 
     # Simulation loops
     for step in range(100000):
+        
+        if exp_num == 2:
+            assert control_style == 'path_planner', "Variable control_style must be set to path planner for this exercise"
+            state_data = drone.read_KF_estimates()
+            # Update the drone status in simulation with KF
+            drone.step_KF(state_data)
 
-        # # Read sensor data including []
-        if exp_num != 2:            
+        else:
+            # Read sensor data including []
             sensor_data = drone.read_sensors()
+            dt_ctrl = drone.getTime() - drone.PID_update_last_time
 
-            if exp_num == 0 or exp_num == 1:
-                if control_style == 'keyboard':
-                    control_commands = drone.action_from_keyboard(sensor_data)
-
-                    eulers = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
-                    control_commands = utils.rot_global2body(control_commands, eulers)
-
-                    set_x = sensor_data['x_global'] + control_commands[0]
-                    set_y = sensor_data['y_global'] + control_commands[1]
-                    set_alt = control_commands[2]
-                    set_yaw = sensor_data['yaw'] + control_commands[3]
-                    
-                    setpoint = [set_x, set_y, set_alt, set_yaw]
-
-                else:
-                    dt_ctrl = drone.getTime() - drone.PID_update_last_time
-                    setpoint = example.path_planning(sensor_data,dt_ctrl)
-            else:
-                # Control commands with [v_forward, v_left, yaw_rate, altitude]
-                # ---- Select only one of the following control methods ---- #
+            if control_style == 'keyboard':
                 control_commands = drone.action_from_keyboard(sensor_data)
+
+                eulers = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
+                control_commands = utils.rot_global2body(control_commands, eulers)
+
+                set_x = sensor_data['x_global'] + control_commands[0]
+                set_y = sensor_data['y_global'] + control_commands[1]
+                set_alt = control_commands[2]
+                set_yaw = sensor_data['yaw'] + control_commands[3]
+                
+                setpoint = [set_x, set_y, set_alt, set_yaw]
+            elif control_style == 'path_planner':
+                setpoint = example.path_planning(sensor_data,dt_ctrl)
+
+            if exp_num == 3:
+                # For the PROJECT CHANGE YOUR CODE HERE
+                # Example Path planner call
+                setpoint = example.path_planning(sensor_data,dt_ctrl)
                 drone.check_landing_pad(sensor_data)
                 # Check if the drone has reached the goal
                 drone.check_goal(sensor_data)
-            
-            # control_commands = utils.rot_global2body(control_commands, [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']])
+
+            # Update the drone status in simulation
             drone.step(setpoint, sensor_data)
-        else:
-            state_data = drone.read_KF_estimates()
-            drone.step_KF(state_data)
-
-        # # Check if the drone has reached the landing pad
-        # if exp_num != 1 and exp_num != 2:
-        #     drone.check_landing_pad(sensor_data)
-
-        #     # Check if the drone has reached the goal
-        #     drone.check_goal(sensor_data)
-
 
         # control_commands = example.obstacle_avoidance(sensor_data)
-
-
         # map = example.occupancy_map(sensor_data)
         # ---- end --- #
 
-        # Update the drone status in simulation
+
 
