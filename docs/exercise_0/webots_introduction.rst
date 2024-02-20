@@ -16,15 +16,15 @@ If you prefer, you can also use your favorite text editor or IDE to edit the cod
 
 Webots Installation
 -------------------
-Download Webots R2023a according to the operation system of your laptop.
+Download Webots R2023b according to the operation system of your laptop.
 
-- For Ubuntu 20.04 & 22.04, you will download the `webots_2023a_amd64.deb <https://github.com/cyberbotics/webots/releases/download/R2023a/webots_2023a_amd64.deb>`_. To install the deb file, run the following command in your terminal:
+- For Ubuntu 20.04 & 22.04, you will download the `webots_2023b_amd64.deb <https://github.com/cyberbotics/webots/releases/download/R2023b/webots_2023b_amd64.deb>`_. To install the deb file, run the following command in your terminal:
 
 .. code-block:: console
 
-	$ sudo dpkg -i install webots_2023a_amd64.deb
+	$ sudo dpkg -i install webots_2023b_amd64.deb
 
-- For Windows 10, you will download and install the `webots-R2023a_setup.exe <https://github.com/cyberbotics/webots/releases/download/R2023a/webots-R2023a_setup.exe>`_.
-- For macOS, you will download and install the `webots-R2023a.dmg <https://github.com/cyberbotics/webots/releases/download/R2023a/webots-R2023a.dmg>`_. For error like 'unidentified developer', try 'right-click' the application and choose 'open'. For error of 'Python was not found' in Webots, put the correct Python path in 'Webots->preferences->python command'. To find the python path, open terminal, type 'python3', type 'import sys', and type 'print(sys.executable)'.
+- For Windows 10, you will download and install the `webots-R2023b_setup.exe <https://github.com/cyberbotics/webots/releases/download/R2023b/webots-R2023b_setup.exe>`_.
+- For macOS, you will download and install the `webots-R2023b.dmg <https://github.com/cyberbotics/webots/releases/download/R2023b/webots-R2023b.dmg>`_. For error like 'unidentified developer', try 'right-click' the application and choose 'open'. For error of 'Python was not found' in Webots, put the correct Python path in 'Webots->preferences->python command'. To find the python path, open terminal, type 'python3', type 'import sys', and type 'print(sys.executable)'.
 
 For library missing error, you can type 'pip3 install numpy' or 'pip3 install matplotlib' in the terminal. For more information about Webots, refere to `Webots website <https://cyberbotics.com/>`_.
