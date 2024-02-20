@@ -19,11 +19,12 @@ You should see a drone in the simulation that you can control using the keys on 
   - **E**: Turn the drone right
 
 By looking at the 3D view of the scene and the FPV camera from the drone, you can see that the drone moves in the world frame, regardless of its orientation.
+(**Note**: The drone might not seem very stable, this is something you will improve in the exercise next week.)
 
 This is because our controller from the drone assumes the commands are given in the world frame. This is useful for autonomous operations where the drone needs to move to a specific location in the world. 
 However, sometimes we also want to control the drone relative to its own orientation. For example, if a human is piloting a drone remotely using an FPV camera, they will want to control the drone relative to the camera's orientation, not the world frame.
 
-To see why not, change the control input from 'keyboard' to 'path_planning' in line 110 of the file **main.py**.
+To see why not, change the control input from 'keyboard' to 'path_planning' in line 12 of the file **main.py**.
 
 Now you can reload the world by clicking the reload button in the top left of the Webots window.
 
