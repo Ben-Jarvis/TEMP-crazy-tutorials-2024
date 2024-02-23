@@ -9,7 +9,7 @@ Task Overview
 For this task you will need to convert commands for a drone from the body frame to the world frame.
 This is important because the drone's orientation will change as it moves, and the control commands need to be aligned with the drone's current orientation to ensure that it moves correctly.
 
-To start, you can run the the simulation in Webots by opening the world file (**crazyflie_world_exercise_0.wbt**) and clicking the play button.
+To start, you can run the the simulation in Webots by opening the world file (**crazyflie_world_exercise.wbt**) and clicking the play button.
 You should see a drone in the simulation that you can control using the keys on your keyboard as follows:
   - **W**: Move the drone forward
   - **S**: Move the drone backward
@@ -24,7 +24,7 @@ By looking at the 3D view of the scene and the FPV camera from the drone, you ca
 This is because our controller from the drone assumes the commands are given in the world frame. This is useful for autonomous operations where the drone needs to move to a specific location in the world. 
 However, sometimes we also want to control the drone relative to its own orientation. For example, if a human is piloting a drone remotely using an FPV camera, they will want to control the drone relative to the camera's orientation, not the world frame.
 
-To see why not, change the control input from 'keyboard' to 'path_planning' in line 12 of the file **main.py**.
+To see why not, change the control input from 'keyboard' to 'path_planner' in line 13 of the file **main.py**.
 
 Now you can reload the world by clicking the reload button in the top left of the Webots window.
 
@@ -56,7 +56,7 @@ Exercise
 
 2. Next, implement the **rot_global2body(control_commands, euler_angs)** function. Use the rotation matrix you obtained from **euler2rotmat(euler_angs)** to transform the velocity commands from the world frame to the body frame. This step is crucial for ensuring that the drone's movements are correctly aligned with its current orientation.
 
-3. Test your implementation in the Webots simulation environment (**drone_world_exercise_2**). You should observe that the drone responds accurately to control commands and reaches each of the yellow spheres despite its spinning motion.
+3. Test your implementation in the Webots simulation environment (**crazyflie_world_exercise**). You should observe that the drone can now be flown in the body frame, and that the control commands are correctly aligned with the drone's orientation.
 
 Bonus challenge
 ---------------
