@@ -9,34 +9,44 @@ def euler2rotmat(euler_angles):
     # First calculate the rotation matrix for each angle (roll, pitch, yaw)
     # Then multiply the matrices together to get the total rotation matrix
 
+    # Inputs:
+    #           euler_angles: A list of 3 Euler angles [roll, pitch, yaw] in radians
+    # Outputs:
+    #           R: A 3x3 numpy array that represents the rotation matrix of the euler angles
+    
     # --- YOUR CODE HERE ---
 
-    #R_roll = 
-    #R_pitch =
-    #R_yaw =
+    # R_roll = 
+    # R_pitch = 
+    # R_yaw = 
 
-    #R = 
+    # R =
     
     return R
 
-# Rotate the control commands from the global refernce frame to the drone reference frame
-def rot_global2body(control_commands, euler_angles):
+# Rotate the control commands from the inertial refernce frame to the body reference frame
+def rot_inertial2body(control_commands, euler_angles):
     
-    # Here you need to rotate the control commands from the global reference frame to the drone reference frame
+    # Here you need to rotate the control commands from the inertial reference frame to the drone reference frame
     # You should use the euler2rotmat function to get the rotation matrix
     # Keep in mind that you only want to rotate the velocity commands, which are the first two elements of the control_commands array
     # Think carefully about which direction you need to perform the rotation
+
+    # Inputs:
+    #           control_commands: A list of 4 control commands [vel_x, vel_y, altitude, yaw_rate] in the inertial reference frame
+    #           euler_angles: A list of 3 Euler angles [roll, pitch, yaw] in radians
+    # Outputs:
+    #           control_commands: A list of 4 control commands [vel_x, vel_y, altitude, yaw_rate] in the body reference frame
 
     # --- YOUR CODE HERE ---
 
     # vel_world = 
     
-    # R = euler2rotmat(euler_angles)
+    # R = 
     
-    # vel_body =
+    # vel_body = 
     
-    # control_commands =
-     
+    # control_commands = 
 
 
 
