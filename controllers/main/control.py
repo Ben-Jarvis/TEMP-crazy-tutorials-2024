@@ -6,55 +6,18 @@ from scipy.spatial.transform import Rotation as R
 
 class quadrotor_controller():
     def __init__(self):
-        self.pastVxError = 0
-        self.pastVyError = 0
-        self.pastAltError = 0
-        self.pastPitchError = 0
-        self.pastRollError = 0
-        self.pastYawrateError = 0
-
-        self.intVx = 0
-        self.intVy = 0
-        self.intAlt = 0
-        self.intPitch = 0
-        self.intRoll = 0
-        self.intYawrate = 0
-
-        self.global_time = 0
-        self.mass = 0.05 #[kg]
-
-        # Only for tuning
-        self.tuning_level = "off" # Exercise 1: Choose what to tune ["vel_z", "pos_z", "rate_rp", ("rate_y"), "att_rp", ("att_y"), "vel_xy", "pos_xy"]
-
-        # good gains
-        # gains = {"P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 0.8,
-        #             "P_pos_z": 2.5,     "I_pos_z": 0.0,     "D_pos_z": 1.0,
-        #             "P_rate_rp": 0.5,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
-        #             "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
-        #             "P_att_rp": 18.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
-        #             "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1,
-        #             "P_vel_xy": 5.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.15,
-        #             "P_pos_xy": 2.2,     "I_pos_xy": 0.0,     "D_pos_xy": 0.03}
-        
-        # KF gains
-        gains = {"P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 0.8,
-                    "P_pos_z": 2.5,     "I_pos_z": 0.0,     "D_pos_z": 1.0,
-                    "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
-                    "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
-                    "P_att_rp": 18.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
-                    "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1,
-                    "P_vel_xy": 2.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.10,
-                    "P_pos_xy": 1.5,     "I_pos_xy": 0.0,     "D_pos_xy": 0.02}
+        # Exercise 1: Choose what to tune ["vel_z", "pos_z", "rate_rp", ("rate_y"), "att_rp", ("att_y"), "vel_xy", "pos_xy"]
+        self.tuning_level = "off"
 
         # Exercise 1: Tune gains (we suggest: P < 25, I = 0 in most cases, D < 2)
-        # gains = {"P_vel_z": 4.0,     "I_vel_z": 1.0,     "D_vel_z": 0.1,
-        #             "P_pos_z": 4.0,     "I_pos_z": 0.0,     "D_pos_z": 0.0,
-        #             "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03, # already good
-        #             "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001, # already good
-        #             "P_att_rp": 11.0,     "I_att_rp":0.0,      "D_att_rp": 0.0,
-        #             "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1, # already good
-        #             "P_vel_xy": 1.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.0,
-        #             "P_pos_xy": 4.0,     "I_pos_xy": 0.0,     "D_pos_xy": 0.0}
+        gains = {"P_vel_z": 4.0,     "I_vel_z": 1.0,     "D_vel_z": 0.1,
+                    "P_pos_z": 4.0,     "I_pos_z": 0.0,     "D_pos_z": 0.0,
+                    "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03, # already good
+                    "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001, # already good
+                    "P_att_rp": 11.0,     "I_att_rp":0.0,      "D_att_rp": 0.0,
+                    "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1, # already good
+                    "P_vel_xy": 1.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.0,
+                    "P_pos_xy": 4.0,     "I_pos_xy": 0.0,     "D_pos_xy": 0.0}
         
         # Bonus: Increase limits and retune
         self.limits = {
@@ -64,15 +27,10 @@ class quadrotor_controller():
                 "L_vel_z": 0.75,
                 "L_vel_xy": 2.0
         }
-
-        # crazy limits
-        # self.limits = {
-        #         "L_rate_rp": 2.0,
-        #         "L_rate_y": 3.0,
-        #         "L_acc_rp": 10.0,
-        #         "L_vel_z": 1.0,
-        #         "L_vel_xy": 3.0
-        # }
+        
+        # DO NOT CHANGE ANYTHING BELOW
+        self.global_time = 0
+        self.mass = 0.05 #[kg]
 
         self.tuning_on = False
         self.tuning_start = 7
@@ -161,7 +119,7 @@ class quadrotor_controller():
         if self.tuning_level == "att_rp":
             acc_y_setpoint = self.tuning(-self.limits["L_acc_rp"],self.limits["L_acc_rp"],2,dt,acc_y_setpoint, sensor_data["roll"], "roll [rad]", transform=True)
         if self.tuning_level == "att_y":
-            att_z_setpoint = self.tuning(-2,2,1,dt,att_z_setpoint, sensor_data["att_y"], "yaw [rad]")
+            att_z_setpoint = self.tuning(-2,2,1,dt,att_z_setpoint, sensor_data["yaw"], "yaw [rad]")
 
         R_setpoint, combined_thrust = self.acc_to_rotation(acc_x_setpoint, acc_y_setpoint, acc_z_setpoint, att_z_setpoint)
 
@@ -272,6 +230,7 @@ class quadrotor_controller():
         return input
     
     def plot(self,ylabel):
+        # Plot tuning relevant data
         c_actual = "black"
         c_desired = "grey"
         c_os = [0/255,109/255,143/255]
@@ -340,9 +299,6 @@ class quadrotor_controller():
             ax.text(x=self.tuning_ts[idx_rt_low],y=self.tuning_actual[idx_rt_low],s=str(np.round(rt_low,1))+"[s]",
                         color=c_rt,fontsize="x-large",horizontalalignment="right",verticalalignment="bottom")
 
-        # Plot the smoothed version of tuning_actual that is used to detect the overshoot
-        # ax.plot(self.tuning_ts,self.moving_average(self.tuning_actual,10),label="smoothed",color=c_rt)
-
         ax.set_xlabel("time [s]")
         ax.set_ylabel(ylabel)
         plt.legend(loc="upper left")
@@ -350,11 +306,3 @@ class quadrotor_controller():
         plt.show()
 
         self.tuning_level = "off"
-
-    # def moving_average(self,data,window_size):
-    #     # Define the kernel for the moving average
-    #     kernel = np.ones(window_size) / window_size
-
-    #     # Use 'same' mode to ensure the output has the same length as the input
-    #     smoothed_data = np.convolve(data, kernel, mode='same')
-    #     return smoothed_data

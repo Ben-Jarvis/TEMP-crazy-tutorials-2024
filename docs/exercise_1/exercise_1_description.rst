@@ -1,7 +1,7 @@
 Exercise 1: Cascaded PID control
 ==================================
 
-In this exercise, you will learn how to tune a cascaded PID controller for the CrazyFlie (**pid_control.py**). 
+In this exercise, you will learn how to tune a cascaded PID controller for the CrazyFlie (**control.py**). 
 As seen in the lecture, it takes a position and yaw setpoint as an input and generates pwm signals for the motors as output:
 
 .. image:: pid.png
@@ -12,7 +12,7 @@ Task overview
 -------------
 
 For this task you will learn how to systematically tune each layer of the cascaded controller and thus improve the overall performance.
-To start, you can run the simulation on webots (**crazyflie_world_excercise_1**) and you should see a badly tuned controller flying through a parcour, marked by four spheres.
+To start, make sure that in in **control.py**, **exp_num = 1** and **control_style = 1**. You can now run the simulation on webots (**crazyflie_world_excercise**) and you should see a badly tuned controller flying through a parcour, marked by four spheres.
 Note that webots tells you how long it takes the drone to complete the task: With the initial gains this is roughly 18 s. 
 
 .. image:: square_before.gif
@@ -28,7 +28,7 @@ If tuned well, you will end up with a much better performance, completing the pa
 Exercise
 ---------
 The key to a successful tuning is to start from a stable state: first you need to make sure that your drone can keep an altitude. This requires tuning the PID responsible for z-velocity as well as the one for z-position.
-1. Start by opening **pid_control.py** and change the variable **self.tuning_level = "vel_z"**.
+1. Start by opening **control.py** and change the variable **self.tuning_level = "vel_z"**.
 This will now send step inputs for z-velocity to your drone. 
 After two iterations, a plot displays the most important metrics for tuning:
 - Rise time: How long it takes the system to reach the reference. This should be as short as possible.
@@ -43,10 +43,9 @@ As a general rule of thumb, we propose the following strategy:
 - Start with a small P and I,D = 0.
 - Increase P until you see an overshoot.
 - Increase D until the overshoot vanishes (D is usually smaller than P).
-- Repeat last two steps until increasing D does no longer stabilize your system.
-- Reduce P by 20% value and adapt D accordingly.
-- If nescessary, increase I to counteract steady state error.
-- I gains should only be used on the lowest level.
+- Repeat last two steps until increasing D does no longer stabilize your system and leads to oscillatory behaviour.
+- Reduce P by 20% and adapt D accordingly. This ensures robust behaviour when operating in unforseen cases (e.g. roll and pitch at the same time).
+- If nescessary, increase I to counteract steady state error: e.g. on "vel_z" to counteract gravity, or on "vel_xy" in case of wind (which we are not simulating in webots).
 
 This should lead you to similar performance:
 
@@ -55,13 +54,15 @@ This should lead you to similar performance:
   :alt: altitude tracking after tuning
 
 2. Now you can do the same for z-position by switching **self.tuning_level = "pos_z"**. Once you are done, your drone can hover in a stable manner, allowing tuning the other gains.
-3. A cascaded controller always needs to be tuned from the bottom up. The gains in brackets are already at good values to save you time, so you can skip those if you want.
+3. In a cascaded controller higher levels send references to lower ones. That's why you always tune from the bottom up. The gains in brackets are already at good values to save you time, so you can skip those if you want.
 - **self.tuning_level = "rate_rp"**
 - (**self.tuning_level = "rate_y"**)
 - **self.tuning_level = "att_rp"**
 - (**self.tuning_level = "att_y"**)
 - **self.tuning_level = "vel_xy"**
+- **self.tuning_level = "vel_z"** (slight retuning might improve performance, as lower levels have changed)
 - **self.tuning_level = "pos_xy"**
+- **self.tuning_level = "pos_z"** (slight retuning might improve performance, as lower levels have changed)
 
 Once you are happy with your gains, disable tuning (**self.tuning_level = "off"**) and tell an assistant the time it takes your CrazyFlie to finish the parcour.
 We will keep a live score board during the exercise.

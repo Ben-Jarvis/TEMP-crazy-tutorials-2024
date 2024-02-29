@@ -41,6 +41,12 @@ Crazyflie {
       type "laser"
       aperture 0.005
     }
+    Accelerometer {
+      xAxis TRUE
+      yAxis TRUE
+      zAxis TRUE
+      resolution -1
+    }
   ]
 }
 CeilingLight {
