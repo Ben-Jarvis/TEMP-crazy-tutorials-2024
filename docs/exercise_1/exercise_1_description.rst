@@ -5,8 +5,9 @@ In this exercise, you will learn how to tune a cascaded PID controller for the C
 As seen in the lecture, it takes a position and yaw setpoint as an input and generates pwm signals for the motors as output:
 
 .. image:: pid.png
-  :width: 650
+  :width: 450
   :alt: PID controller
+  :align: center
 
 Task overview
 -------------
@@ -18,12 +19,14 @@ Note that webots tells you how long it takes the drone to complete the task: Wit
 .. image:: square_before.gif
   :width: 650
   :alt: initial gains lead to bad performance
+  :align: center
 
 If tuned well, you will end up with a much better performance, completing the parcour below 12 s.
 
 .. image:: square_after.gif
   :width: 650
   :alt: if tuned correclty, performance increases significantly
+  :align: center
 
 Exercise
 ---------
@@ -31,13 +34,14 @@ The key to a successful tuning is to start from a stable state: first you need t
 1. Start by opening **control.py** and change the variable **self.tuning_level = "vel_z"**.
 This will now send step inputs for z-velocity to your drone. 
 After two iterations, a plot displays the most important metrics for tuning:
-- Rise time: How long it takes the system to reach the reference. This should be as short as possible.
-- Oversthoot: How much your system exeeds the reference after reaching it. This should stay within a certain range (we suggest less than 10%).
-- Steady state error: Your system might not converge fully to your reference within a period of the step function. This should stay within a certain range (we suggest less than 5%).
+  - Rise time: How long it takes the system to reach the reference. This should be as short as possible.
+  - Overshoot: How much your system exeeds the reference after reaching it. This should stay within a certain range (we suggest less than 10%).
+  - Steady state error: Your system might not converge fully to your reference within a period of the step function. This should stay within a certain range (we suggest less than 5%).
 
 .. image:: vel_z_before.png
-  :width: 650
+  :width: 550
   :alt: altitude tracking before tuning
+  :align: center
 
 As a general rule of thumb, we propose the following strategy: 
 - Start with a small P and I,D = 0.
@@ -50,8 +54,9 @@ As a general rule of thumb, we propose the following strategy:
 This should lead you to similar performance:
 
 .. image:: vel_z_after.png
-  :width: 650
+  :width: 550
   :alt: altitude tracking after tuning
+  :align: center
 
 2. Now you can do the same for z-position by switching **self.tuning_level = "pos_z"**. Once you are done, your drone can hover in a stable manner, allowing tuning the other gains.
 3. In a cascaded controller higher levels send references to lower ones. That's why you always tune from the bottom up. The gains in brackets are already at good values to save you time, so you can skip those if you want.

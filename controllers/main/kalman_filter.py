@@ -19,17 +19,19 @@ class kalman_filter():
         self.initialize_KF(self.noise_std_GPS, self.noise_std_ACCEL)
 
         # Flags for use cases to test
-        self.use_accel_only = True
-        self.use_ground_truth_measurement = False
+        self.use_accel_only = False
+        self.use_ground_truth_measurement = True
         self.use_noisy_measurement = False
 
-        # ----------------------------------
+        # Simulation time after which plots are generated
+        self.plot_time_limit = 30.0
+
+        # ---------------------------------- DO NOT MODIFY ---------------------------------
         #Variables for Plotting
         self.raw_data_vec = []
         self.noisy_data_vec = []
         self.KF_estimate_vec = []
         self.time = []
-        self.plot_time_limit = 25.0
 
         # Variable for noise generation
         self.x_noisy_global_last = 0.0
@@ -41,11 +43,22 @@ class kalman_filter():
         self.v_x_noisy = 0.0
         self.v_y_noisy = 0.0
         self.v_z_noisy = 0.0
+
+        # Good Kalman Filter PID Gains
+        # KF gains
+        # gains = {"P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 0.8,
+        #             "P_pos_z": 2.5,     "I_pos_z": 0.0,     "D_pos_z": 1.0,
+        #             "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
+        #             "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
+        #             "P_att_rp": 16.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
+        #             "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1,
+        #             "P_vel_xy": 2.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.10,
+        #             "P_pos_xy": 1.5,     "I_pos_xy": 0.0,     "D_pos_xy": 0.02}
     
     def initialize_KF(self, noise_std_GPS, noise_std_ACCEL):
         # Function to initialize the following:
         #   Optimal state vector (self.X_opt)
-        #   Optimal covariance (self.P_opt)
+        #   Optimal prediction covariance (self.P_opt)
         #   Measurement Matrices (self.H_GPS and self.H_ACCEL)
         #   Measurement Covariance Matrices (self.R_GPS and self.R_ACCEL)
 
@@ -53,6 +66,14 @@ class kalman_filter():
 
         # YOUR CODE HERE
         # -----------------------------------
+        # self.X_opt = ...
+        # self.P_opt = ...
+
+        # self.H_GPS = ...
+        # self.H_ACCEL = ...
+
+        # self.R_GPS = ...
+        # self.R_ACCEL = ...
 
         # SAMPLE SOLUTION
 
@@ -87,6 +108,11 @@ class kalman_filter():
         # YOUR CODE HERE
         # -----------------------------------
 
+        # A_trans = ...
+
+        # X_pred = ...
+        # P_pred = ...
+
         # SAMPLE SOLUTION
 
         # Define the state transition matrix A_trans (n_states x n_states)
@@ -110,7 +136,7 @@ class kalman_filter():
         #   X_pred: State propagated to time of fusion (n_states x 1)
         #   P_pred: Covariance matrix propagated to time of fusion (n_states x n_states)
         #   H: Measurement Matrix of measured sensor (n_measurements x n_states)
-        #   R: Measurement Covariance of measured sensor (n_measurements x 9)
+        #   R: Measurement Covariance of measured sensor (n_measurements x n_states)
         #   Z: Measurement vector received from the sensor (n_measurements x 1)
         # Returns:
         #   self.X_opt: Fused state estimate at sensor readout time (n_states x 1)
@@ -118,6 +144,9 @@ class kalman_filter():
 
         # YOUR CODE HERE
         # -----------------------------------
+        # K = ...
+        # self.X_opt = ...
+        # self.P_opt = ...
 
         # SAMPLE SOLUTION
 
@@ -132,17 +161,27 @@ class kalman_filter():
         # Inputs:
         #   dt_last_measurement: Time elapsed since last acceleration measurements received from either acclerometer or GPS (always > 0)
         #   sensor_state_flag: Possible values are [0,1,2,3]
-        #       -> 0: No sensor measurement received at current requested time // 
-        #       -> 1: GPS measurement received at current requested time (if both measurements are received simultaneously, the GPS is also used) // 
+        #       -> 0: No sensor measurement received at current requested time
+        #       -> 1: GPS measurement received at current requested time
         #       -> 2: Accelerometer measurement received at current requested time
+        #       -> 3: Accelerometer and GPS measurements received simultaneously
         #   measured_state_gps: The latest GPS position measurement (X,Y,Z) in inertial world frame (n_measurements x 1)
-        #   measured_state_accel: The latest ACCELEROMETER measurement (A_X, A_Y, A_Z) in inertial world frame (n_measurements x 1)
+        #   measured_state_accel: The latest ACCELEROMETER measurement (A_X, A_Y, A_Z) in  world frame (n_measurements x 1)
         # Returns:
-        #   X_est: Estimated drone state (9 x 1)
-        #   P_est: Estimated covariance (9 x 9)
+        #   X_est: Estimated drone state (n_states x 1)
+        #   P_est: Estimated covariance (n_states x n_states)
 
         # YOUR CODE HERE
         # -----------------------------------
+
+        # X_prop, P_prop = ...
+
+        # # Sensor fusion dependant on measurement cases (sensor_flag)
+
+        # # Example implementation for case 3
+        # if sensor_state_flag == 3:
+        #     X_opt_gps, P_opt_gps = self.KF_sensor_fusion(X_prop, P_prop, self.H_GPS, self.R_GPS, measured_state_gps)
+        #     X_est, P_est = self.KF_sensor_fusion(X_opt_gps, P_opt_gps, self.H_ACCEL, self.R_ACCEL, measured_state_accel)
 
         # SAMPLE SOLUTION
 
@@ -173,6 +212,8 @@ class kalman_filter():
     # --------------------------------------------------------- WORK ONLY UP TO HERE --------------------------------------------------------------------------------- #
 
     def calculate_Q(self, dt_tr, q_tr):
+
+        # Calculate Q submatrix
         Q_sub = q_tr * np.array([[np.power(dt_tr,5)/20, np.power(dt_tr,4)/8, np.power(dt_tr,3)/6],
                                    [np.power(dt_tr,4)/8, np.power(dt_tr,3)/3, np.power(dt_tr,2)/2],
                                    [np.power(dt_tr,3)/6, np.power(dt_tr,2)/2, dt_tr]
@@ -219,7 +260,6 @@ class kalman_filter():
         noisy_sensor_data['v_forward'] =  self.v_x_noisy * np.cos(noisy_sensor_data['yaw']) + self.v_y_noisy * np.sin(noisy_sensor_data['yaw'])
         noisy_sensor_data['v_left'] = -self.v_x_noisy * np.sin(noisy_sensor_data['yaw']) + self.v_y_noisy * np.cos(noisy_sensor_data['yaw'])
         noisy_sensor_data['v_down'] = self.v_z_noisy
-        # noisy_sensor_data['range_down'] = raw_sensor_data['range_down'] + np.random.normal(rng_bias, self.noise_std_RNG)
 
         return noisy_sensor_data
     
@@ -232,7 +272,6 @@ class kalman_filter():
 
     def plot_states(self):
         
-
         raw_data_vec_np = np.array(self.raw_data_vec)
         noisy_data_vec_np = np.array(self.noisy_data_vec)
         KF_estimate_vec_np = np.array(self.KF_estimate_vec)
@@ -241,11 +280,17 @@ class kalman_filter():
         new_dir = os.path.abspath(os.path.join(os.path.join(os.getcwd(), os.pardir), os.pardir)) + "/docs/exercise_2"
         os.chdir(new_dir)
 
+        colors = ['blue', 'darkorange', 'green']
+        colors_two = ['red', 'brown', 'black']
+
         fig, ax = plt.subplots(1)
         fig.canvas.manager.set_window_title("Noisy measurement and Kalman Filter Position estimates")
         fig.suptitle("Position measurements (Noisy and Kalman Filtered)")
-        ax.plot(time,noisy_data_vec_np[:,:3])
-        ax.plot(time,KF_estimate_vec_np[:,:3])
+
+        for i in np.arange(3):
+            ax.plot(time,noisy_data_vec_np[:,i], color=colors[i])
+        for i in np.arange(3):
+            ax.plot(time,KF_estimate_vec_np[:,i], color=colors_two[i])
         ax.legend(['Noisy X','Noisy Y','Noisy Z','Kalman Filter X ','Kalman Filter Y ', 'Kalman Filter Z '])
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Position (m)")
@@ -254,8 +299,10 @@ class kalman_filter():
         fig, ax = plt.subplots(1)
         fig.canvas.manager.set_window_title("Noisy measurement and Kalman Filter Velocity estimates")
         fig.suptitle("Velocity measurements (Noisy and Kalman Filtered)")
-        ax.plot(time,noisy_data_vec_np[:,3:6])
-        ax.plot(time,KF_estimate_vec_np[:,3:6])
+        for i in np.arange(3):
+            ax.plot(time,noisy_data_vec_np[:,3+i],color=colors[i])
+        for i in np.arange(3):
+            ax.plot(time,KF_estimate_vec_np[:,3+i],color=colors_two[i])
         ax.legend(['Noisy Forward','Noisy Leftward','Noisy Upward','Kalman Filter Forward','Kalman Filter Leftward', 'Kalman Filter Upward'])
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Velocity (m/s)")
@@ -264,8 +311,10 @@ class kalman_filter():
         fig, ax = plt.subplots(1)
         fig.canvas.manager.set_window_title("Noisy measurement and Kalman Filter Acceleration estimates")
         fig.suptitle("Acceleration measurements (Noisy and Kalman Filtered)")
-        ax.plot(time,noisy_data_vec_np[:,6:9])
-        ax.plot(time,KF_estimate_vec_np[:,6:9])
+        for i in np.arange(3):
+            ax.plot(time,noisy_data_vec_np[:,6+i],color=colors[i])
+        for i in np.arange(3):
+            ax.plot(time,KF_estimate_vec_np[:,6+i],color=colors_two[i])
         ax.legend(['Noisy measurement X ','Noisy measurement Y ','Noisy measurement Z ','Kalman Filter X ','Kalman Filter Y ', 'Kalman Filter Z '])
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Acceleration (m/s²)")
@@ -274,8 +323,10 @@ class kalman_filter():
         fig, ax = plt.subplots(1)
         fig.canvas.manager.set_window_title("True measurement and Kalman Filter Position estimates")
         fig.suptitle("Position measurements (True and Kalman Filtered)")
-        ax.plot(time,raw_data_vec_np[:,:3])
-        ax.plot(time,KF_estimate_vec_np[:,:3])
+        for i in np.arange(3):
+            ax.plot(time,raw_data_vec_np[:,i],color=colors[i])
+        for i in np.arange(3):
+            ax.plot(time,KF_estimate_vec_np[:,i],color=colors_two[i],linestyle='dashed')
         ax.legend(['Ground truth X ','Ground truth Y','Ground truth Z','Kalman Filter X','Kalman Filter Y', 'Kalman Filter Z'])
         if self.use_accel_only:
             ax.vlines(2.0,-4, 10, colors='r', linestyles='dashed')
@@ -286,8 +337,10 @@ class kalman_filter():
         fig, ax = plt.subplots(1)
         fig.canvas.manager.set_window_title("True measurement and Kalman Filter Velocity estimates")
         fig.suptitle("Velocity measurements (True and Kalman Filtered)")
-        ax.plot(time,raw_data_vec_np[:,3:6])
-        ax.plot(time,KF_estimate_vec_np[:,3:6])
+        for i in np.arange(3):
+            ax.plot(time,raw_data_vec_np[:,3+i],color=colors[i])
+        for i in np.arange(3):
+            ax.plot(time,KF_estimate_vec_np[:,3+i],color=colors_two[i], linestyle='dashed')
         ax.legend(['Ground truth Forward','Ground truth Leftward','Ground truth Upward','Kalman Filter Forward','Kalman Filter Leftward', 'Kalman Filter Upward'])
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Velocity (m/s)")
@@ -296,8 +349,10 @@ class kalman_filter():
         fig, ax = plt.subplots(1)
         fig.canvas.manager.set_window_title("True measurement and Kalman Filter Acceleration estimates")
         fig.suptitle("Acceleration measurements (True and Kalman Filtered)")
-        ax.plot(time,raw_data_vec_np[:,6:9])
-        ax.plot(time,KF_estimate_vec_np[:,6:9])
+        for i in np.arange(3):
+            ax.plot(time,raw_data_vec_np[:,6+i],color=colors[i])
+        for i in np.arange(3):
+            ax.plot(time,KF_estimate_vec_np[:,6+i],color=colors_two[i],linestyle='dashed')
         ax.legend(['Ground truth X ','Ground truth Y ','Ground truth Z ','Kalman Filter X ','Kalman Filter Y ', 'Kalman Filter Z '])
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Acceleration (m/s²)")
@@ -306,14 +361,18 @@ class kalman_filter():
         fig, ax = plt.subplots(1,2)
         fig.canvas.manager.set_window_title("True and Noisy Measurements")
         ax[0].title.set_text("Position measurements")
-        ax[0].plot(time,noisy_data_vec_np[:,:3])
-        ax[0].plot(time,raw_data_vec_np[:,:3])
+        for i in np.arange(3):
+            ax[0].plot(time,noisy_data_vec_np[:,i],color=colors[i])
+        for i in np.arange(3):
+            ax[0].plot(time,raw_data_vec_np[:,i],color=colors_two[i])
         ax[0].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
         ax[0].set_xlabel("Time (s)")
         ax[0].set_ylabel("Position (m)")
         ax[1].title.set_text("Acceleration measurements")
-        ax[1].plot(time,noisy_data_vec_np[:,6:9])
-        ax[1].plot(time,raw_data_vec_np[:,6:9])
+        for i in np.arange(3):
+            ax[1].plot(time,noisy_data_vec_np[:,6+i],color=colors[i])
+        for i in np.arange(3):
+            ax[1].plot(time,raw_data_vec_np[:,6+i],color=colors_two[i])
         ax[1].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
         ax[1].set_xlabel("Time (s)")
         ax[1].set_ylabel("Acceleration (m/s²)")
@@ -323,46 +382,15 @@ class kalman_filter():
         fig, ax = plt.subplots(1)
         fig.canvas.manager.set_window_title("True and Noisy Velocity")
         ax.title.set_text("Velocity measurements")
-        ax.plot(time,noisy_data_vec_np[:,3:6])
-        ax.plot(time,raw_data_vec_np[:,3:6])
+        for i in np.arange(3):
+            ax.plot(time,noisy_data_vec_np[:,3+i],color=colors[i])
+        for i in np.arange(3):
+            ax.plot(time,raw_data_vec_np[:,3+i],color=colors_two[i])
         ax.legend(['Noisy Forward','Noisy Leftward', 'Noisy Upward','Ground truth Forward ','Ground truth Leftward','Ground truth Upward'], fontsize = 10)
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Velocity (m/s)")
         plt.savefig("Comparison_velocity_truth_Noise.png")
         
-        # plt.figure(1)
-        # plt.plot(time,raw_data_vec_np[:,:3])
-        # plt.plot(time,KF_estimate_vec_np[:,:3])
-        # plt.legend(['Ground truth X Position','Ground truth Y Position','Ground truth Z Position'])
-        # plt.legend(['Kalman Filter estimated X Position','Kalman Filter estimated Y Position', 'Kalman Filter estimated Z Position'])
-
-        # plt.figure(1)
-        # plt.plot(time,raw_data_vec_np[:,3:6])
-        # plt.plot(time,noisy_data_vec_np[:,3:6])
-        # plt.plot(time,KF_estimate_vec_np[:,3:6])
-
-        # plt.figure(2)
-        # plt.plot(time,raw_data_vec_np[:,6:9])
-        # plt.plot(time,noisy_data_vec_np[:,6:9])
-        # plt.plot(time,KF_estimate_vec_np[:,6:9])
-
         plt.show()
 
-    def create_gif(input_folder, output_file, duration=500):
-        images = []
-        # Assuming the images are named in numerical order (e.g., 1.png, 2.png, ...)
-        image_files = sorted([f for f in os.listdir(input_folder) if f.endswith(".png")])
-        for image_file in image_files:
-            image_path = os.path.join(input_folder, image_file)
-            with Image.open(image_path) as img:
-                images.append(img.copy())
-        # Save as GIF
-        images[0].save(output_file, save_all=True, append_images=images[1:], duration=duration, loop=0)
 
-    # def moving_average(self,data,window_size):
-    #     # Define the kernel for the moving average
-    #     kernel = np.ones(window_size) / window_size
-
-    #     # Use 'same' mode to ensure the output has the same length as the input
-    #     smoothed_data = np.convolve(data, kernel, mode='same')
-    #     return smoothed_data
