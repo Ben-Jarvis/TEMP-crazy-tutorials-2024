@@ -13,7 +13,7 @@ Task overview
 -------------
 
 For this task you will learn how to systematically tune each layer of the cascaded controller and thus improve the overall performance.
-To start, make sure that in in **control.py**, **exp_num = 1** and **control_style = 1**. You can now run the simulation on webots (**crazyflie_world_excercise**) and you should see a badly tuned controller flying through a parcour, marked by four spheres.
+To start, make sure that you are in **control.py**, **exp_num = 1** and **control_style = 1**. You can now run the simulation on webots (**crazyflie_world_excercise**) and you should see a badly tuned controller flying through a parcour, marked by four spheres.
 Note that webots tells you how long it takes the drone to complete the task: With the initial gains this is roughly 18 s. 
 
 .. image:: square_before.gif
@@ -35,7 +35,7 @@ The key to a successful tuning is to start from a stable state: first you need t
 This will now send step inputs for z-velocity to your drone. 
 After two iterations, a plot displays the most important metrics for tuning:
   - Rise time: How long it takes the system to reach the reference. This should be as short as possible.
-  - Overshoot: How much your system exeeds the reference after reaching it. This should stay within a certain range (we suggest less than 10%).
+  - Overshoot: How much your system exceeds the reference after reaching it. This should stay within a certain range (we suggest less than 10%).
   - Steady state error: Your system might not converge fully to your reference within a period of the step function. This should stay within a certain range (we suggest less than 5%).
 
 .. image:: vel_z_before.png
@@ -49,7 +49,7 @@ As a general rule of thumb, we propose the following strategy:
 - Increase D until the overshoot vanishes (D is usually smaller than P).
 - Repeat last two steps until increasing D does no longer stabilize your system and leads to oscillatory behaviour.
 - Reduce P by 20% and adapt D accordingly. This ensures robust behaviour when operating in unforseen cases (e.g. roll and pitch at the same time).
-- If nescessary, increase I to counteract steady state error: e.g. on "vel_z" to counteract gravity, or on "vel_xy" in case of wind (which we are not simulating in webots).
+- If nescessary, increase I to counteract steady state error: e.g. on "vel_z" to counteract gravity, or on "vel_xy" to counteract drag).
 
 This should lead you to similar performance:
 
@@ -60,14 +60,13 @@ This should lead you to similar performance:
 
 2. Now you can do the same for z-position by switching **self.tuning_level = "pos_z"**. Once you are done, your drone can hover in a stable manner, allowing tuning the other gains.
 3. In a cascaded controller higher levels send references to lower ones. That's why you always tune from the bottom up. The gains in brackets are already at good values to save you time, so you can skip those if you want.
-- **self.tuning_level = "rate_rp"**
+- (**self.tuning_level = "rate_rp"**)
 - (**self.tuning_level = "rate_y"**)
-- **self.tuning_level = "att_rp"**
-- (**self.tuning_level = "att_y"**)
+- **self.tuning_level = "att"**
 - **self.tuning_level = "vel_xy"**
-- **self.tuning_level = "vel_z"** (slight retuning might improve performance, as lower levels have changed)
+- **self.tuning_level = "vel_z"** (retuning might improve performance since lower levels have changed now)
 - **self.tuning_level = "pos_xy"**
-- **self.tuning_level = "pos_z"** (slight retuning might improve performance, as lower levels have changed)
+- **self.tuning_level = "pos_z"** (retuning might improve performance since lower levels have changed now)
 
 Once you are happy with your gains, disable tuning (**self.tuning_level = "off"**) and tell an assistant the time it takes your CrazyFlie to finish the parcour.
 We will keep a live score board during the exercise.
