@@ -68,8 +68,9 @@ This should lead you to similar performance:
 - **self.tuning_level = "pos_xy"**
 - **self.tuning_level = "pos_z"** (retuning might improve performance since lower levels have changed now)
 
-Once you are happy with your gains, disable tuning (**self.tuning_level = "off"**) and tell an assistant the time it takes your CrazyFlie to finish the parcour.
-We will keep a live score board during the exercise.
+Once you are happy with your gains, you can disable tuning (**self.tuning_level = "off"**).
+Please send your gains and best time to **simon.jeger@epfl.ch** with the subject "exercise 1".
+We will keep a live score board during the exercise session.
 
 Bonus challenge
 ---------------
