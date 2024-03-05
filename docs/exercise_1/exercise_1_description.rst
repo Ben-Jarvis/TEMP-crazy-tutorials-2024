@@ -59,9 +59,9 @@ This should lead you to similar performance:
   :align: center
 
 2. Now you can do the same for z-position by switching **self.tuning_level = "pos_z"**. Once you are done, your drone can hover in a stable manner, allowing tuning the other gains.
-3. In a cascaded controller higher levels send references to lower ones. That's why you always tune from the bottom up. The gains in brackets are already at good values to save you time, so you can skip those if you want.
-- (**self.tuning_level = "rate_rp"**)
-- (**self.tuning_level = "rate_y"**)
+3. In a cascaded controller higher levels send references to lower ones. That's why you always tune from the bottom up.
+- **self.tuning_level = "rate_rp"**
+- **self.tuning_level = "rate_y"**
 - **self.tuning_level = "att"**
 - **self.tuning_level = "vel_xy"**
 - **self.tuning_level = "vel_z"** (retuning might improve performance since lower levels have changed now)
