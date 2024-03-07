@@ -13,7 +13,7 @@ Task overview
 -------------
 
 For this task you will learn how to systematically tune each layer of the cascaded controller and thus improve the overall performance.
-To start, make sure that you are in **control.py**, **exp_num = 1** and **control_style = 1**. You can now run the simulation on webots (**crazyflie_world_excercise**) and you should see a badly tuned controller flying through a parcour, marked by four spheres.
+To start, make sure that you are in **main.py**, **exp_num = 1** and **control_style = "path_planner"**. You can now run the simulation on webots (**crazyflie_world_excercise**) and you should see a badly tuned controller flying through a parcour, marked by four spheres.
 Note that webots tells you how long it takes the drone to complete the task: With the initial gains this is roughly 18 s. 
 
 .. image:: square_before.gif
@@ -48,7 +48,7 @@ As a general rule of thumb, we propose the following strategy:
 - Increase P until you see an overshoot.
 - Increase D until the overshoot vanishes (D is usually smaller than P).
 - Repeat last two steps until increasing D does no longer stabilize your system and leads to oscillatory behaviour.
-- Reduce P by 20% and adapt D accordingly. This ensures robust behaviour when operating in unforseen cases (e.g. roll and pitch at the same time).
+- Reduce P by 20% and adapt D accordingly. This ensures robust behaviour when operating in unforseen cases (e.g. roll and pitch at the same time). If this is not respected, you might end up with unexpected behaviour (e.g. oscillations) when tuning higher levels.
 - If nescessary, increase I to counteract steady state error: e.g. on "vel_z" to counteract gravity, or on "vel_xy" to counteract drag).
 
 This should lead you to similar performance:
