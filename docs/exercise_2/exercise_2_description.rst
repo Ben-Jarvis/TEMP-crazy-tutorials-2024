@@ -153,14 +153,16 @@ Your drone movement should show a noticeable change after taking off, similar to
   :alt: Drone parcours flight with Kalman Filter estimate using only the accelerometer
   :align: center
 
+A comparison of the ground truth and Kalman Filter estimate then looks like this:
+
 .. image:: Figures/position_estimates_truth_KF_ACCEL.png
   :width: 650
   :alt: Performance of drone parcours flight with Kalman Filter estimate using only the accerlometer
   :align: center
 
-Why does this happen?
+What do you observe? Why does this happen?
 
-As we only propagate our GPS measurements but never correct our state estimate with a true (be it noisy) position estimate, the position and velocities are determined primarily from integration of the accelerometer.
+As we only obtain accelerometer measurements but never correct our state estimate with a true (be it noisy) position estimate, the position and velocities are determined solely by integration of the accelerations.
 The position and velocity estimates therefore "drift" away from the true value as the uncertainty becomes larger and larger over time. This is called sensor drift and is a commonly observed phenomenon when working with accelerometers.
 
 
