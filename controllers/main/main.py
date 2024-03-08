@@ -469,8 +469,8 @@ if __name__ == '__main__':
             if control_style == 'keyboard':
                 control_commands = drone.action_from_keyboard(sensor_data)
 
-                eulers = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
-                control_commands = utils.rot_global2body(control_commands, eulers)
+                euler_angles = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
+                control_commands = utils.rot_inertial2body(control_commands, euler_angles)
 
                 set_x = sensor_data['x_global'] + control_commands[0]
                 set_y = sensor_data['y_global'] + control_commands[1]
