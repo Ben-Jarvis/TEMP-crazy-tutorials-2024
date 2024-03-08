@@ -21,7 +21,7 @@ These provide the following translational sensor measurements for your implement
 - GPS: Global X,Y,Z position
 - Accelerometer: Global X,Y,Z accelerations (are already transformed from body frame for you in this exercise)
 
-Each of the sensors in the simulation and the PID controller furthermore run at the individual update intervals:
+Each of the sensors in the simulation and the PID controller furthermore run at the following individual update intervals:
 
 - GPS: 24 milliseconds
 - Accelerometer: 16 milliseconds
@@ -131,7 +131,7 @@ Your results should look similar to the plots below:
 If you are happy with the filtering performance, run the PID controller with the activated noisy measurements and a running Kalman Filter. 
 To do this, set **self.use_ground_truth_measurement = False**, **self.use_noisy_measurement = False** and **self.use_accel_only = False**. 
 
-You should now see a smooth tracking performance that performs the parcours nearly as fast as with ground truth feedback.
+You should now see a smooth tracking performance. How do your run times compare to the case with ground truth feedback? 
 
 .. image:: Figures/crazyflie_world_excercise_2_KF_success_new_PID.gif
   :width: 650
