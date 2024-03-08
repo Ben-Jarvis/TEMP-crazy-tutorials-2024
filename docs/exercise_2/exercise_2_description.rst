@@ -12,7 +12,7 @@ With this method, you will see that your quadrotor can stay on track in noisy, r
 Task description
 -----------------
 
-In this task, you will implement a Kalman Filter in the file **kalman_filter.py** and explore how it can significantly improve the performance of a closed loop cascaded PID controller in a real-world scenario.
+In this task, you will implement a Kalman Filter in the file **kalman_filter.py** and explore how it can significantly improve the performance of a closed loop cascaded PID controller in a noisy real-world scenario.
 
 Besides the Gyroscope, for this exercise, the Crazyflie drone is equipped with a GPS and an Accelerometer. 
 
@@ -61,7 +61,6 @@ When feeding these measurements directly into our cascaded PID controller, we th
 As you will see later in this exercise, relying on the integration of accleration measurements for the same purpose yields similarly unsatisfactory results.
 
 Therefore, to remedy this problem, given the noisy GPS and Acclerometer measurements and using the provided theory from the lecture, you will implement a Kalman Filter that returns much better state estimates for three-dimensional position, velocity and acceleration, yielding better performance despite noise.
-
 Your drone should then remain in flight throughout the parcours and you can modify process parameters to improve the performance of your controller with the Kalman Filter!
 
 Exercise
@@ -165,10 +164,10 @@ As we only propagate our GPS measurements but never correct our state estimate w
 The position and velocity estimates therefore "drift" away from the true value as the uncertainty becomes larger and larger over time. This is called sensor drift and is a commonly observed phenomenon when working with accelerometers.
 
 
-Part 3 - Process Covariance Tuning and Performance Improvement (Bonus)
+Part 3 - Process Covariance Tuning (Bonus)
 ----------------------------------------------------------------------
 
-A variable parameter for the Kalman Filter is the Process Covariance (**Q**). In our implementation, the process covariance is affected by the coefficient variable **self.q_tr**.
+A variable parameter of the Kalman Filter is the Process Covariance (**Q**). In our implementation, the process covariance is affected by the coefficient variable **self.q_tr**.
 This parameter describes the uncertainty associated with the classical Kalman Filter assumption that the drone undergoes motions with constant acceleration over a single prediction timestep.
 
 In simpler words:
@@ -178,12 +177,9 @@ In simpler words:
   - If **self.q_tr >> 0**, we assume that the drone undergoes motions which are different to the piecewise constant accleration assumption. Therefore, with a higher **self.q_tr**, the Kalman Filter will rely more heavily on the noisy sensor measurements to provide a more accurate state estimate.
 
 Starting with **self.q_tr = 0**, increase **self.q_tr** by small increments and investigate how this affects the behavior of the drone in the parcours.
+You can then keep tuning this coeffcient to find the lowest possible total run-time!
 
-The optimal process covariance can be obtained as the variance between the predicted and true acceleration as measured along the parcours.
+**Note:** There are more advanced mehtods to determine your process covariance. An ideal process covariance may for instance be calculated from the variance between the predicted and measured accelerations along the parcours.
 
-When you feel you have reached satisfactory performance and a low run completion time, you can compare your result to the run-time with the optimal process covariance below:
-
-Total completion time: 14.1 seconds
-
-==================================================================================
+====================================================================================
 Any questions about the exercise, please contact Julius Wanner (julius.wanner@epfl.ch).
