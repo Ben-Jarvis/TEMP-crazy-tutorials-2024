@@ -20,7 +20,7 @@ class kalman_filter():
 
         # Flags for use cases to test
         self.use_accel_only = False
-        self.use_ground_truth_measurement = True
+        self.use_ground_truth_measurement = False
         self.use_noisy_measurement = False
 
         # Simulation time after which plots are generated
@@ -279,6 +279,7 @@ class kalman_filter():
 
         new_dir = os.path.abspath(os.path.join(os.path.join(os.getcwd(), os.pardir), os.pardir)) + "/docs/exercise_2"
         os.chdir(new_dir)
+        os.mkdir("Figures")
 
         colors = ['blue', 'darkorange', 'green']
         colors_two = ['red', 'brown', 'black']
