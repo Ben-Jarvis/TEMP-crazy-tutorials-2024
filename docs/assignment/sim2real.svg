@@ -2,21 +2,21 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="140.65594mm"
    height="86.209351mm"
    viewBox="0 0 140.65594 86.209351"
    version="1.1"
    id="svg8"
-   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
-   sodipodi:docname="sim2real.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/">
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="sim2real.svg">
   <defs
      id="defs2">
     <marker
@@ -181,9 +181,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8284272"
-     inkscape:cx="184.20131"
-     inkscape:cy="194.63114"
+     inkscape:zoom="2.0000001"
+     inkscape:cx="223.0091"
+     inkscape:cy="133.55096"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -191,10 +191,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1121"
-     inkscape:window-x="-9"
-     inkscape:window-y="1341"
+     inkscape:window-width="1848"
+     inkscape:window-height="1136"
+     inkscape:window-x="338"
+     inkscape:window-y="1467"
      inkscape:window-maximized="1"
      inkscape:showpageshadow="2"
      inkscape:pagecheckerboard="0"
@@ -208,6 +208,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -270,7 +271,7 @@
        width="40.065475" />
     <text
        xml:space="preserve"
-       style="font-size:3.175px;line-height:1.25;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       style="font-size:3.17499995px;line-height:1.25;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        x="58.863895"
        y="130.36511"
        id="text819-35"><tspan
@@ -293,14 +294,14 @@
          x="58.863895"
          y="142.27136"
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="tspan913">    camera_image (not used in project)</tspan></text>
+         id="tspan913">    camera_image</tspan></text>
     <rect
        style="opacity:1;fill:#19a500;fill-opacity:0.10891089;stroke:#000000;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect821-9"
        width="83.654182"
        height="17.365911"
        x="57.002499"
-       y="126.85954" />
+       y="127.25642" />
     <text
        xml:space="preserve"
        style="font-size:3.175px;line-height:1.25;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -375,12 +376,12 @@
        x="84.660225"
        y="150.09132" />
     <rect
-       style="opacity:1;fill:#19efd9;fill-opacity:0.108911;stroke:#000000;stroke-width:0.214122;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       style="opacity:1;fill:#19efd9;fill-opacity:0.10891101;stroke:#000000;stroke-width:0.22247128;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect821-9-61"
-       width="49.437191"
-       height="14.953992"
-       x="75.139984"
-       y="163.7352" />
+       width="53.397591"
+       height="14.945642"
+       x="74.61499"
+       y="163.73938" />
     <rect
        style="opacity:1;fill:#8b06d9;fill-opacity:0.10891089;stroke:#000000;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect821-9-2-7"
@@ -390,7 +391,7 @@
        y="184.0717" />
     <path
        style="opacity:1;fill:none;fill-opacity:0.10891089;stroke:#000000;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
-       d="m 44.340015,157.43185 v -21.32811 h 12.53494"
+       d="M 43.41397,157.56415 V 136.23604 H 55.94891"
        id="path1056"
        inkscape:connector-curvature="0" />
     <path
