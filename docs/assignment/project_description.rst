@@ -39,8 +39,8 @@ Your grade in this simulation exercise will be determined according to the follo
 - **Grade 5.0**: Take off from the landing pad and leave the landing region whilst being airborne
 - **Grade 5.25**: Avoid obstacles and reach the starting region whilst being airborne
 - **Grade 5.5**: Land on the take-off pad
-- **Grade: + 0.25**: Detect and pass through the pink square during flight from the starting region towards the landing region
-- **Grade: + 0.25**: Pass through the location of the pink square during flight from the landing region towards the starting region
+- **Grade + 0.25**: Detect and pass through the pink square during flight from the starting region towards the landing region
+- **Grade + 0.25**: Pass through the location of the pink square during flight from the landing region towards the starting region
 
 Hardware Task overview
 -----------------------
