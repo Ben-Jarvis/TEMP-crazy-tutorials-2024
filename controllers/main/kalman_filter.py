@@ -20,11 +20,11 @@ class kalman_filter():
 
         # Flags for use cases to test
         self.use_accel_only = False
-        self.use_ground_truth_measurement = True
+        self.use_ground_truth_measurement = False
         self.use_noisy_measurement = False
 
         # Simulation time after which plots are generated
-        self.plot_time_limit = 30.0
+        self.plot_time_limit = 25.0
 
         # ---------------------------------- DO NOT MODIFY ---------------------------------
         #Variables for Plotting
@@ -376,7 +376,7 @@ class kalman_filter():
         ax[1].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
         ax[1].set_xlabel("Time (s)")
         ax[1].set_ylabel("Acceleration (m/s²)")
-        ax[1].set_ylim(-10,10)
+        ax[1].set_ylim(-2,2)
         plt.savefig("Comparison_pos_accel_truth_Noise.png")
 
         fig, ax = plt.subplots(1)
