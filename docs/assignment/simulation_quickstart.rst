@@ -12,7 +12,8 @@ Install relevant packages
 
 Besides the previously installed packages, install OpenCV by executing:
 
-**pip install opencv-python**
+::
+    pip install opencv-python
 
 Controller switch
 -----------------
