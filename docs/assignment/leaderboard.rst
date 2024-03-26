@@ -7,7 +7,7 @@ Do not share your code with others, we are checking your code for similarities.
 
 Please ensure that the zip file you submit at least contains your **my_control.py** file. We will only evaluate this file as the other files should be the same for all submissions to ensure fairness in the evaluation process.
 
-**Notices**:
+**Note**:
 
 1. Your code will be evaluated on five randomly generated environments
 2. Please save your code before the submission deadline on Moodle to avoid any potential last-minute system crashes
