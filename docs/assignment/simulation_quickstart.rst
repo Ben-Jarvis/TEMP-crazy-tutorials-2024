@@ -7,6 +7,13 @@ Make sure you load **crazyflie_world_assignment.wbt** in Webots.
 
 Remember to select 'Close without Saving' when you close Webots software, such that you will not change the simulated world environments.
 
+Install relevant packages
+--------------------------
+
+Besides the previously installed packages, install OpenCV by executing:
+
+**pip install opencv-python**
+
 Controller switch
 -----------------
 In **main.py**, **choose exp_num = 3** for this assignment. 

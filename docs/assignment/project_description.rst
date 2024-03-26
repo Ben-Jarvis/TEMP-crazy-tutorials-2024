@@ -8,7 +8,7 @@ In the remaining weeks of the course, all students will then compete as groups t
 Simulation Task overview
 -------------------------
 
-.. image:: objective_figure.png
+.. image:: objective_figure_pink_square.png
   :width: 650
   :alt: objective figure
 
@@ -20,15 +20,17 @@ The simulation arena is shown in the figure above. Your task is composed of mult
 - Upon successful landing, the drone takes off, flies back and lands on the take-off pad.
 - In the whole arena, there will be a few obstacles of previously unknown dimensions which can be detected with the multiranger deck. Your developed algorithm should allow the drone to avoid any collisions.
 
-To obtain a full score, you will further make use of the camera onboard the Crazyflie in this simulation exercise:
+To obtain a full score, in this simulation exercise, you will further make use of the camera onboard the Crazyflie:
 
 - During flight towards the landing pad, a pink square at an arbitrary height will be featured in the arena. You should use the camera to detect the location of the pink square and pass through it.
 - On the way back towards the starting region, the pink square will not be visible anymore and your algorithm should allow you to pass through the stored location of the pink square.
 
-Please note that the center positions of the take-off and landing pads, as well as the location of the pink square are randomly assigned.
-The origin and the coordinate system for your reference are indicated in the figure above. The Z coordinate is directed upwards (out of the page).
-A maximum time limit for your run in simulation is set at 240 seconds. 
-The phases which you have completed up to this cutoff time will determine your grade for this task according to the metrics defined below.
+Please note the following:
+
+- The center positions of the take-off and landing pads are randomly assigned within the respective starting and landing regions.
+- The origin and the coordinate system for your reference are indicated in the figure above. The Z coordinate is directed upwards (out of the page).
+- The pink square has dimensions of 0.4 x 0.4 x 0.1 meters and its center location is also randomly assigned within the pink region highlighted in the above figure.
+- A maximum time limit for your run in simulation is set at 240 seconds. Only the phases which you have completed up to this cutoff time will determine your grade for this task according to the metrics defined below.
 
 Your grade in this simulation exercise will be determined according to the following **Performance metrics**:
 
