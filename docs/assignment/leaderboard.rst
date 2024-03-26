@@ -20,5 +20,5 @@ Please ensure that the zip file you submit at least contains your **my_control.p
 ============== ========= ======== 
 Name           Avg Grade Avg Time 
 ============== ========= ======== 
-LIS            6.0       69.0
+LIS            6.0       60.0
 ============== ========= ======== 
