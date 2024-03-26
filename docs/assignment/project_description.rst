@@ -21,12 +21,14 @@ The simulation arena is shown in the figure above. Your task is composed of mult
 - In the whole arena, there will be a few obstacles of previously unknown dimensions which can be detected with the multiranger deck. Your developed algorithm should allow the drone to avoid any collisions.
 
 To obtain a full score, you will further make use of the camera onboard the Crazyflie in this simulation exercise:
+
 - During flight towards the landing pad, a pink square at an arbitrary height will be featured in the arena. You should use the camera to detect the location of the pink square and pass through it.
 - On the way back towards the take-off region, the pink square will not be visible anymore and your algorithm should allow you to pass through the stored location of the pink square.
 
 Please note that the center positions of the take-off and landing pads, as well as the location of the pink square are randomly assigned.
 The origin and the coordinate system for your reference are indicated in the figure above. The Z coordinate is directed upwards (out of the page).
-A maximum time limit for your run in simulation is set at 240 seconds. The phases which you have completed up to this cutoff time will determine your grade for this task according to the metrics defined below.
+A maximum time limit for your run in simulation is set at 240 seconds. 
+The phases which you have completed up to this cutoff time will determine your grade for this task according to the metrics defined below.
 
 Your grade in this simulation exercise will be determined according to the following **Performance metrics**:
 
@@ -35,8 +37,8 @@ Your grade in this simulation exercise will be determined according to the follo
 - **Grade 5.0**: Take off from the landing pad and leave the landing region whilst being airborne
 - **Grade 5.25**: Avoid obstacles and reach the starting region whilst being airborne
 - **Grade 5.5**: Land on the take-off pad
-- **Grade: +0.25**: Detect and pass through the pink square during flight from the starting region towards the landing region
-- **Grade: +0.25**: Pass through the location of the pink square during flight from the landing region towards the take-off region
+- **Grade: + 0.25**: Detect and pass through the pink square during flight from the starting region towards the landing region
+- **Grade: + 0.25**: Pass through the location of the pink square during flight from the landing region towards the take-off region
 
 Hardware Task overview
 -----------------------
