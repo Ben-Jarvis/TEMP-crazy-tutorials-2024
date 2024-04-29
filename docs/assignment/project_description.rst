@@ -42,6 +42,8 @@ Your grade in this simulation exercise will be determined according to the follo
 - **Grade + 0.25**: Detect and pass through the pink square during flight from the starting region towards the landing region
 - **Grade + 0.25**: Pass through the location of the pink square during flight from the landing region towards the starting region
 
+You will get a 3.5 if you crash before reaching the landing region.
+
 Hardware Task overview
 -----------------------
 
@@ -71,6 +73,8 @@ Here is a real-world test example of this project from last year:
 .. image:: demo_2022.gif
   :width: 650
   :alt: demo video from last year
+
+You will get a 3.5 if you crash before reaching the landing region.
 
 Final project grade
 --------------------
