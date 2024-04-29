@@ -68,13 +68,14 @@ Your grade in this hardware exercise will be determined according to the followi
 - **Grade 5.5**: Land on the take-off pad
 - **Grade 5.5 + f(t)**: For students who complete the full task, extra grades will be based on the time taken to complete the task. The top 25% of students will receive a grade of f(t)=0.5, the next 50% will receive a grade of f(t)=0.25, and the bottom 25% will receive a grade of f(t)=0.
 
+You will get a 3.5 if you crash before reaching the landing region.
+
 Here is a real-world test example of this project from last year:
 
 .. image:: demo_2022.gif
   :width: 650
   :alt: demo video from last year
 
-You will get a 3.5 if you crash before reaching the landing region.
 
 Final project grade
 --------------------
@@ -108,7 +109,9 @@ The following table provides the schedule of the crazy-practical project.
 | Week 11, May 7            | Hardware development, Q&A
 | Week 12, May 14           | Hardware development, Q&A
 | Week 13, May 21           | Hardware development, Q&A
-| Week 14, May 28           | Hardware demonstrations, hand in the drones
+           May 22           | Testing runs for hardware demonstrations
+| Week 14, May 27, 23:59    | Submit hardwatre task video, Code and Presentation files
+           May 28           | Hardware task presentation and final demonstrations, hand in the drones
 ==========================  ========================================================
 
 Any questions about the task, submission, schedule and grading, please contact Charbel Toumieh (charbel.toumieh@epfl.ch).
