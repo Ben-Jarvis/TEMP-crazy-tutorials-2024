@@ -108,10 +108,10 @@ The following table provides the schedule of the crazy-practical project.
 | Week 10, April 30         | Hardware introduction, pick up your drone by group
 | Week 11, May 7            | Hardware development, Q&A
 | Week 12, May 14           | Hardware development, Q&A
-| Week 13, May 21           | Hardware development, Q&A
-           May 22             Testing runs for hardware demonstrations
-| Week 14, May 27, 23:59    | Submit hardware task video, Code and Presentation files
-           May 28             Hardware task presentation and final demonstrations, hand in the drones
+| Week 13, May 21/22        | Hardware development, Q&A
+                            | Testing runs for hardware demonstrations (May 22nd)
+| Week 14, May 27/28        | Submit hardware task video, Code and Presentation files (due May 27th 23:59)
+                            | Hardware task presentation and final demonstrations, hand in the drones (May 28th)
 ==========================  ========================================================
 
 Any questions about the task, submission, schedule and grading, please contact Charbel Toumieh (charbel.toumieh@epfl.ch).
