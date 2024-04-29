@@ -2,23 +2,25 @@ Hardware instruction
 ====================
 
 You should be familiar with the project task through simulation.
-As a group, you can now fine-tune the best solution to control a real quadrotor in cluttered environments.
-Keep in mind that the sensor signals on the actual drone are noisy and less accurate than in simulation.
-You will demonstrate its performance live at the end of the course.
+As a group, you can now fine-tune the best solution to control a real quadrotor in cluttered environments. 
+Compared to the simulation, you will find that you may have to adjust your algorithms so that they can be executed in real-time on the hardware. 
+You should also keep in mind that the sensor signals on the actual drone are noisy and less accurate than in simulation.
+You will lastly present your algorithm and demonstrate its performance live on the real Crazyflie at the end of the course.
 
-Learning objective
+Learning objectives
 ------------------
-- controlling a plug-and-play drone
-- interfacing with the Python library to control the drone
-- learning the difference between simulation and real drone
-- mastering different flight phases in the real world
-- reporting performance results in a scientific manner
+- Controlling a plug-and-play drone
+- Interfacing with the Python library to control the drone
+- Learning the difference between code deployment in simulation and on the real drone
+- Mastering different flight phases in the real world
+- Reporting performance results in a scientific manner
 
 Final demonstration
 -------------------
+The final tasks which you will be graded on for this hardware practical are the following:
 - Short presentation (4 slides max)
 - Video recording of one of your trials in an obstacle-rich environment
-- Demonstration on May 30: 3 trials with obstacles (**best grade counts**), and each trial must be completed with only one battery
+- Demonstration on May 28th: 3 trials with obstacles (**best grade counts**), and each trial must be completed with only one battery
 
 Presentation
 ------------
@@ -40,6 +42,7 @@ Video of one trial
 Complementary information
 -------------------------
 - **Submit by Monday 29th May, 23:59** (your code with comments, the video as MP4, presentation as PPTX) in a zip file named GROUPNUMBER_LASTNAME1_LASTNAME2_LASTNAME3_LASTNAME4_LASTNAME5.zip on moodle
+- To get sufficiently good position and velocity estimates from the optic flow sensor, the ground below the crazyflie should contain some texture
 - Initial position of the drone will be given one day before the final exam
 - Each group will present the PPTX from our computer before the demonstration
 - Return the drone directly after the demonstration
