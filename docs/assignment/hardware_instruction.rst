@@ -49,7 +49,7 @@ You will prepare and submit a video of one of your trials with your own obsatcle
 
 Note that:
 
-- You can create your own obstacles and landing pads (environment like the task setup, for an example check a video from the previous years in :ref:`Task overview`)
+- You can create your own obstacles and landing pads (environment like the task setup, for an example check a video from the previous years in :ref:`Hardware Task overview`)
 - To get sufficiently good position and velocity estimates from the optic flow sensor, the ground below the Crazyflie should contain some texture
 
 Demonstrations
