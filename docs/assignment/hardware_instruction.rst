@@ -28,6 +28,7 @@ The final deliverables which you will be graded on for this hardware practical a
 Presentation
 ------------
 Length: up to 4 slides
+
 Duration: up to 7 minutes
 
 - 1 slide on the experimental setup (Environment layout)
