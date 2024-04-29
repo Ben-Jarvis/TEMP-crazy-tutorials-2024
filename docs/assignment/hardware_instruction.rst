@@ -8,7 +8,7 @@ You should also keep in mind that the sensor signals on the actual drone are noi
 You will lastly present your algorithm and demonstrate its performance live on the real Crazyflie at the end of the course.
 
 Learning objectives
-------------------
+-------------------
 - Controlling a plug-and-play drone
 - Interfacing with the Python library to control the drone
 - Learning the difference between code deployment in simulation and on the real drone
