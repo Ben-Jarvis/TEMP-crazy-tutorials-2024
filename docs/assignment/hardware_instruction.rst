@@ -89,7 +89,8 @@ The demonstration performance will be graded according to the performance metric
 - **Grade 5.25**: Avoid obstacles and reach the starting region whilst being airborne
 - **Grade 5.5**: Land on the take-off pad
 - **Grade 5.5 + f(t)**: For students who complete the full task, extra grades will be based on the time taken to complete the task. The top 25% of students will receive a grade of f(t)=0.5, the next 50% will receive a grade of f(t)=0.25, and the bottom 25% will receive a grade of f(t)=0.
-- Solutions that go against the spirit of the exercise will not be accepted (e.g. flying above obstacles).
+
+Solutions that go against the spirit of the exercise will not be accepted (e.g. flying above obstacles or outside of the arena).
 
 You will get a 3.5 in your demonstration if you crash before reaching the landing region.
 
@@ -98,15 +99,14 @@ Demonstration schedule on May 28th
 ============= ============= ==============
 Time          Room MED11518 Room MED-11422
 ============= ============= ==============
-15:15 - 15:30 group 1       group 12
-15:35 - 15:50 group 2       group 13
-15:55 - 16:10 group 3       group 14
-16:15 - 16:30 group 4       group 15
-16:35 - 16:50 group 5       group 16
-16:55 - 17:10 group 6       group 17
-17:15 - 17:30 group 7       group 18
-17:35 - 17:50 group 8       group 19
-17:55 - 18:10 group 9       group 20
-18:15 - 18:30 group 10      group 21
-18:35 - 18:50 group 11      group 22
+15:15 - 15:30 group 1       group 11
+15:35 - 15:50 group 2       group 12
+15:55 - 16:10 group 3       group 13
+16:15 - 16:30 group 4       group 14
+16:35 - 16:50 group 5       group 15
+16:55 - 17:10 group 6       group 16
+17:15 - 17:30 group 7       group 17
+17:35 - 17:50 group 8       group 18
+17:55 - 18:10 group 9       group 19
+18:15 - 18:30 group 10      group 20
 ============= ============= ==============

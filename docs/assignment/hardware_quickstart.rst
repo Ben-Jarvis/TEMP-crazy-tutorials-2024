@@ -47,7 +47,7 @@ Onboaed LEDs indicate drone states such as low power, self-test fail, etc. Refer
 
 Software installation
 ---------------------
-For developing the code for the Crazyflie, you will first need to install Python 3.7+ if you don't have it yet.
+For developing the code for the Crazyflie, you will first need to install Python 3.8+ if you don't have it yet.
 Then, you can clone and install the Crazyflie Python Library, to communicate with and control the Crazyflie.
 
 For both Ubuntu and Windows, you can install the library by running following commands in your terminal:
@@ -60,6 +60,10 @@ For both Ubuntu and Windows, you can install the library by running following co
     pip3 install -e .
 
 Possible installation issues: 1. In Windows, if pip3 command is not found, then you need to use pip instead; 2. Useful `links <https://www.bitcraze.io/documentation/repository/crazyflie-clients-python/master/installation/install/>`_ to Python and pip issues on Windows.
+
+To connect to the drone and visualize its measurements, you can install the Crazyflie client. To do this, follow the instructions under the section "Installing from source" on the site:
+`links <https://www.bitcraze.io/documentation/repository/crazyflie-clients-python/master/installation/install/>`_. If there are issue with launching the crazyflie client, install both the crazyflie-lib and crazyflie-client it in a new conda / virtual environment.
+
 
 The next step is to configure the radio driver:
 
