@@ -50,6 +50,7 @@ You will prepare and submit a video of one of your trials with your own obsatcle
 Note that:
 
 - You can create your own obstacles and landing pads (environment like the task setup, for an example check a video from the previous years in :ref:`Hardware Task overview`)
+- Collaboration between groups to build the environment is encouraged
 - To get sufficiently good position and velocity estimates from the optic flow sensor, the ground below the Crazyflie should contain some texture
 
 Demonstrations
@@ -78,7 +79,7 @@ We will evaluate you as a group and determine your grade for this hardware task 
 - Presentation and video showcasing the algorithm on one of your trials (Grade 1-6, Weighting: 60%) 
 - Demonstration (Grade 1-6, Weighting: 40%)
 
-The assistants will judge your presentation and the algorithm performance in your video submission.
+The assistants will judge your presentation right before your hardware demonstration. Your video submission to moodle will be judged separatly in the same week.
 
 The demonstration performance will be graded according to the performance metrics defined under :ref:`Hardware Task overview`:
 
@@ -88,6 +89,7 @@ The demonstration performance will be graded according to the performance metric
 - **Grade 5.25**: Avoid obstacles and reach the starting region whilst being airborne
 - **Grade 5.5**: Land on the take-off pad
 - **Grade 5.5 + f(t)**: For students who complete the full task, extra grades will be based on the time taken to complete the task. The top 25% of students will receive a grade of f(t)=0.5, the next 50% will receive a grade of f(t)=0.25, and the bottom 25% will receive a grade of f(t)=0.
+- Solutions that go against the spirit of the exercise will not be accepted (e.g. flying above obstacles).
 
 You will get a 3.5 in your demonstration if you crash before reaching the landing region.
 

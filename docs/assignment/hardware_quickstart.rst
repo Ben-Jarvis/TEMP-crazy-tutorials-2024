@@ -35,6 +35,9 @@ Note that there is **a small power button** located in front of the quadrotor th
   :width: 550
   :alt: battery_and_deck_direction
 
+.. image:: on_off.gif
+  :width: 300
+  :alt: on_off
 
 **To replace the propellers**, make sure to identify the correct type of propeller.
 Look for the arrows on the drone arm near the motors.
