@@ -8,9 +8,19 @@ import utils
 from scipy.spatial.transform import Rotation as R
 import example
 import time, random
+import threading
 
-exp_num = 3                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
+exp_num = 1                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
 control_style = 'path_planner'      # 'keyboard' or 'path_planner
+
+# Global variables for handling threads
+latest_sensor_data = None
+sensor_lock = threading.Lock()
+
+current_setpoint = None
+setpoint_lock = threading.Lock()
+
+running = True
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -444,6 +454,28 @@ class CrazyflieInDroneDome(Supervisor):
         # Update drone states in simulation
         super().step(self.timestep)
 
+# A thread that runs the path planner in parallel with the simulation
+def path_planner_thread(drone):
+    global latest_sensor_data, current_setpoint, running
+    
+    while running:
+        # Make a local copy of the sensor data
+        sensor_data_copy = None
+        dt_ctrl = 0.0
+
+        # Lock the sensor data to prevent it from being updated while we are using it
+        with sensor_lock:
+            # Update sensor data if it is available
+            if latest_sensor_data is not None:
+                sensor_data_copy = latest_sensor_data.copy()
+                dt_ctrl = drone.getTime() - drone.PID_update_last_time
+        # Call the path planner to get the new setpoint
+        if sensor_data_copy is not None:
+            new_setpoint = example.path_planning(sensor_data_copy,dt_ctrl)
+            with setpoint_lock:
+                current_setpoint = new_setpoint
+        time.sleep(0.01)
+    
 
 if __name__ == '__main__':
 
@@ -452,49 +484,74 @@ if __name__ == '__main__':
     assert control_style in ['keyboard','path_planner'], "Variable control_style must either be 'keyboard' or 'path_planner'"
     assert exp_num in [0,1,2,3], "Exp_num must be a value between 0 and 3"
 
-    # Simulation loops
-    for step in range(100000):
-        
-        if exp_num == 2:
-            assert control_style == 'path_planner', "Variable control_style must be set to path planner for this exercise"
-            state_data = drone.read_KF_estimates()
-            # Update the drone status in simulation with KF
-            drone.step_KF(state_data)
+    # Start the path planner thread
+    if control_style == 'path_planner':
+        planner_thread = threading.Thread(target=path_planner_thread, args=(drone,))
+        planner_thread.daemon = True
+        planner_thread.start()
+   
+    try:
 
-        else:
-            # Read sensor data including []
-            sensor_data = drone.read_sensors()
-            dt_ctrl = drone.getTime() - drone.PID_update_last_time
+        # Simulation loops
+        for step in range(100000):
+            
+            if exp_num == 2:
+                assert control_style == 'path_planner', "Variable control_style must be set to path planner for this exercise"
+                state_data = drone.read_KF_estimates()
+                # Update the drone status in simulation with KF
+                drone.step_KF(state_data)
 
-            if control_style == 'keyboard':
-                control_commands = drone.action_from_keyboard(sensor_data)
+            else:
+                # Read sensor data including []
+                sensor_data = drone.read_sensors()
+                # Update the sensor data
+                with sensor_lock:
+                    latest_sensor_data = sensor_data
 
-                euler_angles = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
-                control_commands = utils.rot_inertial2body(control_commands, euler_angles)
+                # NEED TO UPDATE THIS AND STEP_KF
+                dt_ctrl = drone.getTime() - drone.PID_update_last_time
 
-                set_x = sensor_data['x_global'] + control_commands[0]
-                set_y = sensor_data['y_global'] + control_commands[1]
-                set_alt = control_commands[2]
-                set_yaw = sensor_data['yaw'] + control_commands[3]
-                
-                setpoint = [set_x, set_y, set_alt, set_yaw]
-            elif control_style == 'path_planner':
-                setpoint = example.path_planning(sensor_data,dt_ctrl)
+                if control_style == 'keyboard':
+                    control_commands = drone.action_from_keyboard(sensor_data)
 
-            if exp_num == 3:
-                # For the PROJECT CHANGE YOUR CODE HERE
-                # Example Path planner call
-                setpoint = example.path_planning(sensor_data,dt_ctrl)
-                drone.check_landing_pad(sensor_data)
-                # Check if the drone has reached the goal
-                drone.check_goal(sensor_data)
+                    euler_angles = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
+                    control_commands = utils.rot_inertial2body(control_commands, euler_angles)
 
-            # Update the drone status in simulation
-            drone.step(setpoint, sensor_data)
+                    set_x = sensor_data['x_global'] + control_commands[0]
+                    set_y = sensor_data['y_global'] + control_commands[1]
+                    set_alt = control_commands[2]
+                    set_yaw = sensor_data['yaw'] + control_commands[3]
+                    
+                    setpoint = [set_x, set_y, set_alt, set_yaw]
 
-        # control_commands = example.obstacle_avoidance(sensor_data)
-        # map = example.occupancy_map(sensor_data)
-        # ---- end --- #
+                elif control_style == 'path_planner':
+                    with setpoint_lock:
+                        # If the path planner has calculated a setpoint, use it
+                        if current_setpoint is not None:
+                            setpoint = current_setpoint
+                        else:
+                            # If the path planner has not yet calculated a setpoint, hover in place
+                            setpoint = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global'], sensor_data['yaw']]
+                    
+
+                if exp_num == 3:
+                    # For the PROJECT CHANGE YOUR CODE HERE
+                    # Example Path planner call
+                    setpoint = example.path_planning(sensor_data,dt_ctrl)
+                    drone.check_landing_pad(sensor_data)
+                    # Check if the drone has reached the goal
+                    drone.check_goal(sensor_data)
+
+                # Update the drone status in simulation
+                drone.step(setpoint, sensor_data)
+
+            # control_commands = example.obstacle_avoidance(sensor_data)
+            # map = example.occupancy_map(sensor_data)
+            # ---- end --- #
+    
+    except KeyboardInterrupt:
+        running = False
+        planner_thread.join()
 
 
 
