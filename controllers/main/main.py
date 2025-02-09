@@ -9,8 +9,8 @@ from scipy.spatial.transform import Rotation as R
 import example
 import time, random
 
-exp_num = 3                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
-control_style = 'path_planner'      # 'keyboard' or 'path_planner
+exp_num = 1                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
+control_style = 'path_planner'      # 'keyboard' or 'path_planner'
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -112,7 +112,6 @@ class CrazyflieInDroneDome(Supervisor):
 
         # For the assignment, randomise the positions of the drone, obstacles, goal, take-off pad and landing pad 
         if exp_num == 3:
-
             # Variables to track progress
             self.reached_landing_pad = False
             self.reached_goal_first = False
@@ -401,14 +400,8 @@ class CrazyflieInDroneDome(Supervisor):
         self.simulationReset()
         super().step(self.timestep)
 
-    def step(self, setpoint, sensor_data):
-        
-        dt_ctrl = self.getTime() - self.PID_update_last_time
-        # Time interval for PID control
-        self.PID_update_last_time = self.getTime()
-        # Low-level PID velocity control with fixed height
-        motorPower = self.PID_CF.pid(dt_ctrl, setpoint, sensor_data)
-            
+    def step(self, motorPower, sensor_data):
+
         # Update motor command
         self.m1_motor.setVelocity(-motorPower[0])
         self.m2_motor.setVelocity(motorPower[1])
@@ -468,18 +461,12 @@ if __name__ == '__main__':
 
             if control_style == 'keyboard':
                 control_commands = drone.action_from_keyboard(sensor_data)
+                print(control_commands)
+                motorPower = drone.PID_CF.keys_to_pwm(dt_ctrl, control_commands, sensor_data)    
 
-                euler_angles = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
-                control_commands = utils.rot_inertial2body(control_commands, euler_angles)
-
-                set_x = sensor_data['x_global'] + control_commands[0]
-                set_y = sensor_data['y_global'] + control_commands[1]
-                set_alt = control_commands[2]
-                set_yaw = sensor_data['yaw'] + control_commands[3]
-                
-                setpoint = [set_x, set_y, set_alt, set_yaw]
             elif control_style == 'path_planner':
                 setpoint = example.path_planning(sensor_data,dt_ctrl)
+                motorPower = drone.PID_CF.setpoint_to_rpm(dt_ctrl, setpoint, sensor_data)
 
             if exp_num == 3:
                 # For the PROJECT CHANGE YOUR CODE HERE
@@ -489,8 +476,12 @@ if __name__ == '__main__':
                 # Check if the drone has reached the goal
                 drone.check_goal(sensor_data)
 
+            # Control commands
+            dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control
+            drone.PID_update_last_time = drone.getTime()
+
             # Update the drone status in simulation
-            drone.step(setpoint, sensor_data)
+            drone.step(motorPower, sensor_data)
 
         # control_commands = example.obstacle_avoidance(sensor_data)
         # map = example.occupancy_map(sensor_data)
