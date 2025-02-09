@@ -158,6 +158,7 @@ class quadrotor_controller():
 
         # return self.acceleration_to_pwm(dt, [acc_x_setpoint, acc_y_setpoint, acc_z_setpoint], yaw_setpoint, sensor_data)
         ### SOLUTION ###
+        pass
     
     def keys_to_pwm(self, dt, keys, sensor_data):
         # keys = acc_x, acc_y, altitude, yaw

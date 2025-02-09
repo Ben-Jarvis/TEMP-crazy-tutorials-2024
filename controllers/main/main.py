@@ -11,7 +11,16 @@ import time, random
 import threading
 
 exp_num = 1                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
-control_style = 'path_planner'      # 'keyboard' or 'path_planner'
+control_style = 'keyboard'      # 'keyboard' or 'path_planner'
+
+# Global variables for handling threads
+latest_sensor_data = None
+sensor_lock = threading.Lock()
+
+current_setpoint = None
+setpoint_lock = threading.Lock()
+
+running = True
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
