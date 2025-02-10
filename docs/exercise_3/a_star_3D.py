@@ -14,12 +14,13 @@ class Node:
         return self.f < other.f
 
 class AStar3D:
-    def __init__(self, start, goal, grid_size, obstacles, bounds):
+    def __init__(self, start, goal, grid_size, obstacles, bounds, diagonal_flag=False):
         self.start = start
         self.goal = goal
         self.grid_size = grid_size
         self.obstacles = obstacles
         self.bounds = bounds
+        self.diagonal = diagonal_flag
 
         self.path = None
 
@@ -29,20 +30,22 @@ class AStar3D:
     def get_neighbors(self, node):
         x, y, z = node.position
         neighbors = []
-        # moves = [
-        #     (1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0),
-        #     (0, 0, 1), (0, 0, -1)
-        # ]
-        # If diagonal moves should be included: 
-        moves = [
+        # If diagonal moves should be included:
+        if self.diagonal: 
+            moves = [
+                (1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0),
+                (0, 0, 1), (0, 0, -1),
+                (1, 1, 0), (-1, -1, 0), (1, -1, 0), (-1, 1, 0),
+                (1, 0, 1), (-1, 0, -1), (1, 0, -1), (-1, 0, 1),
+                (0, 1, 1), (0, -1, -1), (0, 1, -1), (0, -1, 1),
+                (1, 1, 1), (-1, -1, -1), (1, -1, -1), (-1, 1, -1),
+                (1, 1, -1), (-1, -1, 1), (1, -1, 1), (-1, 1, 1)
+            ]
+        else:
+            moves = [
             (1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0),
-            (0, 0, 1), (0, 0, -1),
-            (1, 1, 0), (-1, -1, 0), (1, -1, 0), (-1, 1, 0),
-            (1, 0, 1), (-1, 0, -1), (1, 0, -1), (-1, 0, 1),
-            (0, 1, 1), (0, -1, -1), (0, 1, -1), (0, -1, 1),
-            (1, 1, 1), (-1, -1, -1), (1, -1, -1), (-1, 1, -1),
-            (1, 1, -1), (-1, -1, 1), (1, -1, 1), (-1, 1, 1)
-        ]
+            (0, 0, 1), (0, 0, -1)
+            ]
         for dx, dy, dz in moves:
             new_pos = (x + dx * self.grid_size, y + dy * self.grid_size, z + dz * self.grid_size)
             if self.bounds[0] <= new_pos[0] <= self.bounds[1] and self.bounds[2] <= new_pos[1] <= self.bounds[3] and self.bounds[4] <= new_pos[2] <= self.bounds[5]:

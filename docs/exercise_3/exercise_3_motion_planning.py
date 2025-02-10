@@ -102,7 +102,15 @@ class MotionPlanner3D():
     
         return poly_coeffs
     
-    def plot_obstacle(self, ax, x, y, z, dx, dy, dz, color='gray', alpha=0.5):
+    def vel_check(self, poly_coeffs):
+        # Find candidates where acceleration is zero and where the velocity is maximum for each segment
+        
+
+        # Perform check if velocity is greater than allowed limit
+        # Return error
+        pass
+    
+    def plot_obstacle(self, ax, x, y, z, dx, dy, dz, color='gray', alpha=0.3):
         """Plot a rectangular cuboid (obstacle) in 3D space."""
         vertices = np.array([[x, y, z], [x+dx, y, z], [x+dx, y+dy, z], [x, y+dy, z],
                             [x, y, z+dz], [x+dx, y, z+dz], [x+dx, y+dy, z+dz], [x, y+dy, z+dz]])
@@ -113,10 +121,11 @@ class MotionPlanner3D():
         
         ax.add_collection3d(Poly3DCollection(faces, color=color, alpha=alpha))
     
-    def plot(self, poly_coeffs, obs, num_points = 100):
+    def evaluate_and_plot(self, poly_coeffs, obs, num_points = 100):
 
         t_fine = np.linspace(self.times[0], self.times[-1], num_points)  # Fine time intervals
         x_vals, y_vals, z_vals = [], [], []
+        v_x_vals, v_y_vals, v_z_vals = [], [], []
         coeff_x = poly_coeffs[:,0]
         coeff_y = poly_coeffs[:,1]
         coeff_z = poly_coeffs[:,2]
@@ -128,6 +137,9 @@ class MotionPlanner3D():
             x_vals.append(np.dot(self.compute_poly_matrix(t-self.times[segment])[0],coeff_x[segment*6:(segment+1)*6]))
             y_vals.append(np.dot(self.compute_poly_matrix(t-self.times[segment])[0],coeff_y[segment*6:(segment+1)*6]))
             z_vals.append(np.dot(self.compute_poly_matrix(t-self.times[segment])[0],coeff_z[segment*6:(segment+1)*6]))
+            v_x_vals.append(np.dot(self.compute_poly_matrix(t-self.times[segment])[1],coeff_x[segment*6:(segment+1)*6]))
+            v_y_vals.append(np.dot(self.compute_poly_matrix(t-self.times[segment])[1],coeff_y[segment*6:(segment+1)*6]))
+            v_z_vals.append(np.dot(self.compute_poly_matrix(t-self.times[segment])[1],coeff_z[segment*6:(segment+1)*6]))
 
         # print(x_vals)
         # print(y_vals)
@@ -135,17 +147,21 @@ class MotionPlanner3D():
 
         # Plot 3D trajectory
         fig = plt.figure(figsize=(8, 6))
-        ax = fig.add_subplot(111, projection='3d')
+        ax = fig.add_subplot(111, projection='3d', )
+
+        for ob in obs:
+            self.plot_obstacle(ax, ob[0], ob[1], ob[2], ob[3], ob[4], ob[5])
+
         ax.plot(x_vals, y_vals, z_vals, label="Minimum-Jerk Trajectory", linewidth=2)
+        ax.set_xlim(0, 5)
+        ax.set_ylim(0, 3)
+        ax.set_zlim(0, 1.5)
 
         # Plot waypoints
         waypoints_x = [p[0] for p in self.path]
         waypoints_y = [p[1] for p in self.path]
         waypoints_z = [p[2] for p in self.path]
         ax.scatter(waypoints_x, waypoints_y, waypoints_z, color='red', marker='o', label="Waypoints")
-
-        for ob in obs:
-            self.plot_obstacle(ax, ob[0], ob[1], ob[2], ob[3], ob[4], ob[5])
 
         # Labels and legend
         ax.set_xlabel("X Position")
@@ -154,22 +170,39 @@ class MotionPlanner3D():
         ax.set_title("3D Minimum-Jerk Trajectory")
         ax.legend()
         plt.show()
+
+        return x_vals, y_vals, z_vals, v_x_vals, v_y_vals, v_z_vals
     
 if __name__ == '__main__':
-    start = (0, 0, 0)
-    goal = (10, 2, 0)
-    grid_size = 1
-    obstacles = [(2, 2, 0, 1, 1, 1),
-                 (3, 4, 0, 1, 1, 1),
-                 (7, 7, 0, 1, 1, 1)]  # (x, y, z, width_x, width_y, width_z)
-    bounds = (0, 10, 0, 10, 0, 10)  # (x_min, x_max, y_min, y_max, z_min, z_max)
+    start = (0.0, 0.0, 0.0)
+    goal = (5, 1, 1)
+    grid_size = 0.5
+    obstacles = [(1.25, 1.25, 0.0, 0.5, 0.5, 2.0),
+                 (1.5, 2.25, 0.0, 0.5, 0.5, 2.0),
+                 (3.5, 1.35, 0.0, 0.25, 0.25, 1.5),
+                 (4.25, 2.25, 0.0, 0.5, 0.5, 1.5),
+                 (0.8, 0.3, 0.0, 0.5, 0.5, 1.5),
+                 (3.75, 0.4, 0.0, 0.5, 0.5, 1.5),
+                 (2.5, 0.0, 0.0, 0.5, 2.0, 1.5),
+                 (2.5, 2.0, 0.0, 0.5, 1.0, 0.25),
+                 (2.5, 2.0, 0.75, 0.5, 1.0, 0.75)
+                 ]  # (x, y, z, width_x, width_y, width_z)
+    bounds = (0, 5, 0, 5, 0, 1.5)  # (x_min, x_max, y_min, y_max, z_min, z_max)
 
-    astar = AStar3D(start, goal, grid_size, obstacles, bounds)
+    diagonal_flag = True
+    astar = AStar3D(start, goal, grid_size, obstacles, bounds, diagonal_flag)
     path = astar.find_path()
     print("Path:", path)
 
-    t_f = 10.0
+    path_np = np.array([np.asarray(p) for p in path])
+    dists = np.linalg.norm(np.diff(path_np, axis=0), axis=1)
+    dist_ratios = (dists/np.sum(dists))
 
+    t_f = 5.0
+
+    # IMPROVEMENT to allow for more even speed distribution (less speed exceeding peaks)
+    #times = [0]
+    #[times.append(np.sum(dist_ratios[:i+1])*t_f) for i in range(len(dist_ratios))]# (dists/np.sum(dists))*t_f 
     times = np.linspace(0, t_f, len(path))
     print(times)
 
@@ -177,7 +210,7 @@ if __name__ == '__main__':
 
     poly_coeffs = mp.compute_poly_coefficients()
 
-    mp.plot(poly_coeffs, obstacles)
+    x,y,z,vx,vy,vz = np.array(mp.evaluate_and_plot(poly_coeffs, obstacles))
 
-
-    
+    print("Maximum speed: " + str(np.max(np.sqrt(vx**2 + vy**2 + vz**2))))
+    print("Average speed: " + str(np.mean(np.sqrt(vx**2 + vy**2 + vz**2))))
