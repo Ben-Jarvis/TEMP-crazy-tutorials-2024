@@ -24,6 +24,7 @@ This documentation shows the project description, step-by-step software implemen
    assignment/leaderboard
    assignment/hardware_instruction
    assignment/hardware_quickstart
+   faq/faq
 
 .. rubric:: Indices and tables
 
