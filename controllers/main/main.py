@@ -10,8 +10,9 @@ import example
 import time, random
 import threading
 
-exp_num = 1                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
+exp_num = 3                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
 control_style = 'keyboard'      # 'keyboard' or 'path_planner'
+rand_env = True                 # Randomise the environment
 
 # Global variables for handling threads
 latest_sensor_data = None
@@ -126,59 +127,117 @@ class CrazyflieInDroneDome(Supervisor):
             self.reached_landing_pad = False
             self.reached_goal_first = False
             self.reached_goal_second = False
-                
-            # Set random initial position of the drone
-            init_x_drone, init_y_drone = random.uniform(0.3, 1.2), random.uniform(0.3, 2.7)
-            drone = super().getSelf()
-            translation_field = drone.getField('translation')
-            translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.2])
 
-            # Set random initial position of the take-off pad
-            take_off_pad = super().getFromDef('TAKE_OFF_PAD')
-            translation_field = take_off_pad.getField('translation')
-            translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
+        if rand_env:
+            self.randomise_positions()
 
-            # Set random initial position of the landing pad
-            self.landing_pad_position = [random.uniform(3.8, 4.7), random.uniform(0.3, 2.7)]
-            landing_pad = super().getFromDef('LANDING_PAD')
-            translation_field = landing_pad.getField('translation')
-            translation_field.setSFVec3f([self.landing_pad_position[0], self.landing_pad_position[1], 0.05])
+    # Randomise the positions of the drone, obstacles, goal, take-off pad and landing pad
+    def randomise_positions(self):
+                        
+        # # Set random initial position of the drone
+        # init_x_drone, init_y_drone = random.uniform(0.3,1.2), random.uniform(0.3,2.7)
+        # drone = super().getSelf()
+        # translation_field = drone.getField('translation')
+        # translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.25])
 
-            # Set random initial position of the Goal
-            self.goal_position = [random.uniform(2.3, 2.7), random.uniform(0.3, 2.7), random.uniform(0.8,1.4)]
-            goal = super().getFromDef('GOAL')
-            translation_field = goal.getField('translation')
-            translation_field.setSFVec3f(self.goal_position)
+        # # Set random initial position of the take-off pad
+        # take_off_pad = super().getFromDef('TAKE_OFF_PAD')
+        # translation_field = take_off_pad.getField('translation')
+        # translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
 
-            # TODO: Do this properly using the supervisor
-            self.goal_height = 0.4
-            self.goal_width = 0.4
-            self.goal_depth = 0.1    
+        # # Set random initial positions of obstacles
+        # existing_points = []
+        # existing_points.append([init_x_drone, init_y_drone, 0.2])
 
-            # Set random initial positions of obstacles
-            existed_points = []
-            existed_points.append([init_x_drone, init_y_drone])
-            existed_points.append([self.landing_pad_position[0], self.landing_pad_position[1]])
-            existed_points.append([self.goal_position[0], self.goal_position[1]])
-            for i in range(1, 11):
-                find_appropriate_random_position = False
-                while not find_appropriate_random_position:
-                    # Generate new random position
-                    new_init_x_obs, new_init_y_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7)
-                    min_distance = 1000
-                    # Calculate the min distance to existed obstacles and pads
-                    for point in existed_points:
-                        distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs])
-                        if distance < min_distance:
-                            min_distance = distance
-                    if min_distance > 0.8:
-                        find_appropriate_random_position = True
-                # Accept position that is 0.8m far away from existed obstacles and pads
-                obstacle = super().getFromDef('OBSTACLE' + str(i))
-                translation_field = obstacle.getField('translation')
-                translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 0.74])
-                existed_points.append([new_init_x_obs, new_init_y_obs])
+        num_gates = 4
+        for i in range(num_gates):
+            # find_appropriate_random_position = False
 
+            # while not find_appropriate_random_position:
+
+            #     # Generate new random position
+            #     new_init_x_obs, new_init_y_obs, new_init_z_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7), random.uniform(0.7, 1.3)
+            #     min_distance = 1000
+
+            #     # Calculate the min distance to existing points
+            #     for point in existing_points:
+            #         distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs, point[2] - new_init_z_obs])
+
+            #         if distance < min_distance:
+            #             min_distance = distance
+
+            #     # Accept a position that is 0.8m from existing gates and the starting position
+            #     if min_distance > 0.8:
+            #         find_appropriate_random_position = True
+
+            
+            # # Move the gate to the new position
+            # obstacle = super().getFromDef('GATE' + str(i))
+            # translation_field = obstacle.getField('translation')
+            # translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 1.0])
+            # existing_points.append([new_init_x_obs, new_init_y_obs])
+
+
+            ### For now just randomise the height of the gates and keep the current x and y ###
+            goal_node = super().getFromDef('GATE' + str(i))
+
+            self.set_goal_fields(goal_node, random.uniform(0.7, 1.3), random.uniform(0.4, 1.2))
+            
+            
+
+    def set_goal_fields(self, goal_node, goal_height, goal_size):
+        
+        # Default Beam dimensions
+        w = 0.06
+        h = 0.04
+        
+        # Get the current position of the goal
+        translation_field = goal_node.getField('translation')
+        current_position = translation_field.getSFVec3f()
+
+        # Set the new position of the goal
+        translation_field.setSFVec3f([current_position[0], current_position[1], goal_height])
+
+        # Update the top beam
+        top_beam_length = goal_size
+        top_beam_scale_field = goal_node.getField('topBeamScale')
+        top_beam_scale_field.setSFVec3f([top_beam_length, w, h])
+        top_beam_translation_field = goal_node.getField('topBeamTranslation')
+        top_beam_translation_field.setSFVec3f([0, 0, goal_size/2 + w/2])
+
+        # Update the bottom beam
+        bottom_beam_length = goal_size
+        bottom_beam_scale_field = goal_node.getField('bottomBeamScale')
+        bottom_beam_scale_field.setSFVec3f([bottom_beam_length, w, h])
+        bottom_beam_translation_field = goal_node.getField('bottomBeamTranslation')
+        bottom_beam_translation_field.setSFVec3f([0, 0, -goal_size/2 - w/2])
+
+        # Update the left beam
+        left_beam_length = goal_height + goal_size/2 + w - h
+        left_beam_scale_field = goal_node.getField('leftBeamScale')
+        left_beam_scale_field.setSFVec3f([left_beam_length, w, h])
+        left_beam_translation_field = goal_node.getField('leftBeamTranslation')
+        left_beam_translation_field.setSFVec3f([0, goal_size/2 + w/2, h + left_beam_length/2 - goal_height])
+
+        # Update the right beam
+        right_beam_length = goal_height + goal_size/2 + w - h
+        right_beam_scale_field = goal_node.getField('rightBeamScale')
+        right_beam_scale_field.setSFVec3f([right_beam_length, w, h])
+        right_beam_translation_field = goal_node.getField('rightBeamTranslation')
+        right_beam_translation_field.setSFVec3f([0, -goal_size/2 - w/2, h + right_beam_length/2 - goal_height])
+
+        # Update the left leg
+        left_leg_translation_field = goal_node.getField('leftLegTranslation')
+        left_leg_translation_field.setSFVec3f([0, goal_size/2 + w/2, h/2 - goal_height])
+
+        # Update the right leg
+        right_leg_translation_field = goal_node.getField('rightLegTranslation')
+        right_leg_translation_field.setSFVec3f([0, -goal_size/2 - w/2, h/2 - goal_height])
+
+
+
+    
+    
     def wait_keyboard(self):
         while self.keyboard.getKey() != ord('Y'):
             super().step(self.timestep)
