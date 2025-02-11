@@ -165,8 +165,9 @@ class quadrotor_controller():
         pos_z_setpoint = keys[2]
         self.pid_pos_z.setpoint = pos_z_setpoint
         vel_z_setpoint = self.pid_pos_z(sensor_data["z_global"],dt=dt)
-
-        return self.acceleration_to_pwm(dt, [keys[0], keys[1], vel_z_setpoint], keys[3], sensor_data)
+        yaw = sensor_data["yaw"] + keys[3]
+        
+        return self.acceleration_to_pwm(dt, [keys[0], keys[1], vel_z_setpoint], yaw, sensor_data)
 
     def acceleration_to_pwm(self, dt, acceleration, yaw, sensor_data):
         # for tuning
@@ -174,7 +175,7 @@ class quadrotor_controller():
             acc_y_setpoint = self.tuning(-self.limits["L_acc_rp"],self.limits["L_acc_rp"],2,dt,acc_y_setpoint, sensor_data["roll"], "roll [rad]", transform=True)
         if self.tuning_level == "att_y":
             yaw_setpoint = self.tuning(-2,2,1,dt,yaw_setpoint, sensor_data["yaw"], "yaw [rad]")
-
+        
         # linear acceleration to rotation
         R_setpoint, combined_thrust = self.acc_to_rotation_and_thrust(acceleration[0], acceleration[1], acceleration[2], yaw)
 
