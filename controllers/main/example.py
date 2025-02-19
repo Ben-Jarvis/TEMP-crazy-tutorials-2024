@@ -60,7 +60,7 @@ def path_planning(sensor_data,dt):
 
         if timer_done is None:
             timer_done = True
-            print("Path planing took " + str(np.round(timer,1)) + " [s]")
+            print("Path planning took " + str(np.round(timer,1)) + " [s]") #Fixed typo (JULIUS)
         return control_command
 
     # Get the goal position and drone position
