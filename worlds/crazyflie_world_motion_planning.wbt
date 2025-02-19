@@ -4,7 +4,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/lights/protos/CeilingLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
-EXTERNPROTO "../protos/Cow.proto"
 EXTERNPROTO "../protos/Pedestrian.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/plants/protos/PottedTree.proto"
 EXTERNPROTO "../protos/Wall.proto"
@@ -13,8 +12,8 @@ EXTERNPROTO "../protos/Window.proto"
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.4886225029626851 0.27344814447380134 0.8285373629971771 1.9605018515522383
-  position 2.619632063507418 -6.039614548294754 8.857488215849385
+  orientation -0.11595594142826 0.9014869154650192 0.4169838856512936 0.6286803788774629
+  position -5.431970657618181 -0.5767344279487623 5.810015600776217
   follow "crazyflie"
 }
 TexturedBackground {
@@ -255,7 +254,7 @@ DEF GOAL Solid {
   name "goal"
 }
 DEF OBSTACLE1 Solid {
-  translation 1.75 1.5 0.74
+  translation 1.77 1.4 0.74
   children [
     DEF CYLINDER_SHAPE Shape {
       appearance PBRAppearance {
@@ -273,15 +272,7 @@ DEF OBSTACLE1 Solid {
       }
     }
   ]
-  name "obstacle-C1"
-  boundingObject USE CYLINDER_SHAPE
-}
-DEF OBSTACLE2 Solid {
-  translation 1.5 2.5 0.75
-  children [
-    USE CYLINDER_SHAPE
-  ]
-  name "obstacle-C2"
+  name "obstacle-C1(1)"
   boundingObject USE CYLINDER_SHAPE
 }
 DEF OBSTACLE3 Solid {
@@ -299,40 +290,6 @@ DEF OBSTACLE4 Solid {
   ]
   name "obstacle-C4"
   boundingObject USE CYLINDER_SHAPE
-}
-DEF OBSTACLE9 Solid {
-  translation 1 0.5 0.75
-  children [
-    DEF BOX_SHAPE Shape {
-      appearance PBRAppearance {
-        baseColorMap ImageTexture {
-          url [
-            "./textures_epfl_lis/obstacle_box.jpg"
-          ]
-        }
-        roughness 1
-        metalness 0
-      }
-      geometry Box {
-        size 0.31 0.31 1.48
-      }
-    }
-  ]
-  name "obstacle-B4"
-  boundingObject DEF BOX_SHAPE Shape {
-    appearance PBRAppearance {
-      baseColorMap ImageTexture {
-        url [
-          "./textures_epfl_lis/obstacle_box.jpg"
-        ]
-      }
-      roughness 1
-      metalness 0
-    }
-    geometry Box {
-      size 0.31 0.31 1.48
-    }
-  }
 }
 DEF TAKE_OFF_PAD Solid {
   translation 1 1 0.05
@@ -374,10 +331,6 @@ DEF FLIGHT_AREA Solid {
     }
   ]
   name "flight_area"
-}
-Cow {
-  translation 5.47 1 0.83
-  rotation 0 0 1 -1.5707953071795862
 }
 Pedestrian {
   translation 4 0.6 1.26
