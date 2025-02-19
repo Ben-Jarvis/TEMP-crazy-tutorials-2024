@@ -10,9 +10,9 @@ import example
 import time, random
 import threading
 
-exp_num = 3                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
+exp_num = 0           # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
 control_style = 'keyboard'      # 'keyboard' or 'path_planner'
-rand_env = True                 # Randomise the environment
+rand_env = False               # Randomise the environment
 
 # Global variables for handling threads
 latest_sensor_data = None
@@ -234,10 +234,6 @@ class CrazyflieInDroneDome(Supervisor):
         right_leg_translation_field = goal_node.getField('rightLegTranslation')
         right_leg_translation_field.setSFVec3f([0, -goal_size/2 - w/2, h/2 - goal_height])
 
-
-
-    
-    
     def wait_keyboard(self):
         while self.keyboard.getKey() != ord('Y'):
             super().step(self.timestep)
@@ -269,6 +265,7 @@ class CrazyflieInDroneDome(Supervisor):
         # Update time intervals for sensing and propagation
         self.dt_accel = self.getTime() - self.accel_read_last_time
         self.dt_gps = self.getTime() - self.gps_read_last_time
+        # print(self.dt_accel, self.dt_gps)
 
         # Data dictionary
         measured_data_raw = self.read_sensors().copy()
@@ -482,29 +479,29 @@ class CrazyflieInDroneDome(Supervisor):
         super().step(self.timestep)
 
 
-    def step_KF(self, KF_data):
+    # def step_KF(self, KF_data, dt_ctrl):
 
-        self.dt_ctrl = self.getTime() - self.PID_update_last_time
+    #     # self.dt_ctrl = self.getTime() - self.PID_update_last_time
 
-        if np.round(self.dt_ctrl,3) >= self.ctrl_update_period/1000:
+    #     if np.round(dt_ctrl,3) >= self.ctrl_update_period/1000:
 
-            pp_cmds = example.path_planning(KF_data, self.dt_ctrl)
+    #         pp_cmds = example.path_planning(KF_data, dt_ctrl)
 
-            self.PID_update_last_time = self.getTime()
-            # Low-level PID velocity control with fixed height
-            motorPower = self.PID_CF.pid(self.dt_ctrl, pp_cmds, KF_data)
+    #         # Low-level PID velocity control with fixed height
+    #         motorPower = self.PID_CF.setpoint_to_rpm(dt_ctrl, pp_cmds, KF_data)
+    #         #pid(self.dt_ctrl, pp_cmds, KF_data)
         
-            # Update motor command
-            self.m1_motor.setVelocity(-motorPower[0])
-            self.m2_motor.setVelocity(motorPower[1])
-            self.m3_motor.setVelocity(-motorPower[2])
-            self.m4_motor.setVelocity(motorPower[3])
+    #         # Update motor command
+    #         self.m1_motor.setVelocity(-motorPower[0])
+    #         self.m2_motor.setVelocity(motorPower[1])
+    #         self.m3_motor.setVelocity(-motorPower[2])
+    #         self.m4_motor.setVelocity(motorPower[3])
 
-        if np.round(self.getTime(),2) == self.KF.plot_time_limit:
-            self.KF.plot_states()
+    #     if np.round(self.getTime(),2) == self.KF.plot_time_limit:
+    #         self.KF.plot_states()
 
-        # Update drone states in simulation
-        super().step(self.timestep)
+    #     # Update drone states in simulation
+    #     super().step(self.timestep)
 
 # A thread that runs the path planner in parallel with the simulation
 def path_planner_thread(drone):
@@ -548,11 +545,9 @@ if __name__ == '__main__':
         for step in range(100000):
             
             if exp_num == 2:
-                assert control_style == 'path_planner', "Variable control_style must be set to path planner for this exercise"
-                state_data = drone.read_KF_estimates()
-                # Update the drone status in simulation with KF
-                drone.step_KF(state_data)
-
+                sensor_data = drone.read_KF_estimates()
+                if np.round(drone.getTime(),2) == drone.KF.plot_time_limit:
+                    drone.KF.plot_states()
             else:
                 # Read sensor data including []
                 sensor_data = drone.read_sensors()
@@ -560,31 +555,35 @@ if __name__ == '__main__':
                 with sensor_lock:
                     latest_sensor_data = sensor_data
 
-                # NEED TO UPDATE THIS AND STEP_KF
-                dt_ctrl = drone.getTime() - drone.PID_update_last_time
+            # NEED TO UPDATE THIS AND STEP_KF
+            drone.dt_ctrl = drone.getTime() - drone.PID_update_last_time
 
             if control_style == 'keyboard':
                 control_commands = drone.action_from_keyboard(sensor_data)
-                motorPower = drone.PID_CF.keys_to_pwm(dt_ctrl, control_commands, sensor_data)    
+                motorPower = drone.PID_CF.keys_to_pwm(drone.dt_ctrl, control_commands, sensor_data)    
 
             elif control_style == 'path_planner':
-                setpoint = example.path_planning(sensor_data,dt_ctrl)
-                motorPower = drone.PID_CF.setpoint_to_rpm(dt_ctrl, setpoint, sensor_data)
+                if drone.PID_update_last_time == 0 or np.round(drone.dt_ctrl,3) >= drone.ctrl_update_period/1000: #Only execute at first point and in control rate step
+                    if exp_num == 3:
+                        # For the PROJECT CHANGE YOUR CODE HERE
+                        # Example Path planner call
+                        setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
+                        drone.check_landing_pad(sensor_data)
+                        # Check if the drone has reached the goal
+                        drone.check_goal(sensor_data)
+                    else:
+                        # Update the setpoint
+                        setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
+                        # Call the PID controller to get the motor commands
+                        motorPower = drone.PID_CF.setpoint_to_rpm(drone.dt_ctrl, setpoint, sensor_data)
 
-                if exp_num == 3:
-                    # For the PROJECT CHANGE YOUR CODE HERE
-                    # Example Path planner call
-                    setpoint = example.path_planning(sensor_data,dt_ctrl)
-                    drone.check_landing_pad(sensor_data)
-                    # Check if the drone has reached the goal
-                    drone.check_goal(sensor_data)
-
-            # Control commands
-            dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control
-            drone.PID_update_last_time = drone.getTime()
+                    drone.PID_update_last_time = drone.getTime()
 
             # Update the drone status in simulation
             drone.step(motorPower, sensor_data)
+
+            # Control commands
+            # dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control - Why twice?
 
             # control_commands = example.obstacle_avoidance(sensor_data)
             # map = example.occupancy_map(sensor_data)
