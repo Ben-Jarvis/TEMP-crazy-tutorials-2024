@@ -8,9 +8,20 @@ import utils
 from scipy.spatial.transform import Rotation as R
 import example
 import time, random
+import threading
 
 exp_num = 3                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
-control_style = 'path_planner'      # 'keyboard' or 'path_planner
+control_style = 'keyboard'      # 'keyboard' or 'path_planner'
+rand_env = True                 # Randomise the environment
+
+# Global variables for handling threads
+latest_sensor_data = None
+sensor_lock = threading.Lock()
+
+current_setpoint = None
+setpoint_lock = threading.Lock()
+
+running = True
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -112,64 +123,121 @@ class CrazyflieInDroneDome(Supervisor):
 
         # For the assignment, randomise the positions of the drone, obstacles, goal, take-off pad and landing pad 
         if exp_num == 3:
-
             # Variables to track progress
             self.reached_landing_pad = False
             self.reached_goal_first = False
             self.reached_goal_second = False
-                
-            # Set random initial position of the drone
-            init_x_drone, init_y_drone = random.uniform(0.3, 1.2), random.uniform(0.3, 2.7)
-            drone = super().getSelf()
-            translation_field = drone.getField('translation')
-            translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.2])
 
-            # Set random initial position of the take-off pad
-            take_off_pad = super().getFromDef('TAKE_OFF_PAD')
-            translation_field = take_off_pad.getField('translation')
-            translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
+        if rand_env:
+            self.randomise_positions()
 
-            # Set random initial position of the landing pad
-            self.landing_pad_position = [random.uniform(3.8, 4.7), random.uniform(0.3, 2.7)]
-            landing_pad = super().getFromDef('LANDING_PAD')
-            translation_field = landing_pad.getField('translation')
-            translation_field.setSFVec3f([self.landing_pad_position[0], self.landing_pad_position[1], 0.05])
+    # Randomise the positions of the drone, obstacles, goal, take-off pad and landing pad
+    def randomise_positions(self):
+                        
+        # # Set random initial position of the drone
+        # init_x_drone, init_y_drone = random.uniform(0.3,1.2), random.uniform(0.3,2.7)
+        # drone = super().getSelf()
+        # translation_field = drone.getField('translation')
+        # translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.25])
 
-            # Set random initial position of the Goal
-            self.goal_position = [random.uniform(2.3, 2.7), random.uniform(0.3, 2.7), random.uniform(0.8,1.4)]
-            goal = super().getFromDef('GOAL')
-            translation_field = goal.getField('translation')
-            translation_field.setSFVec3f(self.goal_position)
+        # # Set random initial position of the take-off pad
+        # take_off_pad = super().getFromDef('TAKE_OFF_PAD')
+        # translation_field = take_off_pad.getField('translation')
+        # translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
 
-            # TODO: Do this properly using the supervisor
-            self.goal_height = 0.4
-            self.goal_width = 0.4
-            self.goal_depth = 0.1    
+        # # Set random initial positions of obstacles
+        # existing_points = []
+        # existing_points.append([init_x_drone, init_y_drone, 0.2])
 
-            # Set random initial positions of obstacles
-            existed_points = []
-            existed_points.append([init_x_drone, init_y_drone])
-            existed_points.append([self.landing_pad_position[0], self.landing_pad_position[1]])
-            existed_points.append([self.goal_position[0], self.goal_position[1]])
-            for i in range(1, 11):
-                find_appropriate_random_position = False
-                while not find_appropriate_random_position:
-                    # Generate new random position
-                    new_init_x_obs, new_init_y_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7)
-                    min_distance = 1000
-                    # Calculate the min distance to existed obstacles and pads
-                    for point in existed_points:
-                        distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs])
-                        if distance < min_distance:
-                            min_distance = distance
-                    if min_distance > 0.8:
-                        find_appropriate_random_position = True
-                # Accept position that is 0.8m far away from existed obstacles and pads
-                obstacle = super().getFromDef('OBSTACLE' + str(i))
-                translation_field = obstacle.getField('translation')
-                translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 0.74])
-                existed_points.append([new_init_x_obs, new_init_y_obs])
+        num_gates = 4
+        for i in range(num_gates):
+            # find_appropriate_random_position = False
 
+            # while not find_appropriate_random_position:
+
+            #     # Generate new random position
+            #     new_init_x_obs, new_init_y_obs, new_init_z_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7), random.uniform(0.7, 1.3)
+            #     min_distance = 1000
+
+            #     # Calculate the min distance to existing points
+            #     for point in existing_points:
+            #         distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs, point[2] - new_init_z_obs])
+
+            #         if distance < min_distance:
+            #             min_distance = distance
+
+            #     # Accept a position that is 0.8m from existing gates and the starting position
+            #     if min_distance > 0.8:
+            #         find_appropriate_random_position = True
+
+            
+            # # Move the gate to the new position
+            # obstacle = super().getFromDef('GATE' + str(i))
+            # translation_field = obstacle.getField('translation')
+            # translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 1.0])
+            # existing_points.append([new_init_x_obs, new_init_y_obs])
+
+
+            ### For now just randomise the height of the gates and keep the current x and y ###
+            goal_node = super().getFromDef('GATE' + str(i))
+
+            self.set_goal_fields(goal_node, random.uniform(0.7, 1.3), random.uniform(0.4, 1.2))
+            
+            
+
+    def set_goal_fields(self, goal_node, goal_height, goal_size):
+        
+        # Default Beam dimensions
+        w = 0.06
+        h = 0.04
+        
+        # Get the current position of the goal
+        translation_field = goal_node.getField('translation')
+        current_position = translation_field.getSFVec3f()
+
+        # Set the new position of the goal
+        translation_field.setSFVec3f([current_position[0], current_position[1], goal_height])
+
+        # Update the top beam
+        top_beam_length = goal_size
+        top_beam_scale_field = goal_node.getField('topBeamScale')
+        top_beam_scale_field.setSFVec3f([top_beam_length, w, h])
+        top_beam_translation_field = goal_node.getField('topBeamTranslation')
+        top_beam_translation_field.setSFVec3f([0, 0, goal_size/2 + w/2])
+
+        # Update the bottom beam
+        bottom_beam_length = goal_size
+        bottom_beam_scale_field = goal_node.getField('bottomBeamScale')
+        bottom_beam_scale_field.setSFVec3f([bottom_beam_length, w, h])
+        bottom_beam_translation_field = goal_node.getField('bottomBeamTranslation')
+        bottom_beam_translation_field.setSFVec3f([0, 0, -goal_size/2 - w/2])
+
+        # Update the left beam
+        left_beam_length = goal_height + goal_size/2 + w - h
+        left_beam_scale_field = goal_node.getField('leftBeamScale')
+        left_beam_scale_field.setSFVec3f([left_beam_length, w, h])
+        left_beam_translation_field = goal_node.getField('leftBeamTranslation')
+        left_beam_translation_field.setSFVec3f([0, goal_size/2 + w/2, h + left_beam_length/2 - goal_height])
+
+        # Update the right beam
+        right_beam_length = goal_height + goal_size/2 + w - h
+        right_beam_scale_field = goal_node.getField('rightBeamScale')
+        right_beam_scale_field.setSFVec3f([right_beam_length, w, h])
+        right_beam_translation_field = goal_node.getField('rightBeamTranslation')
+        right_beam_translation_field.setSFVec3f([0, -goal_size/2 - w/2, h + right_beam_length/2 - goal_height])
+
+        # Update the left leg
+        left_leg_translation_field = goal_node.getField('leftLegTranslation')
+        left_leg_translation_field.setSFVec3f([0, goal_size/2 + w/2, h/2 - goal_height])
+
+        # Update the right leg
+        right_leg_translation_field = goal_node.getField('rightLegTranslation')
+        right_leg_translation_field.setSFVec3f([0, -goal_size/2 - w/2, h/2 - goal_height])
+
+
+
+    
+    
     def wait_keyboard(self):
         while self.keyboard.getKey() != ord('Y'):
             super().step(self.timestep)
@@ -401,14 +469,8 @@ class CrazyflieInDroneDome(Supervisor):
         self.simulationReset()
         super().step(self.timestep)
 
-    def step(self, setpoint, sensor_data):
-        
-        dt_ctrl = self.getTime() - self.PID_update_last_time
-        # Time interval for PID control
-        self.PID_update_last_time = self.getTime()
-        # Low-level PID velocity control with fixed height
-        motorPower = self.PID_CF.pid(dt_ctrl, setpoint, sensor_data)
-            
+    def step(self, motorPower, sensor_data):
+
         # Update motor command
         self.m1_motor.setVelocity(-motorPower[0])
         self.m2_motor.setVelocity(motorPower[1])
@@ -444,6 +506,28 @@ class CrazyflieInDroneDome(Supervisor):
         # Update drone states in simulation
         super().step(self.timestep)
 
+# A thread that runs the path planner in parallel with the simulation
+def path_planner_thread(drone):
+    global latest_sensor_data, current_setpoint, running
+    
+    while running:
+        # Make a local copy of the sensor data
+        sensor_data_copy = None
+        dt_ctrl = 0.0
+
+        # Lock the sensor data to prevent it from being updated while we are using it
+        with sensor_lock:
+            # Update sensor data if it is available
+            if latest_sensor_data is not None:
+                sensor_data_copy = latest_sensor_data.copy()
+                dt_ctrl = drone.getTime() - drone.PID_update_last_time
+        # Call the path planner to get the new setpoint
+        if sensor_data_copy is not None:
+            new_setpoint = example.path_planning(sensor_data_copy,dt_ctrl)
+            with setpoint_lock:
+                current_setpoint = new_setpoint
+        time.sleep(0.01)
+    
 
 if __name__ == '__main__':
 
@@ -452,49 +536,63 @@ if __name__ == '__main__':
     assert control_style in ['keyboard','path_planner'], "Variable control_style must either be 'keyboard' or 'path_planner'"
     assert exp_num in [0,1,2,3], "Exp_num must be a value between 0 and 3"
 
-    # Simulation loops
-    for step in range(100000):
-        
-        if exp_num == 2:
-            assert control_style == 'path_planner', "Variable control_style must be set to path planner for this exercise"
-            state_data = drone.read_KF_estimates()
-            # Update the drone status in simulation with KF
-            drone.step_KF(state_data)
+    # Start the path planner thread
+    if control_style == 'path_planner':
+        planner_thread = threading.Thread(target=path_planner_thread, args=(drone,))
+        planner_thread.daemon = True
+        planner_thread.start()
+   
+    try:
 
-        else:
-            # Read sensor data including []
-            sensor_data = drone.read_sensors()
-            dt_ctrl = drone.getTime() - drone.PID_update_last_time
+        # Simulation loops
+        for step in range(100000):
+            
+            if exp_num == 2:
+                assert control_style == 'path_planner', "Variable control_style must be set to path planner for this exercise"
+                state_data = drone.read_KF_estimates()
+                # Update the drone status in simulation with KF
+                drone.step_KF(state_data)
+
+            else:
+                # Read sensor data including []
+                sensor_data = drone.read_sensors()
+                # Update the sensor data
+                with sensor_lock:
+                    latest_sensor_data = sensor_data
+
+                # NEED TO UPDATE THIS AND STEP_KF
+                dt_ctrl = drone.getTime() - drone.PID_update_last_time
 
             if control_style == 'keyboard':
                 control_commands = drone.action_from_keyboard(sensor_data)
+                motorPower = drone.PID_CF.keys_to_pwm(dt_ctrl, control_commands, sensor_data)    
 
-                euler_angles = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
-                control_commands = utils.rot_inertial2body(control_commands, euler_angles)
-
-                set_x = sensor_data['x_global'] + control_commands[0]
-                set_y = sensor_data['y_global'] + control_commands[1]
-                set_alt = control_commands[2]
-                set_yaw = sensor_data['yaw'] + control_commands[3]
-                
-                setpoint = [set_x, set_y, set_alt, set_yaw]
             elif control_style == 'path_planner':
                 setpoint = example.path_planning(sensor_data,dt_ctrl)
+                motorPower = drone.PID_CF.setpoint_to_rpm(dt_ctrl, setpoint, sensor_data)
 
-            if exp_num == 3:
-                # For the PROJECT CHANGE YOUR CODE HERE
-                # Example Path planner call
-                setpoint = example.path_planning(sensor_data,dt_ctrl)
-                drone.check_landing_pad(sensor_data)
-                # Check if the drone has reached the goal
-                drone.check_goal(sensor_data)
+                if exp_num == 3:
+                    # For the PROJECT CHANGE YOUR CODE HERE
+                    # Example Path planner call
+                    setpoint = example.path_planning(sensor_data,dt_ctrl)
+                    drone.check_landing_pad(sensor_data)
+                    # Check if the drone has reached the goal
+                    drone.check_goal(sensor_data)
+
+            # Control commands
+            dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control
+            drone.PID_update_last_time = drone.getTime()
 
             # Update the drone status in simulation
-            drone.step(setpoint, sensor_data)
+            drone.step(motorPower, sensor_data)
 
-        # control_commands = example.obstacle_avoidance(sensor_data)
-        # map = example.occupancy_map(sensor_data)
-        # ---- end --- #
+            # control_commands = example.obstacle_avoidance(sensor_data)
+            # map = example.occupancy_map(sensor_data)
+            # ---- end --- #
+    
+    except KeyboardInterrupt:
+        running = False
+        planner_thread.join()
 
 
 

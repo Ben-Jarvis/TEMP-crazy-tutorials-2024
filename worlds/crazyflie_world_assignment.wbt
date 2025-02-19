@@ -1,9 +1,10 @@
-#VRML_SIM R2023a utf8
+#VRML_SIM R2023b utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/lights/protos/CeilingLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
+EXTERNPROTO "../protos/RacingGate.proto"
 
 WorldInfo {
 }
@@ -212,151 +213,6 @@ DEF CEILING Solid {
   name "wall-up"
   boundingObject USE DOOR_WALL_SHAPE
 }
-DEF CHECKERBOARD_A4_25mm_8x6 Solid {
-  translation 8 0 0.5
-  children [
-    DEF CHECKERBOARD_LOGO Shape {
-      appearance PBRAppearance {
-        baseColorMap ImageTexture {
-          url [
-            "./textures_epfl_lis/checkerboard_A4_25mm_8x6.png"
-          ]
-        }
-        roughness 1
-        metalness 0
-      }
-      geometry Box {
-        size 0.01 0.297 0.21
-      }
-    }
-  ]
-  name "checkerboard"
-}
-DEF GOAL Solid {
-  translation 0 0 1
-  children [
-    DEF GOAL_SHAPE Shape {
-      appearance Appearance {
-        material Material {
-          diffuseColor 0 0 0
-          emissiveColor 1 0 1
-          transparency 0.2
-        }
-      }
-      geometry Box {
-        size 0.1 0.4 0.4
-      }
-    }
-  ]
-  name "goal"
-}
-DEF OBSTACLE1 Solid {
-  translation 1.75 0.82 0.74
-  children [
-    DEF CYLINDER_SHAPE Shape {
-      appearance PBRAppearance {
-        baseColorMap ImageTexture {
-          url [
-            "./textures_epfl_lis/obstacle_cylinder.jpg"
-          ]
-        }
-        roughness 1
-        metalness 0
-      }
-      geometry Cylinder {
-        height 1.48
-        radius 0.2
-      }
-    }
-  ]
-  name "obstacle-C1"
-  boundingObject USE CYLINDER_SHAPE
-}
-DEF OBSTACLE2 Solid {
-  translation 1.73 2.5 0.74
-  children [
-    USE CYLINDER_SHAPE
-  ]
-  name "obstacle-C2"
-  boundingObject USE CYLINDER_SHAPE
-}
-DEF OBSTACLE3 Solid {
-  translation 4.46 2.11 0.74
-  children [
-    USE CYLINDER_SHAPE
-  ]
-  name "obstacle-C3"
-  boundingObject USE CYLINDER_SHAPE
-}
-DEF OBSTACLE4 Solid {
-  translation 0.68 1.94 0.74
-  children [
-    USE CYLINDER_SHAPE
-  ]
-  name "obstacle-C4"
-  boundingObject USE CYLINDER_SHAPE
-}
-DEF OBSTACLE5 Solid {
-  translation 3.59 0.36 0.74
-  children [
-    USE CYLINDER_SHAPE
-  ]
-  name "obstacle-C5"
-  boundingObject USE CYLINDER_SHAPE
-}
-DEF OBSTACLE6 Solid {
-  translation 3.73 1.54 0.75
-  children [
-    DEF BOX_SHAPE Shape {
-      appearance PBRAppearance {
-        baseColorMap ImageTexture {
-          url [
-            "./textures_epfl_lis/obstacle_box.jpg"
-          ]
-        }
-        roughness 1
-        metalness 0
-      }
-      geometry Box {
-        size 0.31 0.31 1.48
-      }
-    }
-  ]
-  name "obstacle-B1"
-  boundingObject USE BOX_SHAPE
-}
-DEF OBSTACLE7 Solid {
-  translation 2.86 1.15 0.75
-  children [
-    USE BOX_SHAPE
-  ]
-  name "obstacle-B2"
-  boundingObject USE BOX_SHAPE
-}
-DEF OBSTACLE8 Solid {
-  translation 3 2.39 0.75
-  children [
-    USE BOX_SHAPE
-  ]
-  name "obstacle-B3"
-  boundingObject USE BOX_SHAPE
-}
-DEF OBSTACLE9 Solid {
-  translation 0.86 0.24 0.75
-  children [
-    USE BOX_SHAPE
-  ]
-  name "obstacle-B4"
-  boundingObject USE BOX_SHAPE
-}
-DEF OBSTACLE10 Solid {
-  translation 2.03 1.64 0.75
-  children [
-    USE BOX_SHAPE
-  ]
-  name "obstacle-B5"
-  boundingObject USE BOX_SHAPE
-}
 DEF TAKE_OFF_PAD Solid {
   translation 0.9660470000000083 0.8372480000000008 0.05
   children [
@@ -378,14 +234,6 @@ DEF TAKE_OFF_PAD Solid {
   name "take_off_pad"
   boundingObject USE PAD_SHAPE
 }
-DEF LANDING_PAD Solid {
-  translation 4.5 1 0.05
-  children [
-    USE PAD_SHAPE
-  ]
-  name "landing_pad"
-  boundingObject USE PAD_SHAPE
-}
 DEF FLIGHT_AREA Solid {
   translation 2.5 1.5 0.001
   children [
@@ -405,4 +253,64 @@ DEF FLIGHT_AREA Solid {
     }
   ]
   name "flight_area"
+}
+DEF GATE0 RacingGate {
+  name "GATE0"
+  translation 2 0.5 1
+  rotation 0 0 1 0
+  topBeamTranslation 0 0 0.53
+  topBeamScale 0.94 0.06 0.04
+  bottomBeamTranslation 0 0 -0.53
+  bottomBeamScale 0.94 0.06 0.04
+  leftBeamTranslation 0 0.5 -0.2
+  leftBeamScale 1.52 0.06 0.04
+  rightBeamTranslation 0 -0.5 -0.2
+  rightBeamScale 1.52 0.06 0.04
+  leftLegTranslation 0 -0.5 -0.98
+  rightLegTranslation 0 0.5 -0.98
+}
+DEF GATE1 RacingGate {
+  name "GATE1"
+  translation 4 1.5 1
+  rotation 0 0 1 1.5708
+  topBeamTranslation 0 0 0.53
+  topBeamScale 0.94 0.06 0.04
+  bottomBeamTranslation 0 0 -0.53
+  bottomBeamScale 0.94 0.06 0.04
+  leftBeamTranslation 0 0.5 -0.2
+  leftBeamScale 1.52 0.06 0.04
+  rightBeamTranslation 0 -0.5 -0.2
+  rightBeamScale 1.52 0.06 0.04
+  leftLegTranslation 0 -0.5 -0.98
+  rightLegTranslation 0 0.5 -0.98
+}
+DEF GATE2 RacingGate {
+  name "GATE2"
+  translation 2.5 2.5 1
+  rotation 0 0 1 0
+  topBeamTranslation 0 0 0.53
+  topBeamScale 0.94 0.06 0.04
+  bottomBeamTranslation 0 0 -0.53
+  bottomBeamScale 0.94 0.06 0.04
+  leftBeamTranslation 0 0.5 -0.2
+  leftBeamScale 1.52 0.06 0.04
+  rightBeamTranslation 0 -0.5 -0.2
+  rightBeamScale 1.52 0.06 0.04
+  leftLegTranslation 0 -0.5 -0.98
+  rightLegTranslation 0 0.5 -0.98
+}
+DEF GATE3 RacingGate {
+  name "GATE3"
+  translation 1.5 2 1
+  rotation 0 0 1 1.5708
+  topBeamTranslation 0 0 0.53
+  topBeamScale 0.94 0.06 0.04
+  bottomBeamTranslation 0 0 -0.53
+  bottomBeamScale 0.94 0.06 0.04
+  leftBeamTranslation 0 0.5 -0.2
+  leftBeamScale 1.52 0.06 0.04
+  rightBeamTranslation 0 -0.5 -0.2
+  rightBeamScale 1.52 0.06 0.04
+  leftLegTranslation 0 -0.5 -0.98
+  rightLegTranslation 0 0.5 -0.98
 }
