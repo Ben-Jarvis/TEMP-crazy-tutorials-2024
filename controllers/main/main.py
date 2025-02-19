@@ -121,7 +121,7 @@ class CrazyflieInDroneDome(Supervisor):
             self.circle_centre = [4, 4]
             self.inner_radius = 1.5
             self.outer_radius = 3.5
-            self.gate_height_bounds = [0.7, 1.3]
+            self.gate_height_bounds = [0.7, 2.0]
             self.goal_size_bounds = [0.3, 1.1]
             self.goal_rotation_bounds = [-np.pi/6, np.pi/6]
             self.num_gates = 5
