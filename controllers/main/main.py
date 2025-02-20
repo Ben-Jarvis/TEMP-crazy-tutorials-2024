@@ -10,7 +10,7 @@ import example
 import time, random
 import threading
 
-exp_num = 3                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
+exp_num = 0                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
 control_style = 'keyboard'      # 'keyboard' or 'path_planner'
 rand_env = True                 # Randomise the environment
 
@@ -150,8 +150,8 @@ class CrazyflieInDroneDome(Supervisor):
                 angular_bound = [(2*i-0.5) * self.segment_angular_size, (2*i + 0.5) * self.segment_angular_size]
                 self.angular_bounds.append(angular_bound)
         
-        if rand_env:
-            self.randomise_positions()
+            if rand_env:
+                self.randomise_positions()
 
     # Randomise the positions of the drone, obstacles, goal, take-off pad and landing pad
     def randomise_positions(self):
