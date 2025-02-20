@@ -292,7 +292,6 @@ class CrazyflieInDroneDome(Supervisor):
         # Update time intervals for sensing and propagation
         self.dt_accel = self.getTime() - self.accel_read_last_time
         self.dt_gps = self.getTime() - self.gps_read_last_time
-        # print(self.dt_accel, self.dt_gps)
 
         # Data dictionary
         measured_data_raw = self.read_sensors().copy()
@@ -621,17 +620,21 @@ if __name__ == '__main__':
 
             drone.dt_ctrl = drone.getTime() - drone.PID_update_last_time
 
-            if drone.PID_update_last_time == 0 or np.round(drone.dt_ctrl,3) >= drone.ctrl_update_period/1000: #Only execute at first point and in control rate step
-                
+            if drone.PID_update_last_time == 0.0 or np.round(drone.dt_ctrl,3) >= drone.ctrl_update_period/1000: #Only execute at first point and in control rate step
                 if control_style == 'keyboard':
                     control_commands = drone.action_from_keyboard(sensor_data)
                     motorPower = drone.PID_CF.keys_to_pwm(drone.dt_ctrl, control_commands, sensor_data)    
 
                 elif control_style == 'path_planner':
+                    # Update the setpoint
+                    setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
+                    # Call the PID controller to get the motor commands
+                    motorPower = drone.PID_CF.setpoint_to_rpm(drone.dt_ctrl, setpoint, sensor_data)
+
                     if exp_num == 3:
                         # For the PROJECT CHANGE YOUR CODE HERE
                         # Example Path planner call
-                        setpoint = example.path_planning(sensor_data,dt_ctrl)
+                        setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
                         drone.check_landing_pad(sensor_data)
 
                         # Check which segment the drone is in
@@ -647,22 +650,16 @@ if __name__ == '__main__':
 
                         # Check if the drone has reached the gate in this segment
                         if segment != -1:
-                            drone.check_goal(sensor_data, segment)
-
-                    else:
-                        # Update the setpoint
-                        setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
-                        # Call the PID controller to get the motor commands
-                        motorPower = drone.PID_CF.setpoint_to_rpm(drone.dt_ctrl, setpoint, sensor_data)
-
-
+                            drone.check_goal(sensor_data, segment)                    
+                    
+                drone.dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control - Is refactored above for KF - why done twice?
                 drone.PID_update_last_time = drone.getTime()
 
             # Update the drone status in simulation
             drone.step(motorPower, sensor_data)
 
             # Control commands
-            # dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control - Is refactored above for KF - why done twice?
+            
 
             # control_commands = example.obstacle_avoidance(sensor_data)
             # map = example.occupancy_map(sensor_data)
