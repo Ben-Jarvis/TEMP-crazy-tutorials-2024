@@ -619,7 +619,6 @@ if __name__ == '__main__':
                 with sensor_lock:
                     latest_sensor_data = sensor_data
 
-            # NEED TO UPDATE THIS AND STEP_KF
             drone.dt_ctrl = drone.getTime() - drone.PID_update_last_time
 
             if drone.PID_update_last_time == 0 or np.round(drone.dt_ctrl,3) >= drone.ctrl_update_period/1000: #Only execute at first point and in control rate step
@@ -663,7 +662,7 @@ if __name__ == '__main__':
             drone.step(motorPower, sensor_data)
 
             # Control commands
-            # dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control - Why twice?
+            # dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control - Is refactored above for KF - why done twice?
 
             # control_commands = example.obstacle_avoidance(sensor_data)
             # map = example.occupancy_map(sensor_data)
