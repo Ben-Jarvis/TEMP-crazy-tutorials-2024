@@ -138,6 +138,9 @@ You should now see a smooth tracking performance. How do your run times compare 
   :alt: Performance of drone parcours flight with Kalman Filter estimate
   :align: center
 
+Observation: Check how the state estimate at the start of the trajectory takes several seconds to converge towards the ground truth value. This leads to the noticeable oscillations in flight bahavior when taking-off and when heading towards the first trajectory waypoint.
+The use of better methods to initialize the Kalman filter, tuning the process covariance or de-tuning the aggressive gains of the PID controller during take-off can help to reduce these effects in real-life.
+
 Part 2 - Relying on the Accelerometer 
 -------------------------------------------
 

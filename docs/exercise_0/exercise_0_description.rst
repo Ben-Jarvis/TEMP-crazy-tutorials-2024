@@ -17,6 +17,8 @@ You should see a drone in the simulation that you can control using the keys on 
   - **D**: Move the drone right
   - **Q**: Turn the drone left
   - **E**: Turn the drone right
+  - **X**: Move the drone up
+  - **Z**: Move the drone down
 
 By looking at the 3D view of the scene and the FPV camera from the drone, you can see that the drone moves in the inertial frame, regardless of its orientation.
 (**Note**: The drone might not seem very stable, this is something you will improve in the exercise next week.)

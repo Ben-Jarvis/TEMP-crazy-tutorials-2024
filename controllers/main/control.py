@@ -11,9 +11,9 @@ class quadrotor_controller():
         
         # Only change the gains you are asked to, the others are already tuned by us
         gains = {
-                    "P_pos_z": 1,     "I_pos_z": 0.0,     "D_pos_z": 0.0,
+                    "P_pos_z": 0.5,     "I_pos_z": 0.0,     "D_pos_z": 0.5,
                     "P_pos_xy": 0.5,     "I_pos_xy": 0.0,     "D_pos_xy": 0.02,
-                    "P_vel_z": 3.0,     "I_vel_z": 0.2,     "D_vel_z": 0.2,
+                    "P_vel_z": 3.0,     "I_vel_z": 0.2,     "D_vel_z": 0.5,
                     "P_vel_xy": 1.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.10,
                     "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
                     "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
@@ -22,16 +22,16 @@ class quadrotor_controller():
                     }
         
         ### SOLUTION ###
-        # gains = {
-        #             "P_pos_z": 2.5,     "I_pos_z": 0.0,     "D_pos_z": 1.0,
-        #             "P_pos_xy": 1.5,     "I_pos_xy": 0.0,     "D_pos_xy": 0.02,
-        #             "P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 0.8,
-        #             "P_vel_xy": 2.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.10,
-        #             "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
-        #             "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
-        #             "P_att_rp": 16.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
-        #             "P_att": 5.0,      "I_att": 0.0,      "D_att": 0.1
-        #             }
+        gains = {
+                    "P_pos_z": 2.5,     "I_pos_z": 0.0,     "D_pos_z": 1.0,
+                    "P_pos_xy": 1.5,     "I_pos_xy": 0.0,     "D_pos_xy": 0.02,
+                    "P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 0.8,
+                    "P_vel_xy": 2.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.10,
+                    "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
+                    "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
+                    "P_att_rp": 16.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
+                    "P_att": 5.0,      "I_att": 0.0,      "D_att": 0.1
+                    }
         ### SOLUTION ###
         
         # Do not touch
@@ -44,7 +44,8 @@ class quadrotor_controller():
         }
         
         self.global_time = 0
-        self.mass = 0.055 #[kg]
+        self.altitude_setpoint = 1 #only for keyboard
+        self.mass = 0.0552 #[kg]
 
         self.tuning_on = False
         self.tuning_start = 7
@@ -159,15 +160,15 @@ class quadrotor_controller():
         # return self.acceleration_to_pwm(dt, [acc_x_setpoint, acc_y_setpoint, acc_z_setpoint], yaw_setpoint, sensor_data)
         ### SOLUTION ###
         pass
-    
     def keys_to_pwm(self, dt, keys, sensor_data):
         # keys = acc_x, acc_y, altitude, yaw
-        pos_z_setpoint = keys[2]
-        self.pid_pos_z.setpoint = pos_z_setpoint
-        vel_z_setpoint = self.pid_pos_z(sensor_data["z_global"],dt=dt)
+        vel_z_setpoint = keys[2]
+        self.pid_vel_z.setpoint = vel_z_setpoint
+        acc_z_setpoint = self.pid_vel_z(sensor_data["v_z"],dt=dt)
         yaw = sensor_data["yaw"] + keys[3]
+
         
-        return self.acceleration_to_pwm(dt, [keys[0], keys[1], vel_z_setpoint], yaw, sensor_data)
+        return self.acceleration_to_pwm(dt, [keys[0], keys[1], acc_z_setpoint], yaw, sensor_data)
 
     def acceleration_to_pwm(self, dt, acceleration, yaw, sensor_data):
         # for tuning

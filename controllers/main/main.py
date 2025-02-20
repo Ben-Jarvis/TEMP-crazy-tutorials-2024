@@ -10,7 +10,7 @@ import example
 import time, random
 import threading
 
-exp_num = 0           # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
+exp_num = 0                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
 control_style = 'keyboard'      # 'keyboard' or 'path_planner'
 rand_env = False               # Randomise the environment
 
@@ -111,92 +111,110 @@ class CrazyflieInDroneDome(Supervisor):
         self.keyboard = self.getKeyboard()
         self.keyboard.enable(self.timestep)
 
-        # Set a random initial yaw of the drone
-        # drone = super().getSelf()
-        # init_yaw_drone = random.uniform(-np.pi, np.pi)
-        # # init_yaw_drone = np.pi/6
-        # rotation_field = drone.getField('rotation')
-        # rotation_field.setSFRotation([0, 0, 1, init_yaw_drone])
-
         # Simulation step update
         super().step(self.timestep)
 
         # For the assignment, randomise the positions of the drone, obstacles, goal, take-off pad and landing pad 
         if exp_num == 3:
-            # Variables to track progress
-            self.reached_landing_pad = False
-            self.reached_goal_first = False
-            self.reached_goal_second = False
 
-        if rand_env:
-            self.randomise_positions()
+            # Course parameters
+            self.circle_centre = [4, 4]
+            self.inner_radius = 1.5
+            self.outer_radius = 3.5
+            self.gate_height_bounds = [0.7, 2.0]
+            self.goal_size_bounds = [0.3, 1.1]
+            self.goal_rotation_bounds = [-np.pi/6, np.pi/6]
+            self.num_gates = 5
+            self.num_segments = self.num_gates + 1
+            self.num_laps = 3
+            self.segment_angular_size = np.pi / self.num_segments
+
+            # Variables to track progress
+            self.segment_progress = [False] * self.num_segments
+            self.gate_progress = [False] * self.num_gates
+            self.laps_completed = [False] * self.num_laps
+            
+            # Get the position, size, and orientation of each of the gates
+            self.goal_positions = []
+            self.goal_sizes = []
+            self.goal_orientations = []
+            for i in range(5):
+                goal_node = super().getFromDef('GATE' + str(i))
+                self.goal_positions.append(goal_node.getField('translation').getSFVec3f())
+                self.goal_sizes.append(goal_node.getField('goalSize').getSFVec3f())
+                self.goal_orientations.append(goal_node.getField('rotation').getSFRotation())
+
+            # Get the angular segments of the gates
+            self.angular_bounds = []
+            for i in range(self.num_segments):
+                angular_bound = [(2*i-0.5) * self.segment_angular_size, (2*i + 0.5) * self.segment_angular_size]
+                self.angular_bounds.append(angular_bound)
+        
+            if rand_env:
+                self.randomise_positions()
 
     # Randomise the positions of the drone, obstacles, goal, take-off pad and landing pad
     def randomise_positions(self):
-                        
-        # # Set random initial position of the drone
-        # init_x_drone, init_y_drone = random.uniform(0.3,1.2), random.uniform(0.3,2.7)
-        # drone = super().getSelf()
-        # translation_field = drone.getField('translation')
-        # translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.25])
+                               
+        for i in range(self.num_segments):
 
-        # # Set random initial position of the take-off pad
-        # take_off_pad = super().getFromDef('TAKE_OFF_PAD')
-        # translation_field = take_off_pad.getField('translation')
-        # translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
+            # Randomise the angular position of the gate in polar coordinates
+            angular_position = random.uniform(self.angular_bounds[i][0], self.angular_bounds[i][1])
+            radius = random.uniform(self.inner_radius, self.outer_radius)
 
-        # # Set random initial positions of obstacles
-        # existing_points = []
-        # existing_points.append([init_x_drone, init_y_drone, 0.2])
+            # Convert the polar coordinates to cartesian coordinates
+            x = self.circle_centre[0] - radius * np.cos(angular_position)
+            y = self.circle_centre[1] - radius * np.sin(angular_position)
 
-        num_gates = 4
-        for i in range(num_gates):
-            # find_appropriate_random_position = False
+            if i == 0:
+                # Set the take-off pose of the drone and take-off pad
+                takeoff_position = [x, y]
+                takeoff_orientation = angular_position - np.pi/2
+                self.set_take_off_position(takeoff_position, takeoff_orientation)
+            else:
+                # Set the pose of the gate
+                goal_node = super().getFromDef('GATE' + str(i-1))
+                goal_height = np.random.uniform(self.gate_height_bounds[0], self.gate_height_bounds[1])
+                goal_size = np.random.uniform(self.goal_size_bounds[0], self.goal_size_bounds[1])
+                goal_position = [x, y, goal_height]
+                goal_orientation = angular_position - np.pi/2 + np.random.uniform(self.goal_rotation_bounds[0], self.goal_rotation_bounds[1])
+                self.set_goal_fields(goal_node, goal_size, goal_position, goal_orientation)
+                            
+    # Set the take-off position of the drone and take-off pad
+    def set_take_off_position(self, take_off_position, take_off_orientation):
 
-            # while not find_appropriate_random_position:
+        # Set the initial position of the drone
+        init_x_drone, init_y_drone = take_off_position
+        drone = super().getSelf()
+        translation_field = drone.getField('translation')
+        translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.25])
+        rotation_field = drone.getField('rotation')
+        rotation_field.setSFRotation([0, 0, 1, take_off_orientation])
 
-            #     # Generate new random position
-            #     new_init_x_obs, new_init_y_obs, new_init_z_obs = random.uniform(0.3, 4.7), random.uniform(0.3, 2.7), random.uniform(0.7, 1.3)
-            #     min_distance = 1000
-
-            #     # Calculate the min distance to existing points
-            #     for point in existing_points:
-            #         distance = np.linalg.norm([point[0] - new_init_x_obs, point[1] - new_init_y_obs, point[2] - new_init_z_obs])
-
-            #         if distance < min_distance:
-            #             min_distance = distance
-
-            #     # Accept a position that is 0.8m from existing gates and the starting position
-            #     if min_distance > 0.8:
-            #         find_appropriate_random_position = True
-
-            
-            # # Move the gate to the new position
-            # obstacle = super().getFromDef('GATE' + str(i))
-            # translation_field = obstacle.getField('translation')
-            # translation_field.setSFVec3f([new_init_x_obs, new_init_y_obs, 1.0])
-            # existing_points.append([new_init_x_obs, new_init_y_obs])
-
-
-            ### For now just randomise the height of the gates and keep the current x and y ###
-            goal_node = super().getFromDef('GATE' + str(i))
-
-            self.set_goal_fields(goal_node, random.uniform(0.7, 1.3), random.uniform(0.4, 1.2))
-            
-            
-
-    def set_goal_fields(self, goal_node, goal_height, goal_size):
+        # Set the initial position of the take-off pad
+        take_off_pad = super().getFromDef('TAKE_OFF_PAD')
+        translation_field = take_off_pad.getField('translation')
+        translation_field.setSFVec3f([init_x_drone, init_y_drone, 0.05])
+        rotation_field = take_off_pad.getField('rotation')
+        rotation_field.setSFRotation([0, 0, 1, take_off_orientation])
+    
+    # Set the fields of the obstacle node
+    def set_goal_fields(self, goal_node, goal_size, goal_position, goal_orientation):
         
         # Default Beam dimensions
         w = 0.06
         h = 0.04
         
-        # Get the current position of the goal
+        # Update the translation of the gate
         translation_field = goal_node.getField('translation')
-        current_position = translation_field.getSFVec3f()
+        translation_field.setSFVec3f(goal_position)
 
-        # Set the new position of the goal
-        translation_field.setSFVec3f([current_position[0], current_position[1], goal_height])
+        # Get the gate height
+        goal_height = goal_position[2]
+
+        # Update the goal size
+        goal_size_field = goal_node.getField('goalSize')
+        goal_size_field.setSFVec3f([h, goal_size, goal_size])
 
         # Update the top beam
         top_beam_length = goal_size
@@ -234,6 +252,11 @@ class CrazyflieInDroneDome(Supervisor):
         right_leg_translation_field = goal_node.getField('rightLegTranslation')
         right_leg_translation_field.setSFVec3f([0, -goal_size/2 - w/2, h/2 - goal_height])
 
+        # Update the orientation of the goal
+        rotation_field = goal_node.getField('rotation')
+        rotation_field.setSFRotation([0, 0, 1, goal_orientation])
+
+    
     def wait_keyboard(self):
         while self.keyboard.getKey() != ord('Y'):
             super().step(self.timestep)
@@ -241,24 +264,28 @@ class CrazyflieInDroneDome(Supervisor):
     def action_from_keyboard(self, sensor_data):
         forward_velocity = 0.0
         left_velocity = 0.0
+        altitude_velocity = 0.0
         yaw_rate = 0.0
-        altitude = 1
         key = self.keyboard.getKey()
         while key > 0:
             if key == ord('W'):
-                forward_velocity = 1.0
+                forward_velocity = 2.0
             elif key == ord('S'):
-                forward_velocity = -1.0
+                forward_velocity = -2.0
             elif key == ord('A'):
-                left_velocity = 1.0
+                left_velocity = 2.0
             elif key == ord('D'):
-                left_velocity = -1.0
+                left_velocity = -2.0
             elif key == ord('Q'):
                 yaw_rate = 1.0
             elif key == ord('E'):
                 yaw_rate = -1.0
+            elif key == ord('X'):
+                altitude_velocity = 0.3
+            elif key == ord('Z'):
+                altitude_velocity = -0.3
             key = self.keyboard.getKey()
-        return [forward_velocity, left_velocity, altitude, yaw_rate]
+        return [forward_velocity, left_velocity, altitude_velocity, yaw_rate]
 
     def read_KF_estimates(self):
         
@@ -421,7 +448,7 @@ class CrazyflieInDroneDome(Supervisor):
 
         return data
 
-    # Create a function to detect if the drone has reached the landing pad, if it has set the GOAL object to be transparent
+    # Detect if the drone has reached the landing pad, if it has set the GOAL object to be transparent
     def check_landing_pad(self, sensor_data):
         
         drone_position = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['range_down']]
@@ -434,31 +461,68 @@ class CrazyflieInDroneDome(Supervisor):
             print("Congratulations! You have reached the landing pad, the goal is now hidden.")
             self.reached_landing_pad = True
 
-    # Create a function to detect if the drone has reached the goal
-    def check_goal(self, sensor_data):
+    # Detect which segment the drone is in
+    def check_segment(self, sensor_data):
+        drone_pos = np.array([sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global']])
+        drone_pos = drone_pos[:2]
+        drone_pos = drone_pos - np.array(self.circle_centre)
+        drone_pos = drone_pos / np.linalg.norm(drone_pos)
 
-        drone_position = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['range_down']]
+        # Compute the angle of the drone's position
+        drone_angle = np.arctan2(drone_pos[1], drone_pos[0])
 
-        # Check that the drone is within the goal
-        goal_x_min = self.goal_position[0] - self.goal_width / 2
-        goal_x_max = self.goal_position[0] + self.goal_width / 2
+        # Determine the segment the drone is in
+        for i in range(self.num_segments):
+            if drone_angle >= self.angular_bounds[i][0] and drone_angle <= self.angular_bounds[i][1]:
+                return i
+        return -1
 
-        goal_y_min = self.goal_position[1] - self.goal_depth / 2
-        goal_y_max = self.goal_position[1] + self.goal_depth / 2
+    # Detect if the drone has reached the gate, if it has set the GOAL object to be transparent
+    def check_goal(self, sensor_data, segment):
 
-        goal_z_min = self.goal_position[2] - self.goal_height / 2
-        goal_z_max = self.goal_position[2] + self.goal_height / 2
-
-        if (goal_x_min < drone_position[0] < goal_x_max and goal_y_min < drone_position[1] < goal_y_max and goal_z_min < drone_position[2] < goal_z_max):
+        # Get the gate parameters
+        gate_position = self.goal_positions[segment]
+        gate_size = self.goal_sizes[segment]
+        gate_orientation = self.goal_orientations[segment][3]
+        
+        # Use the drone's global position (using z_global rather than range_down)
+        drone_pos = np.array([sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global']])
+        gate_pos = np.array(gate_position)
+        
+        # Compute the relative position between drone and gate center
+        rel_pos = drone_pos - gate_pos
+        
+        # Create a rotation matrix for a rotation about z by -gate_orientation
+        cos_theta = np.cos(-gate_orientation)
+        sin_theta = np.sin(-gate_orientation)
+        Rz = np.array([[cos_theta, -sin_theta, 0],
+                       [sin_theta,  cos_theta, 0],
+                       [0,         0,         1]])
+        
+        # Transform the drone's position into the gate's local frame
+        local_pos = Rz @ rel_pos
+        
+        # Determine half-dimensions of the gate's opening
+        half_dims = np.array(gate_size) / 2.0
+        
+        # Check if the drone is within the gate bounds in the gate's local frame
+        if (abs(local_pos[0]) <= half_dims[0] and
+            abs(local_pos[1]) <= half_dims[1] and
+            abs(local_pos[2]) <= half_dims[2]):
             
-            if not self.reached_goal_first:
-                print("Congratulations! You have reached the goal for the first time.")
-                self.reached_goal_first = True
-
-            elif self.reached_goal_first and not self.reached_goal_second and self.reached_landing_pad:
-                print("Congratulations! You have reached the goal after it was hidden.")
-                self.reached_goal_second = True
-
+            if not self.gate_progress[segment]:
+                # Check that none of the entries of self.segment_progress greater than the current segment have been visited
+                if not any(self.segment_progress[segment+1:]):
+                    print("Gate", segment, "reached!")
+                    goal_node = super().getFromDef('GATE' + str(segment))
+                    goal_visibility = goal_node.getField('goalVisible')
+                    goal_visibility.setSFFloat(0)
+                    self.gate_progress[segment] = True
+                print("Gate", segment, "reached!")
+                goal_node = super().getFromDef('GATE' + str(segment))
+                goal_visibility = goal_node.getField('goalVisible')
+                goal_visibility.setSFFloat(0)
+                self.gate_progress[segment] = True
 
     def reset(self):
         # Reset the simulation
@@ -558,26 +622,42 @@ if __name__ == '__main__':
             # NEED TO UPDATE THIS AND STEP_KF
             drone.dt_ctrl = drone.getTime() - drone.PID_update_last_time
 
-            if control_style == 'keyboard':
-                control_commands = drone.action_from_keyboard(sensor_data)
-                motorPower = drone.PID_CF.keys_to_pwm(drone.dt_ctrl, control_commands, sensor_data)    
+            if drone.PID_update_last_time == 0 or np.round(drone.dt_ctrl,3) >= drone.ctrl_update_period/1000: #Only execute at first point and in control rate step
+                
+                if control_style == 'keyboard':
+                    control_commands = drone.action_from_keyboard(sensor_data)
+                    motorPower = drone.PID_CF.keys_to_pwm(drone.dt_ctrl, control_commands, sensor_data)    
 
-            elif control_style == 'path_planner':
-                if drone.PID_update_last_time == 0 or np.round(drone.dt_ctrl,3) >= drone.ctrl_update_period/1000: #Only execute at first point and in control rate step
+                elif control_style == 'path_planner':
                     if exp_num == 3:
                         # For the PROJECT CHANGE YOUR CODE HERE
                         # Example Path planner call
-                        setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
+                        setpoint = example.path_planning(sensor_data,dt_ctrl)
                         drone.check_landing_pad(sensor_data)
-                        # Check if the drone has reached the goal
-                        drone.check_goal(sensor_data)
+
+                        # Check which segment the drone is in
+                        curr_segment = drone.check_segment(sensor_data)
+                        
+                        # Make sure that segment can only increase to avoid going back
+                        if curr_segment > segment:
+                            segment = curr_segment
+
+                        # Mark the segment as completed
+                        if segment != -1:
+                            drone.segment_progress[segment] = True
+
+                        # Check if the drone has reached the gate in this segment
+                        if segment != -1:
+                            drone.check_goal(sensor_data, segment)
+
                     else:
                         # Update the setpoint
                         setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
                         # Call the PID controller to get the motor commands
                         motorPower = drone.PID_CF.setpoint_to_rpm(drone.dt_ctrl, setpoint, sensor_data)
 
-                    drone.PID_update_last_time = drone.getTime()
+
+                drone.PID_update_last_time = drone.getTime()
 
             # Update the drone status in simulation
             drone.step(motorPower, sensor_data)

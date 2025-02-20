@@ -10,6 +10,11 @@ EXTERNPROTO "../protos/Wall.proto"
 EXTERNPROTO "../protos/Window.proto"
 
 WorldInfo {
+  basicTimeStep 8
+  defaultDamping Damping {
+    linear 0.5
+    angular 0.5
+  }
 }
 Viewpoint {
   orientation -0.11595594142826 0.9014869154650192 0.4169838856512936 0.6286803788774629
