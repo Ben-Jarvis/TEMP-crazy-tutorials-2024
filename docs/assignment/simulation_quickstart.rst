@@ -16,7 +16,7 @@ Besides the previously installed packages, install OpenCV by executing:
 
 Controller switch
 -----------------
-In **main.py**, **choose exp_num = 3** for this assignment. 
+In **main.py**, **choose exp_num = 4** for this assignment. 
 
 Switch **control_syle = 'keyboard'** to fly on your own (W: forward, S: backward, A: left, D: right, Q: yaw left, E: yaw right, C: lower altitude, V: higher altitude). 
 

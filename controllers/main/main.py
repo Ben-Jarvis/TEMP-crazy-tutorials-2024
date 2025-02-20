@@ -10,7 +10,7 @@ import example
 import time, random
 import threading
 
-exp_num = 0                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Practical
+exp_num = 4                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
 control_style = 'keyboard'      # 'keyboard' or 'path_planner'
 rand_env = False               # Randomise the environment
 
@@ -115,7 +115,7 @@ class CrazyflieInDroneDome(Supervisor):
         super().step(self.timestep)
 
         # For the assignment, randomise the positions of the drone, obstacles, goal, take-off pad and landing pad 
-        if exp_num == 3:
+        if exp_num == 4:
 
             # Course parameters
             self.circle_centre = [4, 4]
@@ -594,7 +594,7 @@ if __name__ == '__main__':
     # Initialize the drone
     drone = CrazyflieInDroneDome()
     assert control_style in ['keyboard','path_planner'], "Variable control_style must either be 'keyboard' or 'path_planner'"
-    assert exp_num in [0,1,2,3], "Exp_num must be a value between 0 and 3"
+    assert exp_num in [0,1,2,3,4], "Exp_num must be a value between 0 and 4"
 
     # Start the path planner thread
     if control_style == 'path_planner':
@@ -631,7 +631,7 @@ if __name__ == '__main__':
                     # Call the PID controller to get the motor commands
                     motorPower = drone.PID_CF.setpoint_to_rpm(drone.dt_ctrl, setpoint, sensor_data)
 
-                    if exp_num == 3:
+                    if exp_num == 4:
                         # For the PROJECT CHANGE YOUR CODE HERE
                         # Example Path planner call
                         setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
