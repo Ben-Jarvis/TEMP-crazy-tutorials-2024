@@ -11,9 +11,9 @@ class quadrotor_controller():
         
         # Only change the gains you are asked to, the others are already tuned by us
         gains = {
-                    "P_pos_z": 1,     "I_pos_z": 0.0,     "D_pos_z": 0.0,
+                    "P_pos_z": 0.5,     "I_pos_z": 0.0,     "D_pos_z": 0.5,
                     "P_pos_xy": 0.5,     "I_pos_xy": 0.0,     "D_pos_xy": 0.02,
-                    "P_vel_z": 3.0,     "I_vel_z": 0.2,     "D_vel_z": 0.2,
+                    "P_vel_z": 3.0,     "I_vel_z": 0.2,     "D_vel_z": 0.5,
                     "P_vel_xy": 1.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.10,
                     "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
                     "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
