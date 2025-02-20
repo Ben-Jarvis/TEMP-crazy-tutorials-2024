@@ -121,9 +121,9 @@ class MotionPlanner3D():
         
         ax.add_collection3d(Poly3DCollection(faces, color=color, alpha=alpha))
     
-    def evaluate_and_plot(self, poly_coeffs, obs, num_points = 100):
+    def evaluate_and_plot(self, poly_coeffs, obs, disc_interval = 100):
 
-        t_fine = np.linspace(self.times[0], self.times[-1], num_points)  # Fine time intervals
+        t_fine = np.linspace(self.times[0], self.times[-1], disc_interval*len(self.times))  # Fine time intervals
         x_vals, y_vals, z_vals = [], [], []
         v_x_vals, v_y_vals, v_z_vals = [], [], []
         coeff_x = poly_coeffs[:,0]
@@ -147,7 +147,7 @@ class MotionPlanner3D():
 
         # Plot 3D trajectory
         fig = plt.figure(figsize=(8, 6))
-        ax = fig.add_subplot(111, projection='3d', )
+        ax = fig.add_subplot(111, projection='3d')
 
         for ob in obs:
             self.plot_obstacle(ax, ob[0], ob[1], ob[2], ob[3], ob[4], ob[5])
@@ -170,6 +170,12 @@ class MotionPlanner3D():
         ax.set_title("3D Minimum-Jerk Trajectory")
         ax.legend()
         plt.show()
+
+        # fig = plt.figure(figsize=(8, 6))
+        # ax = fig.add_subplot(111)
+        # ax.plot(x_vals, y_vals)
+        # ax.scatter(waypoints_x, waypoints_y)
+        # plt.show()
 
         return x_vals, y_vals, z_vals, v_x_vals, v_y_vals, v_z_vals
     
@@ -198,7 +204,7 @@ if __name__ == '__main__':
     dists = np.linalg.norm(np.diff(path_np, axis=0), axis=1)
     dist_ratios = (dists/np.sum(dists))
 
-    t_f = 5.0
+    t_f = 7.0
 
     # IMPROVEMENT to allow for more even speed distribution (less speed exceeding peaks)
     #times = [0]
@@ -208,9 +214,11 @@ if __name__ == '__main__':
 
     mp = MotionPlanner3D(path,times)
 
+    path_disc_steps = 10
+
     poly_coeffs = mp.compute_poly_coefficients()
 
-    x,y,z,vx,vy,vz = np.array(mp.evaluate_and_plot(poly_coeffs, obstacles))
+    x,y,z,vx,vy,vz = np.array(mp.evaluate_and_plot(poly_coeffs, obstacles, disc_interval=path_disc_steps))
 
     print("Maximum speed: " + str(np.max(np.sqrt(vx**2 + vy**2 + vz**2))))
     print("Average speed: " + str(np.mean(np.sqrt(vx**2 + vy**2 + vz**2))))
