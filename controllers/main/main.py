@@ -10,7 +10,7 @@ import example
 import time, random
 import threading
 
-exp_num = 4                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
+exp_num = 0                         # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
 control_style = 'keyboard'      # 'keyboard' or 'path_planner'
 rand_env = False               # Randomise the environment
 
@@ -622,7 +622,15 @@ if __name__ == '__main__':
 
             if drone.PID_update_last_time == 0.0 or np.round(drone.dt_ctrl,3) >= drone.ctrl_update_period/1000: #Only execute at first point and in control rate step
                 if control_style == 'keyboard':
+                    # Get the control commands from the keyboard
                     control_commands = drone.action_from_keyboard(sensor_data)
+                    
+                    # Rotate the control commands from the body reference frame to the inertial reference frame
+                    euler_angles = [sensor_data['roll'], sensor_data['pitch'], sensor_data['yaw']]
+                    quaternion = [sensor_data['q_x'], sensor_data['q_y'], sensor_data['q_z'], sensor_data['q_w']]
+                    control_commands = utils.rot_body2inertial(control_commands, euler_angles, quaternion)
+
+                    # Call the PID controller to get the motor commands
                     motorPower = drone.PID_CF.keys_to_pwm(drone.dt_ctrl, control_commands, sensor_data)    
 
                 elif control_style == 'path_planner':
