@@ -7,6 +7,11 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "../protos/RacingGate.proto"
 
 WorldInfo {
+  basicTimeStep 8
+  defaultDamping Damping {
+    linear 0.5
+    angular 0.5
+  }
 }
 Viewpoint {
   orientation 0.08678493737856167 0.9897152282172664 0.11371957473998688 0.87719713954117

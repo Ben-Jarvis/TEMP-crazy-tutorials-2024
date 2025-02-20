@@ -264,24 +264,28 @@ class CrazyflieInDroneDome(Supervisor):
     def action_from_keyboard(self, sensor_data):
         forward_velocity = 0.0
         left_velocity = 0.0
+        altitude_velocity = 0.0
         yaw_rate = 0.0
-        altitude = 1
         key = self.keyboard.getKey()
         while key > 0:
             if key == ord('W'):
-                forward_velocity = 1.0
+                forward_velocity = 2.0
             elif key == ord('S'):
-                forward_velocity = -1.0
+                forward_velocity = -2.0
             elif key == ord('A'):
-                left_velocity = 1.0
+                left_velocity = 2.0
             elif key == ord('D'):
-                left_velocity = -1.0
+                left_velocity = -2.0
             elif key == ord('Q'):
                 yaw_rate = 1.0
             elif key == ord('E'):
                 yaw_rate = -1.0
+            elif key == ord('X'):
+                altitude_velocity = 0.3
+            elif key == ord('Z'):
+                altitude_velocity = -0.3
             key = self.keyboard.getKey()
-        return [forward_velocity, left_velocity, altitude, yaw_rate]
+        return [forward_velocity, left_velocity, altitude_velocity, yaw_rate]
 
     def read_KF_estimates(self):
         
