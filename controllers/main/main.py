@@ -4,6 +4,7 @@ import numpy as np
 from controller import Supervisor, Keyboard
 from control import quadrotor_controller
 from kalman_filter import kalman_filter as KF
+from motion_planner import MotionPlanner3D as MP
 import utils
 from scipy.spatial.transform import Rotation as R
 import example
@@ -22,6 +23,32 @@ current_setpoint = None
 setpoint_lock = threading.Lock()
 
 running = True
+
+# Handle global setpoints to system depending on exercise
+if exp_num == 3:
+    start = (0.0, 0.0, 0.5)
+    goal = (5, 1, 1)
+    grid_size = 0.5
+    obstacles = [(0.75, 0.25, 0.0, 0.5, 0.5, 1.5),
+                (1.25, 1.75, 0.0, 0.5, 0.5, 2.0),
+                (3.25, 1.25, 0.0, 0.5, 0.5, 1.5),
+                (4.0, 2.0, 0.0, 0.5, 0.5, 1.5),
+                (4.0, 0.875, 0.0, 0.5, 0.25, 1.5),
+                (2.5, 0.0, 0.0, 0.5, 2.25, 1.5),
+                (2.5, 2.25, 0.0, 0.5, 0.75, 0.25),
+                (2.5, 2.25, 1.0, 0.5, 0.75, 0.50),
+                (2.5, 2.75, 0.25, 0.5, 0.25, 0.50)
+                ]  # (x, y, z, width_x, width_y, width_z)
+    bounds = (0, 5, 0, 5, 0, 1.5)  # (x_min, x_max, y_min, y_max, z_min, z_max)
+    mp_obj = MP(start, obstacles, bounds, grid_size, goal)
+    setpoints = mp_obj.trajectory_setpoints
+    timepoints = mp_obj.time_setpoints
+    print(timepoints)
+    assert setpoints is not None, "No valid trajectory reference setpoints found"
+    tol_goal = 0.25
+else:
+    setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
+    tol_goal = 0.1
 
 # Crazyflie drone class in webots
 class CrazyflieInDroneDome(Supervisor):
@@ -543,31 +570,6 @@ class CrazyflieInDroneDome(Supervisor):
         # Update drone states in simulation
         super().step(self.timestep)
 
-
-    # def step_KF(self, KF_data, dt_ctrl):
-
-    #     # self.dt_ctrl = self.getTime() - self.PID_update_last_time
-
-    #     if np.round(dt_ctrl,3) >= self.ctrl_update_period/1000:
-
-    #         pp_cmds = example.path_planning(KF_data, dt_ctrl)
-
-    #         # Low-level PID velocity control with fixed height
-    #         motorPower = self.PID_CF.setpoint_to_rpm(dt_ctrl, pp_cmds, KF_data)
-    #         #pid(self.dt_ctrl, pp_cmds, KF_data)
-        
-    #         # Update motor command
-    #         self.m1_motor.setVelocity(-motorPower[0])
-    #         self.m2_motor.setVelocity(motorPower[1])
-    #         self.m3_motor.setVelocity(-motorPower[2])
-    #         self.m4_motor.setVelocity(motorPower[3])
-
-    #     if np.round(self.getTime(),2) == self.KF.plot_time_limit:
-    #         self.KF.plot_states()
-
-    #     # Update drone states in simulation
-    #     super().step(self.timestep)
-
 # A thread that runs the path planner in parallel with the simulation
 def path_planner_thread(drone):
     global latest_sensor_data, current_setpoint, running
@@ -585,7 +587,10 @@ def path_planner_thread(drone):
                 dt_ctrl = drone.getTime() - drone.PID_update_last_time
         # Call the path planner to get the new setpoint
         if sensor_data_copy is not None:
-            new_setpoint = example.path_planning(sensor_data_copy,dt_ctrl)
+            if exp_num != 3:
+                new_setpoint = example.path_planning(sensor_data_copy,dt_ctrl,setpoints,tol_goal)
+            else:
+                new_setpoint = example.trajectory_tracking(sensor_data_copy,dt_ctrl,timepoints,setpoints,tol_goal)
             with setpoint_lock:
                 current_setpoint = new_setpoint
         time.sleep(0.01)
@@ -637,7 +642,11 @@ if __name__ == '__main__':
 
                 elif control_style == 'path_planner':
                     # Update the setpoint
-                    setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
+                    if exp_num != 3:
+                        setpoint = example.path_planning(sensor_data,drone.dt_ctrl,setpoints,tol_goal)
+                    else:
+                        setpoint = example.trajectory_tracking(sensor_data,drone.dt_ctrl,timepoints,setpoints, tol_goal)
+
                     # Call the PID controller to get the motor commands
                     motorPower = drone.PID_CF.setpoint_to_rpm(drone.dt_ctrl, setpoint, sensor_data)
 
