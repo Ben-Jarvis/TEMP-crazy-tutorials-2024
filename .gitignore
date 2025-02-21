@@ -132,3 +132,12 @@ dmypy.json
 
 # Occupancy map
 map.png
+docs/exercise_2/acceleration_estimates_noise_KF.png
+docs/exercise_2/acceleration_estimates_truth_KF.png
+docs/exercise_2/Comparison_pos_accel_truth_Noise.png
+docs/exercise_2/Comparison_velocity_truth_Noise.png
+docs/exercise_2/position_estimates_noise_KF.png
+docs/exercise_2/position_estimates_truth_KF.png
+docs/exercise_2/velocity_estimates_noise_KF.png
+docs/exercise_2/velocity_estimates_truth_KF.png
+worlds/.crazyflie_world_motion_planning.jpg
