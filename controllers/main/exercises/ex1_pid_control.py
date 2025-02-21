@@ -1,7 +1,7 @@
 # Low-level PID control of velocity and attitude
 import numpy as np
 import matplotlib.pyplot as plt
-from simple_pid import PID
+from lib.simple_pid import PID
 from scipy.spatial.transform import Rotation as R
 
 class quadrotor_controller():
@@ -121,43 +121,43 @@ class quadrotor_controller():
         # return self.acceleration_to_pwm(dt, [acc_x_setpoint, acc_y_setpoint, acc_z_setpoint], yaw_setpoint, sensor_data)
 
         ### SOLUTION ###
-        # if self.tuning_level != "off":
-        #     setpoint = [0.966047,0.837248,1,0]
+        if self.tuning_level != "off":
+            setpoint = [0.966047,0.837248,1,0]
 
-        # pos_x_setpoint = setpoint[0]
-        # pos_y_setpoint = setpoint[1]
-        # pos_z_setpoint = setpoint[2]
-        # yaw_setpoint = setpoint[3]
+        pos_x_setpoint = setpoint[0]
+        pos_y_setpoint = setpoint[1]
+        pos_z_setpoint = setpoint[2]
+        yaw_setpoint = setpoint[3]
 
-        # # Position control loop
-        # if self.tuning_level == "pos_xy":
-        #     pos_y_setpoint = self.tuning(-3,3,5,dt,pos_y_setpoint, sensor_data["y_global"], "y position [m]")
-        # if self.tuning_level == "pos_z":
-        #     pos_z_setpoint = self.tuning(0.5,1.5,5,dt,pos_z_setpoint, sensor_data["z_global"], "z position [m]")
+        # Position control loop
+        if self.tuning_level == "pos_xy":
+            pos_y_setpoint = self.tuning(-3,3,5,dt,pos_y_setpoint, sensor_data["y_global"], "y position [m]")
+        if self.tuning_level == "pos_z":
+            pos_z_setpoint = self.tuning(0.5,1.5,5,dt,pos_z_setpoint, sensor_data["z_global"], "z position [m]")
 
-        # self.pid_pos_x.setpoint = pos_x_setpoint
-        # self.pid_pos_y.setpoint = pos_y_setpoint
-        # self.pid_pos_z.setpoint = pos_z_setpoint
+        self.pid_pos_x.setpoint = pos_x_setpoint
+        self.pid_pos_y.setpoint = pos_y_setpoint
+        self.pid_pos_z.setpoint = pos_z_setpoint
 
-        # vel_x_setpoint = self.pid_pos_x(sensor_data["x_global"],dt=dt)
-        # vel_y_setpoint = self.pid_pos_y(sensor_data["y_global"],dt=dt)
-        # vel_z_setpoint = self.pid_pos_z(sensor_data["z_global"],dt=dt)
+        vel_x_setpoint = self.pid_pos_x(sensor_data["x_global"],dt=dt)
+        vel_y_setpoint = self.pid_pos_y(sensor_data["y_global"],dt=dt)
+        vel_z_setpoint = self.pid_pos_z(sensor_data["z_global"],dt=dt)
 
-        # # Velocity control loop
-        # if self.tuning_level == "vel_xy":
-        #     vel_y_setpoint = self.tuning(-self.limits["L_vel_xy"],self.limits["L_vel_xy"],3,dt,vel_y_setpoint, sensor_data["v_y"], "y velocity [m/s]")
-        # if self.tuning_level == "vel_z":
-        #     vel_z_setpoint = self.tuning(-self.limits["L_vel_z"],self.limits["L_vel_z"],2,dt,vel_z_setpoint, sensor_data["v_z"], "z velocity [m/s]")
+        # Velocity control loop
+        if self.tuning_level == "vel_xy":
+            vel_y_setpoint = self.tuning(-self.limits["L_vel_xy"],self.limits["L_vel_xy"],3,dt,vel_y_setpoint, sensor_data["v_y"], "y velocity [m/s]")
+        if self.tuning_level == "vel_z":
+            vel_z_setpoint = self.tuning(-self.limits["L_vel_z"],self.limits["L_vel_z"],2,dt,vel_z_setpoint, sensor_data["v_z"], "z velocity [m/s]")
 
-        # self.pid_vel_x.setpoint = vel_x_setpoint
-        # self.pid_vel_y.setpoint = vel_y_setpoint
-        # self.pid_vel_z.setpoint = vel_z_setpoint
+        self.pid_vel_x.setpoint = vel_x_setpoint
+        self.pid_vel_y.setpoint = vel_y_setpoint
+        self.pid_vel_z.setpoint = vel_z_setpoint
 
-        # acc_x_setpoint = self.pid_vel_x(sensor_data["v_x"],dt=dt)
-        # acc_y_setpoint = self.pid_vel_y(sensor_data["v_y"],dt=dt)
-        # acc_z_setpoint = self.pid_vel_z(sensor_data["v_z"],dt=dt)
+        acc_x_setpoint = self.pid_vel_x(sensor_data["v_x"],dt=dt)
+        acc_y_setpoint = self.pid_vel_y(sensor_data["v_y"],dt=dt)
+        acc_z_setpoint = self.pid_vel_z(sensor_data["v_z"],dt=dt)
 
-        # return self.acceleration_to_pwm(dt, [acc_x_setpoint, acc_y_setpoint, acc_z_setpoint], yaw_setpoint, sensor_data)
+        return self.acceleration_to_pwm(dt, [acc_x_setpoint, acc_y_setpoint, acc_z_setpoint], yaw_setpoint, sensor_data)
         ### SOLUTION ###
         pass
     def keys_to_pwm(self, dt, keys, sensor_data):
