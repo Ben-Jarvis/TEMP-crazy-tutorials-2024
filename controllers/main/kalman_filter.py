@@ -24,7 +24,7 @@ class kalman_filter():
         self.use_noisy_measurement = False
 
         # Simulation time after which plots are generated
-        self.plot_time_limit = 40.0
+        self.plot_time_limit = 25.0
 
         # ---------------------------------- DO NOT MODIFY ---------------------------------
         #Variables for Plotting
