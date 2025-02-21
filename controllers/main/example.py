@@ -34,10 +34,11 @@ def obstacle_avoidance(sensor_data):
     return control_command
 
 # Coverage path planning
-setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
 index_current_setpoint = 0
-def path_planning(sensor_data,dt):
-    global on_ground, height_desired, index_current_setpoint, setpoints, timer, timer_done, startpos
+def path_planning(sensor_data, dt, setpoints, tol):
+    global on_ground, height_desired, index_current_setpoint, timer, timer_done, startpos
+
+    print(dt)
 
     # Take off
     if startpos is None:
@@ -56,11 +57,11 @@ def path_planning(sensor_data,dt):
         timer += dt
     # Hover at the final setpoint
     if index_current_setpoint == len(setpoints):
-        control_command = [startpos[0], startpos[1], startpos[2]-0.05, 0.0]
+        control_command = [0.0, 0.0, height_desired, 0.0] #[startpos[0], startpos[1], startpos[2]-0.05, 0.0]
 
         if timer_done is None:
             timer_done = True
-            print("Path planning took " + str(np.round(timer,1)) + " [s]") #Fixed typo (JULIUS)
+            print("Path planning took " + str(np.round(timer,1)) + " [s]")
         return control_command
 
     # Get the goal position and drone position
@@ -69,7 +70,7 @@ def path_planning(sensor_data,dt):
     distance_drone_to_goal = np.linalg.norm([current_setpoint[0] - x_drone, current_setpoint[1] - y_drone, current_setpoint[2] - z_drone, current_setpoint[3] - yaw_drone%(2*np.pi)])
 
     # When the drone reaches the goal setpoint, e.g., distance < 0.1m
-    if distance_drone_to_goal < 0.1:
+    if distance_drone_to_goal < tol:
         # Select the next setpoint as the goal position
         index_current_setpoint += 1
         # Hover at the final setpoint
@@ -78,6 +79,45 @@ def path_planning(sensor_data,dt):
             return current_setpoint
 
     return current_setpoint
+
+def trajectory_tracking(sensor_data, dt, timepoints, setpoints, tol):
+    global on_ground, index_current_setpoint, timer, timer_done
+
+    start_point = setpoints[0]
+    end_point = setpoints[-1]
+
+    # Take off 
+    if on_ground and sensor_data['z_global'] < start_point[2] - 0.01:
+        current_setpoint = start_point
+        return current_setpoint
+    else:
+        on_ground = False
+        if timer is None:
+            # Begin timer and start trajectory
+            timer = 0
+            print("Trajectory tracking started")
+            index_current_setpoint == 1
+        else:
+            timer += dt
+        
+    # Determine the current setpoint based on the time
+    if not on_ground and timer is not None:
+        if index_current_setpoint < len(timepoints) - 1:
+            # Update new setpoint
+            if timer >= timepoints[index_current_setpoint]:
+                index_current_setpoint += 1
+            current_setpoint = setpoints[index_current_setpoint,:]
+        else:
+            # Hover at the final setpoint
+            current_setpoint = end_point
+            if timer_done is None and np.linalg.norm([sensor_data['x_global'] - end_point[0], sensor_data['y_global'] - end_point[1], sensor_data['z_global'] - end_point[2], sensor_data['yaw'] - end_point[3]]) < tol:
+                timer_done = True
+                print("Trajectory took " + str(np.round(timer,1)) + " [s]")
+    
+    # print(current_setpoint)
+        
+    return current_setpoint
+    
     
 # Occupancy map based on distance sensor
 min_x, max_x = 0, 5.0 # meter

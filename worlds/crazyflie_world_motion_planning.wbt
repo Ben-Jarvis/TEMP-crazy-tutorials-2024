@@ -7,7 +7,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "../protos/Pedestrian.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/plants/protos/PottedTree.proto"
 EXTERNPROTO "../protos/Wall.proto"
-EXTERNPROTO "../protos/Window.proto"
 
 WorldInfo {
   basicTimeStep 8
@@ -17,14 +16,14 @@ WorldInfo {
   }
 }
 Viewpoint {
-  orientation -0.11595594142826 0.9014869154650192 0.4169838856512936 0.6286803788774629
-  position -5.431970657618181 -0.5767344279487623 5.810015600776217
+  orientation 0.0661291978565845 0.9709650449988739 -0.2298995662918472 0.513788599933673
+  position -4.7007920644506305 3.7896252764160114 5.26796386968169
   follow "crazyflie"
 }
 TexturedBackground {
 }
 Crazyflie {
-  translation 0.9660470000000083 0.8372480000000008 0.12
+  translation 0 0 0.12
   rotation 1.4432514312069223e-13 -7.094951043479413e-14 1 0.004202810932212425
   name "crazyflie"
   controller "main"
@@ -90,9 +89,6 @@ Floor {
     roughness 1
     metalness 0
   }
-}
-Window {
-  translation 2.75 2.59 0
 }
 DEF WALL_LEFT Solid {
   translation 3 5 3
@@ -259,7 +255,7 @@ DEF GOAL Solid {
   name "goal"
 }
 DEF OBSTACLE1 Solid {
-  translation 1.77 1.4 0.74
+  translation 1 0.5 0.75
   children [
     DEF CYLINDER_SHAPE Shape {
       appearance PBRAppearance {
@@ -289,7 +285,7 @@ DEF OBSTACLE3 Solid {
   boundingObject USE CYLINDER_SHAPE
 }
 DEF OBSTACLE4 Solid {
-  translation 0.5 2 0.75
+  translation 1.5 2 0.75
   children [
     USE CYLINDER_SHAPE
   ]
@@ -297,7 +293,7 @@ DEF OBSTACLE4 Solid {
   boundingObject USE CYLINDER_SHAPE
 }
 DEF TAKE_OFF_PAD Solid {
-  translation 1 1 0.05
+  translation 0 0 0.05
   children [
     DEF PAD_SHAPE Shape {
       appearance PBRAppearance {
@@ -337,12 +333,28 @@ DEF FLIGHT_AREA Solid {
   ]
   name "flight_area"
 }
+Wall {
+  translation 2.75 2.625 1
+  name "wall(2)"
+  size 0.5 0.75 0.5
+}
+Wall {
+  translation 2.75 2.625 0
+  name "wall(1)"
+  size 0.5 0.75 0.25
+}
+Wall {
+  translation 2.75 2.875 0.25
+  name "wall(3)"
+  size 0.5 0.25 0.75
+}
 Pedestrian {
-  translation 4 0.6 1.26
+  translation 4.25 1 1.26
   rotation 0 0 1 1.5708
 }
 Wall {
-  translation 2.75 1.1 0
+  translation 2.75 1.125 0
+  size 0.5 2.25 1.5
 }
 PottedTree {
   translation 3.5 1.5 0
