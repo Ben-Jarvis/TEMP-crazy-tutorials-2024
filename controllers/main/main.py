@@ -19,12 +19,13 @@ rand_env = False                # Randomise the environment
 latest_sensor_data = None
 sensor_lock = threading.Lock()
 
-current_setpoint = None
+current_setpoint = np.zeros(4)
 setpoint_lock = threading.Lock()
 
 running = True
 
 # Handle global setpoints to system depending on exercise
+# TODO JULIUS: Put in drone class
 if exp_num == 3:
     start = (0.0, 0.0, 0.5)
     goal = (5, 1, 1)
@@ -476,19 +477,6 @@ class CrazyflieInDroneDome(Supervisor):
 
         return data
 
-    # # Detect if the drone has reached the landing pad, if it has set the GOAL object to be transparent
-    # def check_landing_pad(self, sensor_data):
-        
-    #     drone_position = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['range_down']]
-
-    #     distance = np.linalg.norm([drone_position[0] - self.landing_pad_position[0], drone_position[1] - self.landing_pad_position[1], drone_position[2]])
-    #     if distance < 0.16 and not self.reached_landing_pad:
-    #         goal_node = super().getFromDef('GOAL')
-    #         cam_node = super().getFromDef('CF_CAMERA')
-    #         goal_node.setVisibility(cam_node, 0)
-    #         print("Congratulations! You have reached the landing pad, the goal is now hidden.")
-    #         self.reached_landing_pad = True
-
     # Detect which segment the drone is in
     def check_segment(self, sensor_data):
         drone_pos = np.array([sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global']])
@@ -586,10 +574,7 @@ def path_planner_thread(drone):
                 dt_ctrl = drone.getTime() - drone.PID_update_last_time
         # Call the path planner to get the new setpoint
         if sensor_data_copy is not None:
-            if exp_num != 3:
-                new_setpoint = mapping_and_planning_examples.path_planning(sensor_data_copy,dt_ctrl,setpoints,tol_goal)
-            else:
-                new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy,dt_ctrl,timepoints,setpoints,tol_goal)
+            new_setpoint = mapping_and_planning_examples.path_planning(sensor_data_copy,dt_ctrl,setpoints,tol_goal)
             with setpoint_lock:
                 current_setpoint = new_setpoint
         time.sleep(0.01)
@@ -603,7 +588,7 @@ if __name__ == '__main__':
     assert exp_num in [0,1,2,3,4], "Exp_num must be a value between 0 and 4"
 
     # Start the path planner thread
-    if control_style == 'path_planner':
+    if control_style == 'path_planner' and exp_num == 4:
         planner_thread = threading.Thread(target=path_planner_thread, args=(drone,))
         planner_thread.daemon = True
         planner_thread.start()
@@ -620,9 +605,6 @@ if __name__ == '__main__':
             else:
                 # Read sensor data including []
                 sensor_data = drone.read_sensors()
-                # Update the sensor data
-                with sensor_lock:
-                    latest_sensor_data = sensor_data
 
             drone.dt_ctrl = drone.getTime() - drone.PID_update_last_time
 
@@ -639,8 +621,8 @@ if __name__ == '__main__':
                     # Call the PID controller to get the motor commands
                     motorPower = drone.PID_CF.keys_to_pwm(drone.dt_ctrl, control_commands, sensor_data)    
 
-                elif control_style == 'path_planner':
-                    # Update the setpoint
+                elif control_style == 'path_planner' and exp_num != 4:
+                    # # Update the setpoint
                     if exp_num != 3:
                         setpoint = mapping_and_planning_examples.path_planning(sensor_data,drone.dt_ctrl,setpoints,tol_goal)
                     else:
@@ -653,7 +635,14 @@ if __name__ == '__main__':
                     # For the PROJECT CHANGE YOUR CODE HERE
                     # Example Path planner call
                     # setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
+                    # Update the sensor data
+                    with sensor_lock:
+                        latest_sensor_data = sensor_data
 
+                    # Call the PID controller to get the motor commands
+                    motorPower = drone.PID_CF.setpoint_to_rpm(drone.dt_ctrl, current_setpoint, sensor_data)
+
+                    # TODO BEN: IN separate folder
                     # Check which segment the drone is in
                     curr_segment = drone.check_segment(sensor_data)
 
