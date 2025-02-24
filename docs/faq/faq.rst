@@ -17,7 +17,7 @@ On Windows, it is also recommended to disable the Python app alias that opens th
 numpy / matplotlib not found
 -------------
 Usually a problem with conflicting Python installations. 
-Install a self-contained Python virtual environment, that has its own clean Python runtime and pip packages, and point Webots directly to that executable (something like python path: /path/to/.venv/bin/python3, using .venv/bin/pip3 to install packages, maybe chmod +x is also required on macOS). 
+Go to **Tools/Preferences** in the Python tab, replace “python3” by: “/path/to/your/project/.venv/bin/python3” if you created your environment for this project or “/path/to/your/python/bin/python3” if you have not used a virtual environment.
 
 cf_camera is not showing
 -------------
