@@ -2,18 +2,17 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from control import quadrotor_controller as pid
 import matplotlib.pyplot as plt
 import pandas as pd
 from PIL import Image
 
 class kalman_filter():
     def __init__(self):
-        self.noise_std_GPS = 0.2
-        self.noise_std_ACCEL = 0.02
+        self.noise_std_GPS = 0.3 #0.4
+        self.noise_std_ACCEL = 0.05
 
         #Tuning parameter
-        self.q_tr = 0.8 # Original: 1.0
+        self.q_tr = 0.5 # Original: 1.0 #Best: 0.5
 
         #Initialize KF state and model uncertainty
         self.initialize_KF(self.noise_std_GPS, self.noise_std_ACCEL)
@@ -24,7 +23,7 @@ class kalman_filter():
         self.use_noisy_measurement = False
 
         # Simulation time after which plots are generated
-        self.plot_time_limit = 30.0
+        self.plot_time_limit = 25.0
 
         # ---------------------------------- DO NOT MODIFY ---------------------------------
         #Variables for Plotting
@@ -79,7 +78,7 @@ class kalman_filter():
 
         # Initialize the state vector (self.X_opt) and the covariance matrix (self.P_opt) of the state estimate
         self.X_opt = np.random.rand(9,1)
-        self.P_opt = 1000.0*np.diag(np.ones(9))
+        self.P_opt = 1e6*np.diag(np.ones(9))
 
         # Define the Measurement Matrices (H) for both GPS and ACCELEROMETER measurements - Shape: (n_measurements x n_states)
         self.H_GPS = np.array([[1,0,0,0,0,0,0,0,0],
@@ -279,7 +278,6 @@ class kalman_filter():
 
         new_dir = os.path.abspath(os.path.join(os.path.join(os.getcwd(), os.pardir), os.pardir)) + "/docs/exercise_2"
         os.chdir(new_dir)
-        os.mkdir("Figures")
 
         colors = ['blue', 'darkorange', 'green']
         colors_two = ['red', 'brown', 'black']
@@ -377,7 +375,7 @@ class kalman_filter():
         ax[1].legend(['Noisy X','Noisy Y', 'Noisy Z','Ground truth X ','Ground truth Y','Ground truth Z'], fontsize = 10)
         ax[1].set_xlabel("Time (s)")
         ax[1].set_ylabel("Acceleration (m/s²)")
-        ax[1].set_ylim(-10,10)
+        ax[1].set_ylim(-2,2)
         plt.savefig("Comparison_pos_accel_truth_Noise.png")
 
         fig, ax = plt.subplots(1)
