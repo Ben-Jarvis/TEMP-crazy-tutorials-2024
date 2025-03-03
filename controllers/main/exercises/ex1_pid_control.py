@@ -14,7 +14,7 @@ class quadrotor_controller():
                     "P_pos_z": 8.0,     "I_pos_z": 0.0,     "D_pos_z": 0.8,
                     "P_pos_xy": 0.5,    "I_pos_xy": 0.0,    "D_pos_xy": 0.0,
                     "P_vel_z": 2.0,     "I_vel_z": 0.0,     "D_vel_z": 1.0,
-                    "P_vel_xy": 0.5,    "I_vel_xy": 0.0,    "D_vel_xy": 0.015,
+                    "P_vel_xy": 0.2,    "I_vel_xy": 0.0,    "D_vel_xy": 0.0,
                     "P_att_rp": 10.0,   "I_att_rp": 0.0,    "D_att_rp": 0.2,
                     "P_att_y": 4.0,     "I_att_y": 0.0,     "D_att_y": 0.3,
                     "P_rate_rp": 1.5,   "I_rate_rp":0.0,    "D_rate_rp": 0.1,
@@ -133,7 +133,6 @@ class quadrotor_controller():
         acc_y_setpoint = 0 # this line is just here so it doesn't throw an error
         acc_z_setpoint = 0 # this line is just here so it doesn't throw an error
         yaw_setpoint = 0 # this line is just here so it doesn't throw an error
-
         return self.acceleration_and_yaw_to_pwm(dt, [acc_x_setpoint, acc_y_setpoint, acc_z_setpoint], yaw_setpoint, sensor_data)
     
     def keys_to_pwm(self, dt, keys, sensor_data):
