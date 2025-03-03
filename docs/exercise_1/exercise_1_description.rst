@@ -17,7 +17,7 @@ Your task is to implement a cascaded PID controller and tune it to make your dro
 
 Exercise
 ---------
-1. Start by opening **control.py** and go to the function **setpoint_to_rpm**. You will see that the function is empty. This is where you will implement your cascaded PID controller.
+1. Start by opening **ex_1_pid_control.py** and go to the function **setpoint_to_pwm**. You will see that the function is empty. This is where you will implement your cascaded PID controller.
 2. To run it, in **main.py**, switch **control_style = "path_planner"**. This will let the drone fly the path autonomously (a message in the command line will let you know how long the drone took to complete the lap). This should look like this and since the gains are untuned, will take over a minute:
 .. image:: square_before.gif
   :width: 650

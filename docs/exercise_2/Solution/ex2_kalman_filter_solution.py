@@ -258,12 +258,12 @@ class kalman_filter():
         noisy_sensor_data['v_z'] = self.v_z_noisy
         noisy_sensor_data['v_forward'] =  self.v_x_noisy * np.cos(noisy_sensor_data['yaw']) + self.v_y_noisy * np.sin(noisy_sensor_data['yaw'])
         noisy_sensor_data['v_left'] = -self.v_x_noisy * np.sin(noisy_sensor_data['yaw']) + self.v_y_noisy * np.cos(noisy_sensor_data['yaw'])
-        noisy_sensor_data['v_down'] = self.v_z_noisy
+        noisy_sensor_data['v_up'] = self.v_z_noisy
 
         return noisy_sensor_data
     
     def aggregate_states(self, raw_data, noisy_data, KF_data, time):
-        keys = ['x_global', 'y_global', 'z_global', 'v_forward', 'v_left', 'v_down', 'ax_global', 'ay_global' , 'az_global']
+        keys = ['x_global', 'y_global', 'z_global', 'v_forward', 'v_left', 'v_up', 'ax_global', 'ay_global' , 'az_global']
         self.raw_data_vec.append(list(raw_data[key] for key in keys))
         self.noisy_data_vec.append(list(noisy_data[key] for key in keys))
         self.KF_estimate_vec.append(list(KF_data[key] for key in keys))
