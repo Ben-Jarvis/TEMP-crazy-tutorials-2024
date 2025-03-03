@@ -285,6 +285,52 @@ class CrazyflieInDroneDome(Supervisor):
         rotation_field = goal_node.getField('rotation')
         rotation_field.setSFRotation([0, 0, 1, goal_orientation])
   
+    # Track the progress in the assignment
+    def track_assignment_progress(self, sensor_data):
+         # Check which segment the drone is in
+        curr_segment = drone.check_segment(sensor_data)
+
+        # Start timing when the drone leaves the first segment
+        if curr_segment > 0 and drone.segment == 0:
+            drone.start_time = time.time()
+            print("Timing started...")
+
+        # Stop timing when the drone returns to segment 0
+        if curr_segment == 0 and drone.segment > 0:
+            elapsed_time = time.time() - drone.start_time
+            drone.lap_times[drone.lap] = elapsed_time
+            drone.lap += 1
+            print(f"Lap completed. Total time elapsed: {elapsed_time:.2f} seconds") 
+            drone.segment_progress = [False] * drone.num_segments
+            drone.segment = 0
+        
+        # Make sure that segment can only increase to avoid going back
+        if curr_segment > drone.segment:
+            drone.segment = curr_segment
+
+        # Mark the segment as completed
+        if not drone.segment_progress[drone.segment]:
+            drone.segment_progress[drone.segment] = True
+
+            # Print the current progress
+            if drone.segment > 1:
+                if drone.gate_progress[drone.lap][drone.segment-2]:
+                    print('Moving to the next segment after successfully passing gate', drone.segment-2)
+                else:
+                    print('Moving to the next segment after failing to pass gate', drone.segment-2)
+
+        # Check if the drone has reached the gate in this segment
+        if drone.segment != -1:
+            drone.check_goal(sensor_data)
+        
+        # If finished all segments print the lap times
+        if drone.lap == drone.num_laps:
+            print("Lap times:", drone.lap_times)
+            print("Gate progress:", drone.gate_progress)
+            return False
+        
+        return True
+    
     def wait_keyboard(self):
         while self.keyboard.getKey() != ord('Y'):
             super().step(self.timestep)
@@ -632,59 +678,21 @@ if __name__ == '__main__':
                         motorPower = drone.PID_CF.setpoint_to_pwm(drone.dt_ctrl, setpoint, sensor_data)
 
                     else:
-                        # For the PROJECT CHANGE YOUR CODE HERE
-                        # Example Path planner call
-                        # setpoint = example.path_planning(sensor_data,drone.dt_ctrl)
-                        # Update the sensor data
+
+                        # Update the sensor data in the thread
                         with sensor_lock:
                             latest_sensor_data = sensor_data
 
                         # Call the PID controller to get the motor commands
                         motorPower = drone.PID_CF.setpoint_to_pwm(drone.dt_ctrl, current_setpoint, latest_sensor_data)
 
-                        # TODO BEN: IN separate folder
-                        # Check which segment the drone is in
-                        curr_segment = drone.check_segment(sensor_data)
-
-                        # Start timing when the drone leaves the first segment
-                        if curr_segment > 0 and drone.segment == 0:
-                            drone.start_time = time.time()
-                            print("Timing started...")
-
-                        # Stop timing when the drone returns to segment 0
-                        if curr_segment == 0 and drone.segment > 0:
-                            elapsed_time = time.time() - drone.start_time
-                            drone.lap_times[drone.lap] = elapsed_time
-                            drone.lap += 1
-                            print(f"Lap completed. Total time elapsed: {elapsed_time:.2f} seconds") 
-                            drone.segment_progress = [False] * drone.num_segments
-                            drone.segment = 0
-                        
-                        # Make sure that segment can only increase to avoid going back
-                        if curr_segment > drone.segment:
-                            drone.segment = curr_segment
-
-                        # Mark the segment as completed
-                        if not drone.segment_progress[drone.segment]:
-                            drone.segment_progress[drone.segment] = True
-
-                            # Print the current progress
-                            if drone.segment > 1:
-                                if drone.gate_progress[drone.lap][drone.segment-2]:
-                                    print('Moving to the next segment after successfully passing gate', drone.segment-2)
-                                else:
-                                    print('Moving to the next segment after failing to pass gate', drone.segment-2)
-
-                        # Check if the drone has reached the gate in this segment
-                        if drone.segment != -1:
-                            drone.check_goal(sensor_data)
-                        
-                        # If finished all segments print the lap times
-                        if drone.lap == drone.num_laps:
-                            print("Lap times:", drone.lap_times)
-                            print("Gate progress:", drone.gate_progress)
-                            running = False
-                            break
+                if exp_num == 4:
+                    # Track the progress of the drone through the assignment world
+                    running = drone.track_assignment_progress(sensor_data)
+                    
+                    # If the drone has completed the assignment, crash the drone
+                    if not running:    
+                        break
 
                 # Update the PID control time
                 drone.dt_ctrl = drone.getTime() - drone.PID_update_last_time # Time interval for PID control - Is refactored above for KF - why done twice?
