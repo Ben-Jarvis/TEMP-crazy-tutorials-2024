@@ -19,6 +19,7 @@ Exercise
 ---------
 1. Start by opening **ex_1_pid_control.py** and go to the function **setpoint_to_pwm**. You will see that the function is empty. This is where you will implement your cascaded PID controller.
 2. Now you can run it: In **main.py**, switch **control_style = "path_planner"**. This will let the drone fly the path autonomously (a message in the command line will let you know how long the drone took to complete the lap). This should look like this and since the gains are untuned, will take a bit over half a minute:
+
 .. image:: square_before.gif
   :width: 650
   :alt: initial gains lead to bad performance
@@ -56,7 +57,7 @@ This should lead you to similar performance:
 
 .. image:: square_after.gif
   :width: 650
-  :alt: initial gains lead to bad performance
+  :alt: tuned gains lead to better performance
   :align: center
 
 Once you are happy with your gains, you can disable tuning (**self.tuning_level = "off"**).
