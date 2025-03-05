@@ -12,7 +12,7 @@ With this method, you will see that your quadrotor can stay on track in noisy, r
 Task description
 -----------------
 
-In this task, you will implement a Kalman Filter in the file **kalman_filter.py** and explore how it can significantly improve the performance of a closed loop cascaded PID controller in a noisy real-world scenario.
+In this task, you will implement a Kalman Filter in the file **ex2_kalman_filter.py** and explore how it can significantly improve the performance of a closed loop cascaded PID controller in a noisy real-world scenario.
 
 Besides the Gyroscope, for this exercise, the Crazyflie drone is equipped with a GPS and an Accelerometer. 
 
@@ -28,7 +28,7 @@ Each of the sensors in the simulation and the PID controller furthermore run at 
 - PID Controller: 16 milliseconds
 
 As we are considering real sensor data, the GPS and the Accelerometer measurements posess a so-called "Gaussian" noise with a 
-certain standard deviation from the true measurement, defined respectively as std_GPS = 0.2 meters and std_ACCEL = 0.02 m/s².
+certain standard deviation from the true measurement, defined respectively as std_GPS = 0.3 meters and std_ACCEL = 0.05 m/s².
 
 (**Note**: These do not correspond to the typical update rates and noise variations of real-world sensors)
 
@@ -68,7 +68,7 @@ Exercise
 
 Part 1 - Implementation
 ------------------------
-You will begin by implementing your Kalman Filer code in the file **kalman_filter.py**. 
+You will begin by implementing your Kalman Filer code in the file **ex2_kalman_filter.py**. 
 
 The state prediction vector is represented by a 9 x 1 column vector and must be ordered as: 
 

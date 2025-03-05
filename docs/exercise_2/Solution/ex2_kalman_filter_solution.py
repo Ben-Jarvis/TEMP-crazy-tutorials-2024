@@ -8,11 +8,11 @@ from PIL import Image
 
 class kalman_filter():
     def __init__(self):
-        self.noise_std_GPS = 0.3 #0.4
+        self.noise_std_GPS = 0.3
         self.noise_std_ACCEL = 0.05
 
         #Tuning parameter
-        self.q_tr = 0.5 # Original: 1.0 #Best: 0.5
+        self.q_tr = 1.0 #0.7 # Original: 1.0 #Best: 0.5
 
         #Initialize KF state and model uncertainty
         self.initialize_KF(self.noise_std_GPS, self.noise_std_ACCEL)
@@ -23,7 +23,7 @@ class kalman_filter():
         self.use_noisy_measurement = False
 
         # Simulation time after which plots are generated
-        self.plot_time_limit = 25.0
+        self.plot_time_limit = 30.0
 
         # ---------------------------------- DO NOT MODIFY ---------------------------------
         #Variables for Plotting
@@ -45,14 +45,16 @@ class kalman_filter():
 
         # Good Kalman Filter PID Gains
         # KF gains
-        # gains = {"P_vel_z": 6.0,     "I_vel_z": 1.0,     "D_vel_z": 0.8,
-        #             "P_pos_z": 2.5,     "I_pos_z": 0.0,     "D_pos_z": 1.0,
-        #             "P_rate_rp": 0.2,     "I_rate_rp":0.0,      "D_rate_rp": 0.03,
-        #             "P_rate_y": 0.01,      "I_rate_y": 0.0,      "D_rate_y": 0.001,
-        #             "P_att_rp": 16.0,     "I_att_rp":0.0,      "D_att_rp": 0.3,
-        #             "P_att_y": 5.0,      "I_att_y": 0.0,      "D_att_y": 0.1,
-        #             "P_vel_xy": 2.0,     "I_vel_xy": 0.0,     "D_vel_xy": 0.10,
-        #             "P_pos_xy": 1.5,     "I_pos_xy": 0.0,     "D_pos_xy": 0.02}
+        # gains = {
+        #             "P_pos_z": 5.0,     "I_pos_z": 0.0,     "D_pos_z": 2.5,
+        #             "P_pos_xy": 2.0,    "I_pos_xy": 0.0,    "D_pos_xy": 0.0,
+        #             "P_vel_z": 7.0,     "I_vel_z": 0.1,     "D_vel_z": 2.0,
+        #             "P_vel_xy": 0.5,    "I_vel_xy": 0.0,    "D_vel_xy": 0.015,
+        #             "P_att_rp": 8.0,   "I_att_rp": 0.0,    "D_att_rp": 0.9,
+        #             "P_att_y": 2.0,     "I_att_y": 0.0,     "D_att_y": 1.0,
+        #             "P_rate_rp": 1.5,   "I_rate_rp":0.0,    "D_rate_rp": 0.15,
+        #             "P_rate_y": 0.01,   "I_rate_y": 0.0,    "D_rate_y": 0.002
+        #             }
     
     def initialize_KF(self, noise_std_GPS, noise_std_ACCEL):
         # Function to initialize the following:
