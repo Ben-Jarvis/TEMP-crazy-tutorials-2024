@@ -78,7 +78,7 @@ The state prediction vector is represented by a 9 x 1 column vector and must be 
 
 1. First, go to the function **initialize_KF** which initializes the Kalman Filter parameters. In this function:
 
-  a) Initialize the optimal state estimate **self.X_opt** and prediction covariance **self.P_opt**.
+  a) Initialize the optimal state estimate **self.X_opt** and prediction covariance **self.P_opt** with random finite values according to the tips given in the lecture (do not use infinite values).
 
   b) Define the sensor measurement matrices **self.H_GPS** and **self.H_ACCEL**.
 
@@ -115,7 +115,7 @@ and optimal prediction covariance (**self.P_opt**) obtained at the time of the l
 
   When both measurements are received simultaneously, both measurements are fused sequentially. This case is provided to you as an example in the function.
 
-To test your implementation, first set **self.use_ground_truth_measurement = True** and compare your Kalman Filter estimate to the ground truth using the plots generated at the end of the run.
+To test your implementation, first set **self.use_direct_ground_truth_measurement = True** with all other flags set to false and compare your Kalman Filter estimate to the ground truth using the plots generated at the end of the run.
 Your results should look similar to the plots below:
 
 .. image:: Figures/position_estimates_truth_KF_NO_KF_FB.png
@@ -129,7 +129,9 @@ Your results should look similar to the plots below:
   :align: center
 
 If you are happy with the filtering performance, run the PID controller with the activated noisy measurements and a running Kalman Filter. 
-To do this, set **self.use_ground_truth_measurement = False**, **self.use_noisy_measurement = False** and **self.use_accel_only = False**. 
+To do this, set **self.use_KF_measurement = True**, **self.use_direct_ground_truth_measurement = False**, **self.use_direct_noisy_measurement = False** and **self.use_accel_only = False**. 
+
+**Note**: Ensure that you have pulled the latest version of **ex1_pid_control.py** with the correct PID gains commented as "KF gains and limits". These gains are less aggressive such that the drone can complete the parcours when using the Kalman Filter.
 
 You should now see a smooth tracking performance. How do your run times compare to the case with ground truth feedback? 
 
@@ -147,7 +149,7 @@ Part 2 - Relying on the Accelerometer
 With the implemented Filter, let us look at what happens when we only measure and propagate accelerations from the 
 acclerometer but do not correct our estimates with exact GPS measurements.
 
-For this, within your implemented Kalman Filter class, set **self.use_accel_only = True** and re-run the simulation.
+For this, within your implemented Kalman Filter class and **self.use_KF_measurement = True**, set **self.use_accel_only = True** and re-run the simulation.
 
 Your drone movement should show a noticeable change after taking off, similar to this scenario:
 
@@ -184,7 +186,7 @@ In simpler words:
 Starting with **self.q_tr = 0**, increase **self.q_tr** by small increments and investigate how this affects the behavior of the drone in the parcours.
 You can then keep tuning this coeffcient to find the lowest possible total run-time!
 
-**Note:** There are more advanced mehtods to determine your process covariance. An ideal process covariance may for instance be calculated from the variance between the predicted and measured accelerations along the parcours.
+**Note:** There are more advanced methods to determine your process covariance. An ideal process covariance may for instance be calculated from the variance between the predicted and measured accelerations along the parcours.
 
 ====================================================================================
 Any questions about the exercise, please contact Julius Wanner (julius.wanner@epfl.ch).

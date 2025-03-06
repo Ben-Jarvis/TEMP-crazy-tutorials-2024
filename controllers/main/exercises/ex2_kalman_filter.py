@@ -8,7 +8,7 @@ from PIL import Image
 
 class kalman_filter():
     def __init__(self):
-        self.noise_std_GPS = 0.3 #0.4
+        self.noise_std_GPS = 0.3
         self.noise_std_ACCEL = 0.05
 
         #Tuning parameter
@@ -18,9 +18,10 @@ class kalman_filter():
         self.initialize_KF(self.noise_std_GPS, self.noise_std_ACCEL)
 
         # Flags for use cases to test
-        self.use_accel_only = False
-        self.use_ground_truth_measurement = True
-        self.use_noisy_measurement = False
+        self.use_direct_noisy_measurement = False # Enable this to test the drone response when the nosiy sensor measurement is used directly
+        self.use_direct_ground_truth_measurement = True # Enable this to test the drone response when the ground truth state is used directly
+        self.use_KF_measurement = False # Enable this to test the drone response when the Kalman Filter is used to estimate the state
+        self.use_accel_only = False # Enable this to test the drone response when only accelerometer measurements are used in the Kalman Filter (Part 2)
 
         # Simulation time after which plots are generated
         self.plot_time_limit = 25.0
@@ -44,13 +45,21 @@ class kalman_filter():
         self.v_z_noisy = 0.0
     
     def initialize_KF(self, noise_std_GPS, noise_std_ACCEL):
-        # Function to initialize the following:
-        #   Optimal state vector (self.X_opt)
-        #   Optimal prediction covariance (self.P_opt)
-        #   Measurement Matrices (self.H_GPS and self.H_ACCEL)
-        #   Measurement Covariance Matrices (self.R_GPS and self.R_ACCEL)
 
-        # IMPORTANT: Assume the state definition in the order: X = [x, v_x, a_x, y, v_y, a_y, z, v_z, a_z], Shape: (9,1), n_states = 9
+        # IMPORTANT: Assume the state vectors in the order: X = [x, v_x, a_x, y, v_y, a_y, z, v_z, a_z], Shape: (n_states,1)
+        # n_states = 9
+        # n_measurements = 3
+
+        # Function to initialize the following as 2D numpy arrays:
+        #   self.X_opt: Optimal state vector (n_states x 1) 
+        #   self.P_opt: Optimal prediction covariance (n_states x n_states)
+        #   self.H_GPS: GPS Measurement Matrix (n_measurements x n_states)
+        #   self.H_ACCEL: Accelerometer Measurement Matrix (n_measurements x n_states)
+        #   self.R_GPS: Measurement Covariance Matrix for GPS (n_measurements x n_measurements)
+        #   self.R_ACCEL: Measurement Covariance Matrix for Accelerometer (n_measurements x n_measurements)
+        # Inputs:
+        #   noise_std_GPS: Standard deviation of GPS noise
+        #   noise_std_ACCEL: Standard deviation of Accelerometer noise
 
         # YOUR CODE HERE
         # -----------------------------------
@@ -81,7 +90,7 @@ class kalman_filter():
         A_trans = ...
 
         # Calculate the propagated state (X_pred) and the propagated covariance (P_pred) using the last fused state (self.X_opt) and covariance (self.P_opt)
-        X_pred = ...
+        X_pred = ... # X_pred must be 2D array of shape (n_states, 1) Hint: Check the shape, if it does not match in your implementation use the .reshape(-1, 1) attribute
         P_pred = ...
 
         return X_pred, P_pred
@@ -94,7 +103,7 @@ class kalman_filter():
         #   H: Measurement Matrix of measured sensor (n_measurements x n_states)
         #   R: Measurement Covariance of measured sensor (n_measurements x n_states)
         #   Z: Measurement vector received from the sensor (n_measurements x 1)
-        # Returns:
+        # Outputs:
         #   self.X_opt: Fused state estimate at sensor readout time (n_states x 1)
         #   self.P_opt: Fused covariance matrix at sensor readout time (n_states x n_states)
 
@@ -120,7 +129,7 @@ class kalman_filter():
         #       -> 3: Accelerometer and GPS measurements received simultaneously
         #   measured_state_gps: The latest GPS position measurement (X,Y,Z) in inertial world frame (n_measurements x 1)
         #   measured_state_accel: The latest ACCELEROMETER measurement (A_X, A_Y, A_Z) in  world frame (n_measurements x 1)
-        # Returns:
+        # Outputs:
         #   X_est: Estimated drone state (n_states x 1)
         #   P_est: Estimated covariance (n_states x n_states)
 

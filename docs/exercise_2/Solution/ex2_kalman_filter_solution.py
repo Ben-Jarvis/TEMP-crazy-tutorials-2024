@@ -12,15 +12,16 @@ class kalman_filter():
         self.noise_std_ACCEL = 0.05
 
         #Tuning parameter
-        self.q_tr = 1.0 #0.7 # Original: 1.0 #Best: 0.5
+        self.q_tr = 0.7 #0.7 # Original: 1.0 #Best: 0.5
 
         #Initialize KF state and model uncertainty
         self.initialize_KF(self.noise_std_GPS, self.noise_std_ACCEL)
 
         # Flags for use cases to test
-        self.use_accel_only = False
-        self.use_ground_truth_measurement = False
-        self.use_noisy_measurement = False
+        self.use_direct_noisy_measurement = False # Enable this to test the drone response when the nosiy sensor measurement is used directly
+        self.use_direct_ground_truth_measurement = True # Enable this to test the drone response when the ground truth state is used directly
+        self.use_KF_measurement = False # Enable this to test the drone response when the Kalman Filter is used to estimate the state
+        self.use_accel_only = False # Enable this to test the drone response when only accelerometer measurements are used in the Kalman Filter (Part 2)
 
         # Simulation time after which plots are generated
         self.plot_time_limit = 30.0
@@ -57,14 +58,20 @@ class kalman_filter():
         #             }
     
     def initialize_KF(self, noise_std_GPS, noise_std_ACCEL):
-        # Function to initialize the following:
-        #   Optimal state vector (self.X_opt)
-        #   Optimal prediction covariance (self.P_opt)
-        #   Measurement Matrices (self.H_GPS and self.H_ACCEL)
-        #   Measurement Covariance Matrices (self.R_GPS and self.R_ACCEL)
+        # IMPORTANT: Assume the state vectors in the order: X = [x, v_x, a_x, y, v_y, a_y, z, v_z, a_z], Shape: (n_states,1)
+        # n_states = 9
+        # n_measurements = 3
 
-        # IMPORTANT: Assume the state definition in the order: X = [x, v_x, a_x, y, v_y, a_y, z, v_z, a_z], Shape: (9,1), n_states = 9
-
+        # Function to initialize the following as 2D numpy arrays:
+        #   self.X_opt: Optimal state vector (n_states x 1) 
+        #   self.P_opt: Optimal prediction covariance (n_states x n_states)
+        #   self.H_GPS: GPS Measurement Matrix (n_measurements x n_states)
+        #   self.H_ACCEL: Accelerometer Measurement Matrix (n_measurements x n_states)
+        #   self.R_GPS: Measurement Covariance Matrix for GPS (n_measurements x n_measurements)
+        #   self.R_ACCEL: Measurement Covariance Matrix for Accelerometer (n_measurements x n_measurements)
+        # Inputs:
+        #   noise_std_GPS: Standard deviation of GPS noise
+        #   noise_std_ACCEL: Standard deviation of Accelerometer noise
         # YOUR CODE HERE
         # -----------------------------------
         # self.X_opt = ...

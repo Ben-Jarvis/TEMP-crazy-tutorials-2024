@@ -91,7 +91,7 @@ class CrazyflieInDroneDome(Supervisor):
         self.laser_down.enable(self.timestep)
         
         # Crazyflie velocity PID controller
-        self.PID_CF = quadrotor_controller()
+        self.PID_CF = quadrotor_controller(exp_num)
         self.PID_update_last_time = self.getTime()
         self.sensor_read_last_time = self.getTime()
         self.step_count = 0
@@ -427,18 +427,18 @@ class CrazyflieInDroneDome(Supervisor):
         # Call appending of states over run
         self.KF.aggregate_states(measured_data_raw, measured_noisy_data, KF_state_outputs, self.getTime())
 
-        if self.KF.use_noisy_measurement:
+        if self.KF.use_direct_noisy_measurement:
             if self.getTime() < 2.0:
                 output_measurement = measured_data_raw
             else:
                 output_measurement = measured_noisy_data.copy()
-        elif self.KF.use_ground_truth_measurement:
-            output_measurement = measured_data_raw.copy()
-        else:
+        elif self.KF.use_KF_measurement:
             if measured_data_raw['z_global'] < 0.49:
                 output_measurement = measured_data_raw
             else:
                 output_measurement = KF_state_outputs.copy()
+        elif self.KF.use_direct_ground_truth_measurement:
+            output_measurement = measured_data_raw.copy()
 
         return output_measurement
     

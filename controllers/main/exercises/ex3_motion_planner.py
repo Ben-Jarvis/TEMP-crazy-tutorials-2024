@@ -44,11 +44,11 @@ class MotionPlanner3D():
         # - path_waypoints: The sequence of input path waypoints provided by the path-planner, including the start and final goal position: Vector of m waypoints, consisting of a tuple with three reference positions each as provided by AStar
 
         # SET AND TUNE THE FOLLOWING PARAMETERS ----------------------------------------------------------------- ##
-        self.disc_steps = 10 #4 #integer number oi steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
-        self.vel_lim = 4.0 #2.0 # m/s
-        self.acc_lim = 25.0 #5.0 # m/s²
+        self.disc_steps = 5 #4 #integer number oi steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
+        self.vel_lim = 2.0 #2.0 # m/s
+        self.acc_lim = 10.0 #5.0 # m/s²
 
-        t_f = 4.0 #10 # Final time at the end of the path # As low as 4 or 5 (3.5)
+        t_f = 10.0 #10 # Final time at the end of the path # As low as 4 or 5 (3.5)
         self.times = np.linspace(0, t_f, len(path_waypoints)) # The time vector at each path waypoint to traverse (Vector of size m) (must be 0 at start)
 
         # path_np = np.array([np.asarray(p) for p in path_waypoints])

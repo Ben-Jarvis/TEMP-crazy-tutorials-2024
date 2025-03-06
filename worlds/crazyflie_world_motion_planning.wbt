@@ -1,11 +1,10 @@
-#VRML_SIM R2023a utf8
+#VRML_SIM R2023b utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/lights/protos/CeilingLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
 EXTERNPROTO "../protos/Pedestrian.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/plants/protos/PottedTree.proto"
 EXTERNPROTO "../protos/Wall.proto"
 
 WorldInfo {
@@ -16,8 +15,8 @@ WorldInfo {
   }
 }
 Viewpoint {
-  orientation 0.0661291978565845 0.9709650449988739 -0.2298995662918472 0.513788599933673
-  position -4.7007920644506305 3.7896252764160114 5.26796386968169
+  orientation 0.5773502691896258 -0.5773502691896258 -0.5773502691896258 4.188785307179587
+  position 2.1470930459220057 1.5615265646845424 11.682701429895696
   follow "crazyflie"
 }
 TexturedBackground {
@@ -89,6 +88,28 @@ Floor {
     roughness 1
     metalness 0
   }
+}
+DEF OBSTACLE3 Solid {
+  translation 3.5 1.5 0.75
+  children [
+    DEF CYLINDER_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "./textures_epfl_lis/obstacle_cylinder.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+      }
+      geometry Cylinder {
+        height 1.48
+        radius 0.2
+      }
+    }
+  ]
+  name "obstacle-C3(1)"
+  boundingObject USE CYLINDER_SHAPE
 }
 DEF WALL_LEFT Solid {
   translation 3 5 3
@@ -355,7 +376,4 @@ Pedestrian {
 Wall {
   translation 2.75 1.125 0
   size 0.5 2.25 1.5
-}
-PottedTree {
-  translation 3.5 1.5 0
 }
