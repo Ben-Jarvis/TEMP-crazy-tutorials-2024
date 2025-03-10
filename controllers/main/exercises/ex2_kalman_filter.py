@@ -12,7 +12,7 @@ class kalman_filter():
         self.noise_std_ACCEL = 0.05
 
         #Tuning parameter
-        self.q_tr = 1.0 # Tuning parameter for process noise
+        self.q_tr = 1.0 # Tuning parameter for process noise (Part 3)
 
         #Initialize KF state and model uncertainty
         self.initialize_KF(self.noise_std_GPS, self.noise_std_ACCEL)
