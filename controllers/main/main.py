@@ -11,7 +11,7 @@ import lib.mapping_and_planning_examples as mapping_and_planning_examples
 import time, random
 import threading
 
-exp_num = 2                     # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
+exp_num = 3                    # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
 control_style = 'path_planner'      # 'keyboard' or 'path_planner'
 rand_env = False                # Randomise the environment
 
@@ -44,7 +44,7 @@ class CrazyflieInDroneDome(Supervisor):
         self.m4_motor.setPosition(float('inf'))
         self.m4_motor.setVelocity(1)
 
-        self.meas_state_gps = np.zeros((2,1))
+        self.meas_state_gps = np.zeros((3,1))
         self.meas_state_accel = np.zeros((3,1))
 
         self.accel_read_last_time = 0.0
