@@ -1,190 +1,98 @@
-Exercise 2: Kalman Filtering
+Exercise 3: Motion Planning
 ==================================
 
-You have now already seen how to tune a cascaded PID controller to achieve accurate and fast waypoint flight with a quadrotor.
-Up to this point, the measurement data that you have used for PID control feedback is the ground-truth (or noise-free) 
-measurement which was sampled at every control step.
-
-In reality, we are however faced with noisy sensor measurements and typically use a combination of mutliple sensors, each measuring different quantities with different noise levels at different time intervals, to obtain the state feedback for our controller.
-This is where sensor fusion comes into play. As you have seen in the lecture, the Kalman Filter is a powerful and elegant sensor fusion technique that can both fuse measurements from different sensors and provide state estimates for control feedback at arbitrary time steps.
-With this method, you will see that your quadrotor can stay on track in noisy, real world environments!
+In this exercise, you will explore motion planning between waypoints using polynomial trajectories. 
+Given pre-planned path waypoints, your goal is to calculate minimum-jerk polynomial trajectories and make your drone navigate through a field of obstacles safely, smoothely and as fast as possible!
 
 Task description
 -----------------
 
-In this task, you will implement a Kalman Filter in the file **kalman_filter.py** and explore how it can significantly improve the performance of a closed loop cascaded PID controller in a noisy real-world scenario.
+First, in Webots, open **crazyflie_world-motion_planning.wbt** and take a look at the obstacle map, it should look as shown in the Figure below.
 
-Besides the Gyroscope, for this exercise, the Crazyflie drone is equipped with a GPS and an Accelerometer. 
-
-These provide the following translational sensor measurements for your implementation:
-
-- GPS: Global X,Y,Z position
-- Accelerometer: Global X,Y,Z accelerations (are already transformed from body frame for you in this exercise)
-
-Each of the sensors in the simulation and the PID controller furthermore run at the following individual update intervals:
-
-- GPS: 24 milliseconds
-- Accelerometer: 16 milliseconds
-- PID Controller: 16 milliseconds
-
-As we are considering real sensor data, the GPS and the Accelerometer measurements posess a so-called "Gaussian" noise with a 
-certain standard deviation from the true measurement, defined respectively as std_GPS = 0.2 meters and std_ACCEL = 0.02 m/s².
-
-(**Note**: These do not correspond to the typical update rates and noise variations of real-world sensors)
-
-Let us first look at position and acceleration data obtained from these noisy measurements below:
-
-.. FIGURE (Noisy position and acceleration)
-
-.. image:: Figures/True_and_Noisy_Measurements_NO_KF_FB_USE.png
-  :width: 650
-  :alt: Noisy and Ground truth measurements obtained from GPS and Accelerometer
+.. image:: Figures/crazyflie_world_motion_planning.png
+  :width: 750
+  :alt: Webots obstacle map
   :align: center
 
-To obtain the missing velocity measurements which are required for our PID controller, in a manner similar to the previous exercise, we can start by differentiating the noisy GPS position over every control interval. 
-By comparing this estimate to the ground-truth velocity as shown below, we however observe that the velocity estimates are even noisier than the position measurements and far from accurate:
+The map shows a take-off location, some obstacles and even a small gap through which you must plan a smooth path in order to reach your final goal.
+The final goal is indicated by a pink square.
 
-.. FIGURE (Figure of velocity noise)
+With **exp_num = 3** in **main.py**, launch the simulation. You will see a waypoint map in a 3D environment, as shown below:
 
-.. image:: Figures/True_and_Noisy_Velocity_Measurements_NO_KF_FB_USE.png
-  :width: 650
-  :alt: Noisy and ground truth velocity measurements derived from GPS data
+.. image:: Figures/Figure_waypoints_only.png
+  :width: 750
+  :alt: 3D AStar path waypoints
   :align: center
 
-When feeding these measurements directly into our cascaded PID controller, we then see the catastrophic results:
+The red waypoints are planned using a 3D A* path planner, giving you the shortest path to reach the final goal while avoiding all obstacles.
+However, A* assumes separate straight-line connections between the waypoints, such that your drone movements will not be smooth while following this path.
 
-.. image:: Figures/crazyflie_world_excercise_2_noisy_feedback.gif
-  :width: 650
-  :alt: Noisy and ground truth velocity measurements derived from GPS data
-  :align: center
-
-As you will see later in this exercise, relying on the integration of accleration measurements for the same purpose yields similarly unsatisfactory results.
-
-Therefore, to remedy this problem, given the noisy GPS and Acclerometer measurements and using the provided theory from the lecture, you will implement a Kalman Filter that returns much better state estimates for three-dimensional position, velocity and acceleration, yielding better performance despite noise.
-Your drone should then remain in flight throughout the parcours and you can modify process parameters to improve the performance of your controller with the Kalman Filter!
+To improve smoothness and plan a feasible trajectory for the drone to follow, you will calculate polynomial trajectories that are continouous in velocity, acceleration, snap and jerk about every waypoint.
 
 Exercise
 ---------
 
 Part 1 - Implementation
-------------------------
-You will begin by implementing your Kalman Filer code in the file **kalman_filter.py**. 
+-------------------------------------------
+You will implement your code in the file **ex3_motion_planner.py**.
 
-The state prediction vector is represented by a 9 x 1 column vector and must be ordered as: 
-
-[X Position, X Velocity, X Acceleration, Y Position, Y Velocity, Y Acceleration, Z Position, Z Velocity, Z Acceleration]
+It is suggested to take the lecture slides as a reference for the motion planner implementation.
 
 **Hint**: For matrix multiplications with two-dimensional numpy arrays, use numpy.matmul or the python operator "@" 
 
-1. First, go to the function **initialize_KF** which initializes the Kalman Filter parameters. In this function:
+1. Go to the function *compute_poly_matrix*. This function defines a matrix *A_m(t)* such that :math:'x_m(t) = A_m(t)c_m' at a given time *t*, where x_m(t) = [x, \dot{x}, \ddot{x}, \dddot{x}, \ddddot{x}]^T  and the unknown polynomial coeffcients of a path segment are given as :math:'c_m = [c_0,m, c_1,m, c_2,m,  c_3,m, c_4,m, c_5,m]^T'. This will later be used to define the constraint system of equations at every path segment.
 
-  a) Initialize the optimal state estimate **self.X_opt** and prediction covariance **self.P_opt**.
+  a) By hand, calculate x_m(t) = [x, \dot{x}, \ddot{x}, \dddot{x}, \ddddot{x}]^T based on the given mimimum-jerk trajectory solution x(t) from the lecture.
 
-  b) Define the sensor measurement matrices **self.H_GPS** and **self.H_ACCEL**.
+  b) From your solution, implement *A_m* as a 2D 5 x 6 np.array in function of *t* such that it fulfills the system :math:'x_m(t) = A_m(t)c_m'.
 
-  c) Given the measurement noise standard deviation inputs **noise_std_GPS** and **noise_std_ACCEL**, define the masurement uncertainty matrices **self.R_GPS** and **self.R_ACCEL**.
+2. Go to the function *compute_poly_coefficients*. This function takes in the AStar waypoints *path_waypoint* and then creates and solves the entire system of constraint equations **A * c = b** to yield the polynomial coefficients for each of the *m* path segments between the start and goal position.
+   Here, the rows of the matrix **A** and vector **b** are to be filled to represent all initial and final position, velocity and acceleration constraints as well as the conitnuity constraints for position, velocity, acceleration, snap and jerk between two consecutive path segments.
+   To help your implementation, you are given the vector *seg_times*, which contains the relative duration of each path segment as derived from *self.times*. The variable *m* contains the total number of path segments.
+   For each dimension in x,y and z direction, the matrix **A** and vector **b** are initialized and the vector of *m* waypoint positions is given. An example of how to use the *compute_poly_matrix* function to obtain entries of A at the start of a path segment (t=0) is provided.
 
-2. The function **KF_state_propagation** performs the propagation of the optimal state (**self.X_opt**) 
-and optimal prediction covariance (**self.P_opt**) obtained at the time of the last sensor measurement over a specified time-interval **dt**. In this function:
+  a) For every dimension x, y, and z, iterate through the path segments to calculate all 6*(m-1) rows of the matrix **A** and the vector **b**. The entries of A can be determined by calling the function *compute_poly_matrix* with t=0 for constraints at the start of a path segment or at the entry *seg_times[i]* for constraints at the end of a segment. At the start and end of the entire path, the velocities and accelerations must be zero.
 
-  a) Given the propagation time **dt** as the function input, define the transition matrix **A_trans** for a particle with constant accleration as seen in the lecture.
+  b) Solve the system **A * c = b** for every x,y and z dimension. The coefficent vector **c** for each dimension is then added to a 2D np.array *poly_coeffs* of dimensions (6(m-1) x 3).
 
-  b) As described in the lecture, update both the values of the state prediction **X_pred** and prediction covariance **P_pred**, given the transition matrix **A_trans**, the provided process uncertainty matrix **Q_trans**, the previous optimal state **self.X_opt** and the optimal prediction covariance **self.P_opt**.
+3. When all functions are implemented, run the simulation in Webots. You should see a trajectory plotted in blue at the start of the simulation (as per the figure below).
 
-  c) Return **X_pred** and **P_pred**.
+   To validate your implementation, check the following: Does the trajectory pass through all of the red waypoints? Does the trajectory intersect any of the grey obstacles? Does the trajectory appear continouous about the waypoints?
 
-3. The function **KF_sensor_fusion** performs the fusion of sensor measurements and calculates the new **self.X_opt** and **self.P_opt** once a sensor measurement is received. In this function:
+   When you are happy with your trajectory, close the plot and watch the simulation run. The drone should smoothly follow the trajectory and avoid the obstacles.
 
-  a) Calculate the Kalman Filter gain **K** as seen in the lecture, given the input measurement matrix **H**, measurement uncertainty matrix **R**, the obtained measurement **Z**, the propagated state **X_pred** and propagated covariance **P_pred**.
-
-  b) Implement the sensor fusion rule to update the new values of **self.X_opt** and **self.P_opt**.
-
-4. The function **KF_estimate** returns the state estimate **X_est** and prediction covariance **P_est** when demanded by calling the state propagation and sensor fusion functions according to the latest received sensor measurement(s).
-
-  In this function, the following inputs are provided:
-    - **sensor_state_flag**: Indicates the measurement(s) obtained at the current timestep, can take the values: {0: No measurement received, 1: GPS measurement received, 2: Accelerometer measurement received, 3: GPS and Accelerometer measurement received simultaneousy}.
-    - **dt_last_measurement**: The elapsed time since the latest received sensor measurement(s). 
-
-  By calling the functions **KF_sensor_fusion** and **KF_state_propagation** and using **sensor_state_flag**, you should implement the followoing:
-
-  a) Propagate the current optimal Kalman filter state by the provided input time interval **dt_last_measurement** to yield the propragated Kalman Filter state (**X_prop**) and prediction covariance estimates (**P_prop**).
-
-  b) When either a GPS or an Accelerometer (but not both) measurements is received, using appropriate values for **R**, **H** and **Z** with the **KF_sensor_fusion** function, calculate and return the new optimal state (**self.X_opt**) and prediction covariance (**self.P_opt**).
-
-  c) Return the final state and prediction covariance estimates depending on each case as **X_est** and **P_est**.
-
-  When both measurements are received simultaneously, both measurements are fused sequentially. This case is provided to you as an example in the function.
-
-To test your implementation, first set **self.use_ground_truth_measurement = True** and compare your Kalman Filter estimate to the ground truth using the plots generated at the end of the run.
-Your results should look similar to the plots below:
-
-.. image:: Figures/position_estimates_truth_KF_NO_KF_FB.png
-  :width: 650
-  :alt: Noisy and Kalman filter position estimates for drone parcours flight
+   .. image:: Figures/Figure_traj.png
+  :width: 750
+  :alt: Polynomial trajetory and 3D waypoints in obstacle map
   :align: center
 
-.. image:: Figures/velocity_estimates_truth_KF_NO_KF_FB.png
-  :width: 650
-  :alt: Noisy and Kalman filter velocity estimates for drone parcours flight
+  .. image:: Figures/crazyflie_world_motion_planning_traj_run.gif
+  :width: 750
+  :alt: Polynomial trajetory and 3D waypoints in obstacle map Simulation run
   :align: center
 
-If you are happy with the filtering performance, run the PID controller with the activated noisy measurements and a running Kalman Filter. 
-To do this, set **self.use_ground_truth_measurement = False**, **self.use_noisy_measurement = False** and **self.use_accel_only = False**. 
-
-You should now see a smooth tracking performance. How do your run times compare to the case with ground truth feedback? 
-
-.. image:: Figures/crazyflie_world_excercise_2_KF_success_new_PID.gif
-  :width: 650
-  :alt: Performance of drone parcours flight with Kalman Filter estimate
-  :align: center
-
-Observation: Check how the state estimate at the start of the trajectory takes several seconds to converge towards the ground truth value. This leads to the noticeable oscillations in flight bahavior when taking-off and when heading towards the first trajectory waypoint.
-The use of better methods to initialize the Kalman filter, tuning the process covariance or de-tuning the aggressive gains of the PID controller during take-off can help to reduce these effects in real-life.
-
-Part 2 - Relying on the Accelerometer 
+Part 2 - Trajectory finetuning
 -------------------------------------------
 
-With the implemented Filter, let us look at what happens when we only measure and propagate accelerations from the 
-acclerometer but do not correct our estimates with exact GPS measurements.
+1. It is possible that you see your drone moving in a rather jagged fashion between certain waypoints or, in the worst case, even collides with obstacles. This means that the polynomial trajectory should be discretized at smaller intervals to be used as a reference by the drone controller.
 
-For this, within your implemented Kalman Filter class, set **self.use_accel_only = True** and re-run the simulation.
+  a) In the function *init_params*, the variable *self.disc_steps* can be used to tune this. Increase this value in small increments until you see smoother motion.
 
-Your drone movement should show a noticeable change after taking off, similar to this scenario:
+2. When your drone moves sufficiently smoothly and you obtain no collisions, study the vector *self.times*. Every entry in this vector corresponds to the predefined absolute time at which the drone should pass a corresponding waypoint. 
+  **Note:** At the starting point, *self.times[0] = 0*. At the goal position the last entry self.times[m-1] corresponds to a final time *t_f* taken to fly all *m* trajectory segments.
 
-.. image:: Figures/crazyflie_world_excercise_2_ACCEL_DRIFT.gif
-  :width: 650
-  :alt: Drone parcours flight with Kalman Filter estimate using only the accelerometer
-  :align: center
-
-A comparison of the ground truth and Kalman Filter estimate then looks like this:
-
-.. image:: Figures/position_estimates_truth_KF_ACCEL.png
-  :width: 650
-  :alt: Performance of drone parcours flight with Kalman Filter estimate using only the accerlometer
-  :align: center
-
-What do you observe? Why does this happen?
-
-As we only obtain accelerometer measurements but never correct our state estimate with a true (be it noisy) position estimate, the position and velocities are determined solely by integration of the accelerations.
-The position and velocity estimates therefore "drift" away from the true value as the uncertainty becomes larger and larger over time. This is called sensor drift and is a commonly observed phenomenon when working with accelerometers.
+  a) You can now reduce the total time taken for your drone to reach the goal point by changing the variable *t_f*. At the start of every run, you will further see the maximum velocity and acceleration achieved during the run. Upon trajectory completion, the total time taken is displayed and should approximately coincide with the value of *t_f*. 
+     If you obtain an assertion error that these values exceed the specified limits, increase *self.vel_lim* and *self.acc_lim* accordingly. How low can you set your time without crashing the drone?
+  
+  b) (BONUS) The vector *self.times* is implemented such that every path segment should be completed within the same amount of time. However, depending on the length of each path segment, this may mean that in certain path segments your drone is constrained to accelerate faster if the path segment is long or slower if it is short. 
+     Can you modify the vector *self.times* to yield a better distribution of times, such that the indicated average velocity and peak acceleration are lower? Can you achieve an even faster time to complete the run without crashing with your implementation?
 
 
-Part 3 - Process Covariance Tuning (Bonus)
-----------------------------------------------------------------------
+Part 3 - Collision replanning (BONUS)
+--------------------------------------------
 
-A variable parameter of the Kalman Filter is the Process Covariance (**Q**). In our implementation, the process covariance is affected by the coefficient variable **self.q_tr**.
-This parameter describes the uncertainty associated with the classical Kalman Filter assumption that the drone undergoes motions with constant acceleration over a single prediction timestep.
-
-In simpler words:
-
-  - If **self.q_tr = 0**, we assume that the drone undergoes motions which perfectly match the piecewise constant acclereration assumption. Therefore, the Kalman Filter will rely heavily on our model prediction to provide an accurate state estimate.
-
-  - If **self.q_tr >> 0**, we assume that the drone undergoes motions which are different to the piecewise constant accleration assumption. Therefore, with a higher **self.q_tr**, the Kalman Filter will rely more heavily on the noisy sensor measurements to provide a more accurate state estimate.
-
-Starting with **self.q_tr = 0**, increase **self.q_tr** by small increments and investigate how this affects the behavior of the drone in the parcours.
-You can then keep tuning this coeffcient to find the lowest possible total run-time!
-
-**Note:** There are more advanced mehtods to determine your process covariance. An ideal process covariance may for instance be calculated from the variance between the predicted and measured accelerations along the parcours.
+When flying aggresively, your drone may have some close calls with obstacles and the poor PhD student that is stuck in the drone dome :(
+Can you replan the trajectory to add path waypoints that ensure a larger margin to obstacles? You can implement this in the function *collision_replanning*, set the *replan_flag = True* and redefine the variable *self.path* to add a second re-planning step.
 
 ====================================================================================
 Any questions about the exercise, please contact Julius Wanner (julius.wanner@epfl.ch).
