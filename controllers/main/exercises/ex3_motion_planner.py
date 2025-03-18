@@ -16,16 +16,14 @@ class MotionPlanner3D():
         # - goal: The final goal position of the drone (tuple of 3) 
         
         ## DO NOT MODIFY --------------------------------------------------------------------------------------- ##
-        ast = AStar3D(start, goal, grid_size, obstacles, bounds)
-        self.path = ast.find_path()
+        self.ast = AStar3D(start, goal, grid_size, obstacles, bounds)
+        self.path = self.ast.find_path()
 
         self.trajectory_setpoints = None
 
         self.init_params(self.path)
 
         self.run_planner(obstacles, self.path)
-
-        self.collision_replanning(self.trajectory_setpoints, obstacles)
 
         # ---------------------------------------------------------------------------------------------------- ##
 
@@ -34,8 +32,7 @@ class MotionPlanner3D():
          ## DO NOT MODIFY --------------------------------------------------------------------------------------- ##
     
         poly_coeffs = self.compute_poly_coefficients(path_waypoints)
-        self.trajectory_setpoints, self.time_setpoints = self.poly_setpoint_extraction(poly_coeffs)
-        self.plot(obs, path_waypoints, self.trajectory_setpoints)
+        self.trajectory_setpoints, self.time_setpoints = self.poly_setpoint_extraction(poly_coeffs, obs, path_waypoints)
 
         ## ---------------------------------------------------------------------------------------------------- ##
 
@@ -45,7 +42,7 @@ class MotionPlanner3D():
         # - path_waypoints: The sequence of input path waypoints provided by the path-planner, including the start and final goal position: Vector of m waypoints, consisting of a tuple with three reference positions each as provided by AStar
 
         # TUNE THE FOLLOWING PARAMETERS (PART 2) ----------------------------------------------------------------- ##
-        self.disc_steps = 3 #Integer number steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
+        self.disc_steps = 2 #Integer number steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
         self.vel_lim = 2.0 #Velocity limit of the drone (m/s)
         self.acc_lim = 10.0 #Acceleration limit of the drone (m/s²)
         t_f = 10.0  # Final time at the end of the path (s)
@@ -59,8 +56,8 @@ class MotionPlanner3D():
         # Inputs:
         # - t: The time of evaluation of the A matrix (t=0 at the start of a path segment, else t >= 0) [Scalar]
         # Outputs: 
-        # - The constraint matrix "A(t)" [5 x 6]
-        # The "A_m" matrix is used to represent the system of equations [x, \dot{x}, \ddot{x}, \dddot{x}, \ddddot{x}]^T  = A(t) * poly_coeffs (where poly_coeffs = [c_0, c_1, c_2, c_3, c_4, c_5]^T and represents the unknown polynomial coefficients for one segment)
+        # - The constraint matrix "A_m(t)" [5 x 6]
+        # The "A_m" matrix is used to represent the system of equations [x, \dot{x}, \ddot{x}, \dddot{x}, \ddddot{x}]^T  = A_m(t) * poly_coeffs (where poly_coeffs = [c_0, c_1, c_2, c_3, c_4, c_5]^T and represents the unknown polynomial coefficients for one segment)
         A_m = np.zeros((5,6))
         
         # TASK: Fill in the constraint factor matrix values where each row corresponds to the positions, velocities, accelerations, snap and jerk here
@@ -95,41 +92,31 @@ class MotionPlanner3D():
             A = np.zeros((6*(m-1), 6*(m-1)))
             b = np.zeros(6*(m-1))
             pos = np.array([p[dim] for p in path_waypoints])
-            A_0 = self.compute_poly_matrix(0) # Example: A_0 gives the constraint factor matrix for a segment at t=0    
+            A_0 = self.compute_poly_matrix(0) # A_0 gives the constraint factor matrix A_m for any segment at t=0, this is valid for the starting conditions at every path segment
+
+            for i in range(m-1):
+                pos_0 = pos[i] #Starting position of the segment
+                pos_f = pos[i+1] #Final position of the segment
+                # The prescribed zero velocity (v) and acceleration (a) values at the start and goal position of the entire path
+                v_0, a_0 = 0, 0
+                v_f, a_f = 0, 0
+                A_f = self.compute_poly_matrix(seg_times[i]) # A_f gives the constraint factor matrix A_m for a segment i at its relative end time t=seg_times[i]
+                if i == 0: # First path segment
+                    # 1. Implement the initial constraints here for the first segment using A_0
+                    # 2. Implement the final position and the continuity constraints for velocity, acceleration, snap and jerk at the end of the first segment here using A_0 and A_f (check hints in the exercise description)
+                elif i < m-2: # Intermediate path segments
+                    # 1. Similarly, implement the initial and final position constraints here for each intermediate path segment
+                    # 2. Similarly, implement the end of the continuity constraints for velocity, acceleration, snap and jerk at the end of each intermediate segment here using A_0 and A_f
+                elif i == m-2: #Final path segment
+                    # 1. Implement the initial and final position, velocity and accelerations constraints here for the final path segment using A_0 and A_f
+        
+            # Solve for the polynomial coefficients for the dimension dim
 
             # poly_coeffs[:,dim] = ...
 
         return poly_coeffs
-    
-    def collision_replanning(self, trajectory_setpoints, obs):
-        # Inputs:
-        # - obs: 2D array with obstacle locations and obstacle widths [x, y, z, dx, dy, dz]*n_obs
-        # - trajectory_setpoints: Discretized trajectory x/y/z/yaw setpoints ((self.disc_steps*m) x 4)
-        # Check if a point (x, y, z) is inside an obstacle
 
-        replan_flag = False
-
-        if replan_flag:
-            x_vals, y_vals, z_vals = trajectory_setpoints[:,0], trajectory_setpoints[:,1], trajectory_setpoints[:,2]
-            d_margin = 0.25 #Added obstacle margin
-            for i in len(trajectory_setpoints):
-                for ob in obs:
-                    if x_vals[i] >= ob[0] - d_margin and x_vals[i] <= ob[0] + ob[3] + d_margin and y_vals[i] >= ob[1] - d_margin and y_vals[i] <= ob[1] + ob[4] + d_margin and z_vals[i] >= ob[2] - d_margin and z_vals[i] <= ob[2] + ob[5] + d_margin:
-                        # YOUR SOLUTION HERE (Part 3 - BONUS)
-                        # Replan trajectory segment starting from previous point to next AStar reference to avoid obstacle
-                        # Choose a new reference point outside of obstacle space
-
-                        x_ref = (6,1,1) #Example: Tuple of path waypoint
-                
-                        # Add reference point to path and update self.path variable
-                        # ------------------------------------------------
-                        # self.path = 
-                        
-            # Call run_planner again to find new path and replot, DO NOT MODIFY
-            self.init_params(self.path)
-            self.run_planner(obs, self.path)
-
-    def poly_setpoint_extraction(self, poly_coeffs):
+    def poly_setpoint_extraction(self, poly_coeffs, obs, path_waypoints):
 
         # DO NOT MODIFY --------------------------------------------------------------------------------------- ##
 
@@ -161,12 +148,20 @@ class MotionPlanner3D():
             a_y_vals[i,:] = np.dot(self.compute_poly_matrix(t-self.times[seg_idx])[2],coeff_y[seg_idx*6:(seg_idx+1)*6])
             a_z_vals[i,:] = np.dot(self.compute_poly_matrix(t-self.times[seg_idx])[2],coeff_z[seg_idx*6:(seg_idx+1)*6])
 
+        yaw_vals = np.zeros((self.disc_steps*len(self.times),1))
+        trajectory_setpoints = np.hstack((x_vals, y_vals, z_vals, yaw_vals))
+
+        self.plot(obs, path_waypoints, trajectory_setpoints)
+            
         # Find the maximum absolute velocity during the segment
         vel_max = np.max(np.sqrt(v_x_vals**2 + v_y_vals**2 + v_z_vals**2))
         vel_mean = np.mean(np.sqrt(v_x_vals**2 + v_y_vals**2 + v_z_vals**2))
         acc_max = np.max(np.sqrt(a_x_vals**2 + a_y_vals**2 + a_z_vals**2))
+        acc_mean = np.mean(np.sqrt(a_x_vals**2 + a_y_vals**2 + a_z_vals**2))
+
         print("Maximum flight speed: " + str(vel_max))
         print("Average flight speed: " + str(vel_mean))
+        print("Average flight acceleration: " + str(acc_mean))
         print("Maximum flight acceleration: " + str(acc_max))
         
         # Check that it is less than an upper limit velocity v_lim
@@ -174,9 +169,6 @@ class MotionPlanner3D():
         assert acc_max <= self.acc_lim, "The drone acceleration exceeds the limit acceleration : " + str(acc_max) + " m/s²"
 
         # ---------------------------------------------------------------------------------------------------- ##
-        
-        yaw_vals = np.zeros((self.disc_steps*len(self.times),1))
-        trajectory_setpoints = np.hstack((x_vals, y_vals, z_vals, yaw_vals))
 
         return trajectory_setpoints, time_setpoints
     
