@@ -101,14 +101,14 @@ class MotionPlanner3D():
                 v_0, a_0 = 0, 0
                 v_f, a_f = 0, 0
                 A_f = self.compute_poly_matrix(seg_times[i]) # A_f gives the constraint factor matrix A_m for a segment i at its relative end time t=seg_times[i]
-                if i == 0: # First path segment
-                    # 1. Implement the initial constraints here for the first segment using A_0
-                    # 2. Implement the final position and the continuity constraints for velocity, acceleration, snap and jerk at the end of the first segment here using A_0 and A_f (check hints in the exercise description)
-                elif i < m-2: # Intermediate path segments
-                    # 1. Similarly, implement the initial and final position constraints here for each intermediate path segment
-                    # 2. Similarly, implement the end of the continuity constraints for velocity, acceleration, snap and jerk at the end of each intermediate segment here using A_0 and A_f
-                elif i == m-2: #Final path segment
-                    # 1. Implement the initial and final position, velocity and accelerations constraints here for the final path segment using A_0 and A_f
+                # if i == 0: # First path segment
+                #     # 1. Implement the initial constraints here for the first segment using A_0
+                #     # 2. Implement the final position and the continuity constraints for velocity, acceleration, snap and jerk at the end of the first segment here using A_0 and A_f (check hints in the exercise description)
+                # elif i < m-2: # Intermediate path segments
+                #     # 1. Similarly, implement the initial and final position constraints here for each intermediate path segment
+                #     # 2. Similarly, implement the end of the continuity constraints for velocity, acceleration, snap and jerk at the end of each intermediate segment here using A_0 and A_f
+                # elif i == m-2: #Final path segment
+                #     # 1. Implement the initial and final position, velocity and accelerations constraints here for the final path segment using A_0 and A_f
         
             # Solve for the polynomial coefficients for the dimension dim
 
@@ -207,7 +207,7 @@ class MotionPlanner3D():
         ax.set_xlabel("X Position")
         ax.set_ylabel("Y Position")
         ax.set_zlabel("Z Position")
-        ax.set_title("3D Minimum-Jerk Trajectory")
+        ax.set_title("3D Motion planning trajectories")
         ax.legend()
         plt.show()
 

@@ -53,8 +53,8 @@ It is suggested to take the lecture slides as a reference for the motion planner
    For each dimension in x,y and z direction, the matrix :math:`A_{tot}` and vector :math:`b_{tot}` and an array *pos* containing *m* waypoint positions for the respective dimension are already initialized. 
    
    Before you begin, check the uses of the function *compute_poly_matrix* provided in the function. The matrix *A_0* is calculated as :math:`A_m(t=0)` and remains constant for every path segment. You can use this matrix to fill the the rows of **A** with the initial constraints for velocity, acceleration and position.
-   Similarly, *A_f* is calculated as :math:`A_m(t=seg_times[i])` to describe the constraint matrix entries at the end of the i-th path segment. You can use this matrix to define your final constraints for velocity, acceleration and position.
-   To define the continuity constraints for position, velocity, acceleration, snap and jerk between two consecutive path segments, you can use the matrices *A_0* and *A_f* for the i-th and i+1-th path segment, filling the roes of :math:`A_{tot}` such that :math:`x_{m,i}(t=seg_times[i])` = :math:`x_{m,i+1}(t=0)`.
+   Similarly, *A_f* is calculated as :math:`A_m(t=\text{seg_times[i]})` to describe the constraint matrix entries at the end of the i-th path segment. You can use this matrix to define your final constraints for velocity, acceleration and position.
+   To define the continuity constraints for position, velocity, acceleration, snap and jerk between two consecutive path segments, you can use the matrices *A_f* and *A_0* for the respective i-th and i+1-th path segment, filling the rows of :math:`A_{tot}` such that :math:`x_{m,i}(t=\text{seg_times[i}])` = :math:`x_{m,i+1}(t=0)`.
 
   a) For every dimension x, y, and z, iterate through the path segments to fill all 6*(m-1) rows of the matrix :math:`A_{tot}` and the vector :math:`b_{tot}` using the matrices *A_0* and *A_f* as described above.
 
@@ -66,7 +66,7 @@ It is suggested to take the lecture slides as a reference for the motion planner
 
   When you are happy with your trajectory, close the plot and watch the simulation run. The drone should smoothly follow the trajectory and avoid the obstacles.
 
-  *Note:* If you receive an assertion error regarding the exceeding of velocity and acceleration limits, there are errors in your implementation.
+  *Note:* If you receive an assertion error regarding the exceeding of the original velocity and acceleration limits, there are errors in your implementation.
 
   .. image:: Figures/Figure_traj.png
     :width: 800

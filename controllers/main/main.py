@@ -4,7 +4,7 @@ import numpy as np
 from controller import Supervisor, Keyboard
 from exercises.ex1_pid_control import quadrotor_controller
 from exercises.ex2_kalman_filter import kalman_filter as KF
-from exercises.ex3_motion_planner_solution import MotionPlanner3D as MP
+from exercises.ex3_motion_planner import MotionPlanner3D as MP
 import exercises.ex0_rotations as ex0_rotations
 from scipy.spatial.transform import Rotation as R
 import lib.mapping_and_planning_examples as mapping_and_planning_examples

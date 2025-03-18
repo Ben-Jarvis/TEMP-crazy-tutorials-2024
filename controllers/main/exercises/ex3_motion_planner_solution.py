@@ -283,7 +283,7 @@ class MotionPlanner3D():
         ax.set_xlabel("X Position")
         ax.set_ylabel("Y Position")
         ax.set_zlabel("Z Position")
-        ax.set_title("3D Minimum-Jerk Trajectory")
+        ax.set_title("3D Motion planning trajectories")
         ax.legend()
         plt.show()
 
