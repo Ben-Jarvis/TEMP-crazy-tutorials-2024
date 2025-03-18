@@ -46,7 +46,7 @@ It is suggested to take the lecture slides as a reference for the motion planner
 
 2. Go to the function *compute_poly_coefficients*. This function takes in the A* waypoints *path_waypoints* and creates and solves the entire system of constraint equations :math:`A_{tot}c = b_{tot}` to yield the polynomial coefficients :math:`c` for all of the *m* path segments between the start and goal position.
    
-   Here, your taks is to fill the *6(m-1)* rows of the matrix :math:`A_{tot}` and vector :math:`b_{tot}` to contain all initial and final position, velocity and acceleration constraints as well as the conitnuity constraints for position, velocity, acceleration, snap and jerk between two consecutive path segments.
+   Here, your taks is to fill the *6(m-1)* rows of the matrix :math:`A_{tot}` and vector :math:`b_{tot}` to contain all initial and final position, velocity and acceleration constraints as well as the continuity constraints for position, velocity, acceleration, snap and jerk between two consecutive path segments.
    
    To help your implementation, you are given the vector *seg_times*, which contains the relative duration of each path segment as derived from *self.times*. The variable *m* contains the total number of path segments.
    
