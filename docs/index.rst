@@ -21,7 +21,6 @@ This documentation shows the project description, step-by-step software implemen
    exercise_3/exercise_3_description
    assignment/project_description
    assignment/simulation_quickstart
-   assignment/examples
    assignment/leaderboard
    assignment/hardware_instruction
    assignment/hardware_quickstart

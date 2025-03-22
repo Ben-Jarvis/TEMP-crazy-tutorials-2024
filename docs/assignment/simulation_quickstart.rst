@@ -20,6 +20,6 @@ In **main.py**, **choose exp_num = 4** for this assignment.
 
 Switch **control_syle = 'keyboard'** to fly on your own (W: forward, S: backward, A: left, D: right, Q: yaw left, E: yaw right, C: lower altitude, V: higher altitude). 
 
-Switch **control_syle = 'autonomous'** to choose automatic control. You can edit your own algorithm in **my_control.py**, **get_command()**. This function maps sensor inputs to control commands (velocity forwards, velocity sidewards, altitude, yaw rate).
+Switch **control_syle = 'autonomous'** to choose automatic control. You can edit your own algorithm in **ex1_pid_control.py** and **ex_3_motion_planner.py**.
 
-For submission and grading, we only consider the **my_control.py** file. Details on how to submit can be found in the section “Leaderboard”.
+For submission and grading, we only consider those two files. Details on how to submit can be found in the section “Leaderboard”.
