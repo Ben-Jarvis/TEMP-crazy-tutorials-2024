@@ -18,7 +18,7 @@ Controller switch
 -----------------
 In **main.py**, **choose exp_num = 4** for this assignment. 
 
-Switch **control_syle = 'keyboard'** to fly on your own (W: forward, S: backward, A: left, D: right, Q: yaw left, E: yaw right, C: lower altitude, V: higher altitude). 
+Switch **control_syle = 'keyboard'** to fly on your own. 
 
 Switch **control_syle = 'autonomous'** to choose automatic control. You can edit your own algorithm in **ex1_pid_control.py** and **ex_3_motion_planner.py**.
 
