@@ -8,7 +8,7 @@ In the remaining weeks of the course, all students will then compete as groups t
 Simulation Task overview (individual work)
 -------------------------
 
-.. image:: race_track.pdf
+.. image:: race_track.png
   :width: 650
   :alt: objective figure
 
