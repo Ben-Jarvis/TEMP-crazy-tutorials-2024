@@ -89,7 +89,7 @@ def trajectory_tracking(sensor_data, dt, timepoints, setpoints, tol):
 
     # Take off 
     if on_ground and sensor_data['z_global'] < start_point[2] - 0.01:
-        current_setpoint = start_point
+        current_setpoint = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global'] + 0.5, sensor_data['yaw']]
         return current_setpoint
     else:
         on_ground = False
@@ -100,7 +100,7 @@ def trajectory_tracking(sensor_data, dt, timepoints, setpoints, tol):
             index_current_setpoint == 1
         else:
             timer += dt
-        
+
     # Determine the current setpoint based on the time
     if not on_ground and timer is not None:
         if index_current_setpoint < len(timepoints) - 1:

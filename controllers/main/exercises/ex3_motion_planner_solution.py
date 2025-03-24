@@ -7,15 +7,18 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 class MotionPlanner3D():
     
     #Question: SIMON PID, what is vel_max set for PID? Check should be same here
-    def __init__(self, start, obstacles, bounds, grid_size, goal):
+    def __init__(self, use_AStar = False, start = None, obstacles = None, bounds = None, grid_size = None, goal = None):
         # Inputs:
         # - path: The sequence of input path waypoints provided by the path-planner, including the start and final goal position: Vector of m waypoints, consisting of a tuple with three reference positions each as provided by AStar 
         # - time: The predefined vector of times corresponding to each path waypoint to traverse (Vector of size m) (must be 0 at start)
         # - disc_steps: The integer number of steps to divide every path segment into to provide the reference positions for PID control
 
         ## DO NOT MODIFY --------------------------------------------------------------------------------------- ##
-        ast = AStar3D(start, goal, grid_size, obstacles, bounds)
-        self.path = ast.find_path()
+        if use_AStar:
+            ast = AStar3D(start, goal, grid_size, obstacles, bounds)
+            self.path = ast.find_path()
+
+        self.path = [(1.25, 4.52, 0.5), (2.12, 1.84, 1.24), (5.12, 2.3, 0.78), (7.2, 3.27, 1.29), (5.3, 6.74, 1.19), (2.52, 5.5, 1.04), (1.25, 4.52, 0.5)]
 
         self.trajectory_setpoints = None
 
@@ -42,8 +45,8 @@ class MotionPlanner3D():
         # - path_waypoints: The sequence of input path waypoints provided by the path-planner, including the start and final goal position: Vector of m waypoints, consisting of a tuple with three reference positions each as provided by AStar
 
         # TUNE THE FOLLOWING PARAMETERS (PART 2) ----------------------------------------------------------------- ##
-        self.disc_steps = 2 #Integer number steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
-        self.vel_lim = 2.0 #Velocity limit of the drone (m/s)
+        self.disc_steps = 50 #Integer number steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
+        self.vel_lim = 4.0 #Velocity limit of the drone (m/s)
         self.acc_lim = 10.0 #Acceleration limit of the drone (m/s²)
         t_f = 10.0 # Final time at the end of the path (s)
         
@@ -265,13 +268,14 @@ class MotionPlanner3D():
         fig = plt.figure(figsize=(8, 6))
         ax = fig.add_subplot(111, projection='3d')
 
-        for ob in obs:
-            self.plot_obstacle(ax, ob[0], ob[1], ob[2], ob[3], ob[4], ob[5])
+        if obs is not None:
+            for ob in obs:
+                self.plot_obstacle(ax, ob[0], ob[1], ob[2], ob[3], ob[4], ob[5])
 
         ax.plot(trajectory_setpoints[:,0], trajectory_setpoints[:,1], trajectory_setpoints[:,2], label="Minimum-Jerk Trajectory", linewidth=2)
-        ax.set_xlim(0, 5)
-        ax.set_ylim(0, 3)
-        ax.set_zlim(0, 1.5)
+        ax.set_xlim(0, 10)
+        ax.set_ylim(0, 10)
+        ax.set_zlim(0, 2)
 
         # Plot waypoints
         waypoints_x = [p[0] for p in path_waypoints]

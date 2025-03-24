@@ -643,7 +643,7 @@ def path_planner_thread(drone):
         # Call the path planner to get the new setpoint
         if sensor_data_copy is not None:
             #new_setpoint = mapping_and_planning_examples.path_planning(sensor_data_copy,dt_ctrl,drone.setpoints,drone.tol_goal)
-            new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy,drone.dt_ctrl,drone.timepoints,drone.setpoints, drone.tol_goal)
+            new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy, drone.dt_ctrl, drone.timepoints, drone.setpoints, drone.tol_goal)
             with setpoint_lock:
                 current_setpoint = new_setpoint
         time.sleep(0.01)
