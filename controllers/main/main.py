@@ -1,4 +1,6 @@
 # Main simulation file called by the Webots
+import sys
+print("You are using python at this location:", sys.executable)
 
 import numpy as np
 from controller import Supervisor, Keyboard
@@ -6,6 +8,7 @@ from exercises.ex1_pid_control import quadrotor_controller
 from exercises.ex2_kalman_filter import kalman_filter as KF
 from exercises.ex3_motion_planner import MotionPlanner3D as MP
 from exercises.ex4_assignment_test import MotionPlanner3D as MP_ASSIGNMENT
+import assignment.my_assignment as assignment
 import exercises.ex0_rotations as ex0_rotations
 from scipy.spatial.transform import Rotation as R
 import lib.mapping_and_planning_examples as mapping_and_planning_examples
@@ -201,12 +204,13 @@ class CrazyflieInDroneDome(Supervisor):
             x = self.circle_centre[0] - radius * np.cos(angular_position)
             y = self.circle_centre[1] - radius * np.sin(angular_position)
 
-            if i == 0:
+            # if i == 0:
                 # Set the take-off pose of the drone and take-off pad
-                takeoff_position = [x, y]
-                takeoff_orientation = angular_position - np.pi/2
-                self.set_take_off_position(takeoff_position, takeoff_orientation)
-            else:
+                # takeoff_position = [x, y]
+                # takeoff_orientation = angular_position - np.pi/2
+                # self.set_take_off_position(takeoff_position, takeoff_orientation)
+            # else:
+            if i > 0:
                 # Set the pose of the gate
                 goal_node = super().getFromDef('GATE' + str(i-1))
                 goal_height = np.random.uniform(self.gate_height_bounds[0], self.gate_height_bounds[1])
@@ -530,6 +534,17 @@ class CrazyflieInDroneDome(Supervisor):
 
         return data
 
+    # Read the camera feed
+    def read_camera(self):
+
+        # Read the camera image in BRGA format
+        camera_image = self.camera.getImage()
+
+        # Convert the image to a numpy array for OpenCV
+        image = np.frombuffer(camera_image, np.uint8).reshape((self.camera.getHeight(), self.camera.getWidth(), 4))
+
+        return image
+    
     # Detect which segment the drone is in
     def check_segment(self, sensor_data):
         drone_pos = np.array([sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global']])

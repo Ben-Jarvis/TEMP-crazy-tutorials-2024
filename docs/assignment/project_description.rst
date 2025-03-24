@@ -14,14 +14,15 @@ Simulation Task overview (individual work)
 
 The simulation arena is shown in the figure above. Your task is composed of multiple phases:
 
-- The drone takes off from a take-off pad placed within the starting region.
+- The drone takes off from a take-off pad.
 - In the first lap, the gate positions are unknown and have to be detected using computer vision.
 - In the second and third lap, you now know the gate positions and the drone has to fly through them as fast as possible.
 
 Please note the following:
 
-- The position of the take-off pad is randomly assigned.
-- The gate position is also ransomly assigned, however there will always be five of them, aranged circular and have to be completed counter clock wise.
+- The position of the take-off pad is fixed.
+- The gate positions are randomly assigned, however there will always be five of them, aranged circular and have to be completed counter clock wise.
+- The clock starts when you leave the take-off region and stops when you enter it again.
 - The origin and the coordinate system for your reference are indicated in the figure above. The Z coordinate is directed upwards (out of the page).
 - A maximum time limit for your run in simulation is set at 240 seconds. Only the phases which you have completed up to this cutoff time will determine your grade for this task according to the metrics defined below.
 
@@ -36,7 +37,7 @@ Hardware Task overview (group work)
 -----------------------
 
 In the hardware task, you will work towards transfering your algorithms from simulation onto the real Crazyflie hardware.
-This time you work in a team of 
+This time you work in a team of 4-5 people.
 
 The hardware arena is the same as the simulation arena. We will, however, tell you the position of the gates before the start of the task, so no need for computer vision on hardware.
 
