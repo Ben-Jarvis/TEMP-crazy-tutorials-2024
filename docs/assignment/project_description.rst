@@ -26,6 +26,12 @@ Please note the following:
 - The origin and the coordinate system for your reference are indicated in the figure above. The Z coordinate is directed upwards (out of the page).
 - A maximum time limit for your run in simulation is set at 240 seconds. Only the phases which you have completed up to this cutoff time will determine your grade for this task according to the metrics defined below.
 
+Here is an example:
+
+.. image:: sim_2025.gif
+  :width: 650
+  :alt: demo video in simulation
+
 Your grade in this simulation exercise will be determined according to the following **Performance metrics**:
 
 - **Grade 3.5**: Take off
