@@ -5,13 +5,14 @@ from controller import Supervisor, Keyboard
 from exercises.ex1_pid_control import quadrotor_controller
 from exercises.ex2_kalman_filter import kalman_filter as KF
 from exercises.ex3_motion_planner import MotionPlanner3D as MP
+from exercises.ex4_assignment_test import MotionPlanner3D as MP_ASSIGNMENT
 import exercises.ex0_rotations as ex0_rotations
 from scipy.spatial.transform import Rotation as R
 import lib.mapping_and_planning_examples as mapping_and_planning_examples
 import time, random
 import threading
 
-exp_num = 3                    # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
+exp_num = 4                    # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
 control_style = 'path_planner'      # 'keyboard' or 'path_planner'
 rand_env = False                # Randomise the environment
 
@@ -133,6 +134,11 @@ class CrazyflieInDroneDome(Supervisor):
             self.timepoints = mp_obj.time_setpoints
             assert self.setpoints is not None, "No valid trajectory reference setpoints found"
             self.tol_goal = 0.25
+        elif exp_num == 4:
+            mp_obj = MP_ASSIGNMENT()
+            self.setpoints = mp_obj.trajectory_setpoints
+            self.timepoints = mp_obj.time_setpoints     
+            self.tol_goal = 0.03
         else:
             self.setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
             self.tol_goal = 0.1
@@ -621,7 +627,8 @@ def path_planner_thread(drone):
                 dt_ctrl = drone.getTime() - drone.PID_update_last_time
         # Call the path planner to get the new setpoint
         if sensor_data_copy is not None:
-            new_setpoint = mapping_and_planning_examples.path_planning(sensor_data_copy,dt_ctrl,drone.setpoints,drone.tol_goal)
+            #new_setpoint = mapping_and_planning_examples.path_planning(sensor_data_copy,dt_ctrl,drone.setpoints,drone.tol_goal)
+            new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy,drone.dt_ctrl,drone.timepoints,drone.setpoints, drone.tol_goal)
             with setpoint_lock:
                 current_setpoint = new_setpoint
         time.sleep(0.01)
