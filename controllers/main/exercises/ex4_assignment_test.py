@@ -46,8 +46,8 @@ class MotionPlanner3D():
 
         # TUNE THE FOLLOWING PARAMETERS (PART 2) ----------------------------------------------------------------- ##
         self.disc_steps = 50 #Integer number steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
-        self.vel_lim = 4.0 #Velocity limit of the drone (m/s)
-        self.acc_lim = 10.0 #Acceleration limit of the drone (m/s²)
+        self.vel_lim = 10.0 #Velocity limit of the drone (m/s)
+        self.acc_lim = 30.0 #Acceleration limit of the drone (m/s²)
         t_f = 20.0 # Final time at the end of the path (s)
         
         # YOUR SOLUTION HERE -------------------------------------------------------------------------------- ##
@@ -227,8 +227,9 @@ class MotionPlanner3D():
             a_y_vals[i,:] = np.dot(self.compute_poly_matrix(t-self.times[seg_idx])[2],coeff_y[seg_idx*6:(seg_idx+1)*6])
             a_z_vals[i,:] = np.dot(self.compute_poly_matrix(t-self.times[seg_idx])[2],coeff_z[seg_idx*6:(seg_idx+1)*6])
 
-                
         yaw_vals = np.zeros((self.disc_steps*len(self.times),1))
+        yaw_ref = np.arctan2(np.diff(y_vals,axis=0),np.diff(x_vals,axis=0))
+        yaw_vals[1:, :] = yaw_ref
         trajectory_setpoints = np.hstack((x_vals, y_vals, z_vals, yaw_vals))
         self.plot(obs, path_waypoints, trajectory_setpoints)
 
