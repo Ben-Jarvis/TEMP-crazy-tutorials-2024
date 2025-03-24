@@ -74,8 +74,8 @@ class MotionPlanner3D():
             [t**5, t**4, t**3, t**2, t, 1], #pos
             [5*(t**4), 4*(t**3), 3*(t**2), 2*t, 1, 0], #vel
             [20*(t**3), 12*(t**2), 6*t, 2, 0, 0], #acc  
-            [60*(t**2), 24*t, 6, 0, 0, 0], #snap
-            [120*t, 24, 0, 0, 0, 0] #jerk
+            [60*(t**2), 24*t, 6, 0, 0, 0], #jerk
+            [120*t, 24, 0, 0, 0, 0] #snap
         ])
 
         return A_m
@@ -129,7 +129,7 @@ class MotionPlanner3D():
                     A[row, i*6:(i+1)*6] = A_0[2] #Initial acceleration constraint
                     b[row] = a_0[dim]
                     row += 1
-                    #Continuity of velocity, acceleration, snap and jerk
+                    #Continuity of velocity, acceleration, jerk, snap
                     A[row:row+4, i*6:(i+1)*6] = A_f[1:]
                     A[row:row+4, (i+1)*6:(i+2)*6] = -A_0[1:]
                     b[row:row+4] = np.zeros(4)
@@ -154,7 +154,7 @@ class MotionPlanner3D():
                     A[row, i*6:(i+1)*6] = A_f[0] #Final position constraint
                     b[row] = pos_f
                     row += 1
-                    #Continuity of velocity, acceleration, snap and jerk
+                    #Continuity of velocity, acceleration, jerk and snap
                     A[row:row+4, i*6:(i+1)*6] = A_f[1:]
                     A[row:row+4, (i+1)*6:(i+2)*6] = -A_0[1:]
                     b[row:row+4] = np.zeros(4)
