@@ -28,7 +28,7 @@ Please note the following:
 
 Here is an example:
 
-.. image:: demo_2022.gif
+.. image:: sim_2025.gif
   :width: 650
   :alt: demo video in simulation
 
