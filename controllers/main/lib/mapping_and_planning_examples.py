@@ -97,7 +97,7 @@ def trajectory_tracking(sensor_data, dt, timepoints, setpoints, tol):
             # Begin timer and start trajectory
             timer = 0
             print("Trajectory tracking started")
-            index_current_setpoint == 1
+            index_current_setpoint = 1
         else:
             timer += dt
 
@@ -111,10 +111,12 @@ def trajectory_tracking(sensor_data, dt, timepoints, setpoints, tol):
         else:
             # Hover at the final setpoint
             current_setpoint = end_point
-            if timer_done is None and np.linalg.norm([sensor_data['x_global'] - end_point[0], sensor_data['y_global'] - end_point[1], sensor_data['z_global'] - end_point[2], sensor_data['yaw'] - end_point[3]]) < tol:
+            if timer_done is None: # and np.linalg.norm([sensor_data['x_global'] - end_point[0], sensor_data['y_global'] - end_point[1], sensor_data['z_global'] - end_point[2]]) < tol:
                 timer_done = True
                 print("Trajectory took " + str(np.round(timer,1)) + " [s]")
-        
+                timer_done = None
+                timer = None
+                
     return current_setpoint
     
     

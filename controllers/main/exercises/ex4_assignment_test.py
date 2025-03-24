@@ -109,9 +109,9 @@ class MotionPlanner3D():
             A_0 = self.compute_poly_matrix(0) # Example: A_0 gives the constraint factor matrix for a segment at t=0
 
             # The prescribed velocity (v) and acceleration (a) values at the start and goal position of the path
-            v_0 = np.zeros(3)
+            v_0 = np.array([0.3, 0.0, 0.0]) #np.zeros(3)
             a_0 = np.zeros(3)
-            v_f = np.zeros(3)
+            v_f = np.array([0.3, 0.0, 0.0]) #np.zeros(3)
             a_f = np.zeros(3)
 
             row = 0

@@ -114,7 +114,7 @@ class quadrotor_controller():
 
     def setpoint_to_pwm(self, dt, setpoint, sensor_data):
         if self.tuning_level != "off":
-            setpoint = [0.97,0.84,3,0]
+            setpoint = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global'], 0.0]
 
         ### START EXERCISE 1 SOLUTION ###
         ### Position control loop ###
@@ -158,6 +158,9 @@ class quadrotor_controller():
         acc_x_setpoint = self.pid_vel_x(sensor_data["v_forward"], dt=dt)
         acc_y_setpoint = self.pid_vel_y(sensor_data["v_left"], dt=dt)
         acc_z_setpoint = self.pid_vel_z(sensor_data["v_up"], dt=dt)
+
+        # print(setpoint)
+
         return self.acceleration_and_yaw_to_pwm(dt, [acc_x_setpoint, acc_y_setpoint, acc_z_setpoint], yaw_setpoint, sensor_data)
         ### END EXERCISE 1 SOLUTION ###
     

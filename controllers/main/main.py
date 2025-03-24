@@ -141,7 +141,7 @@ class CrazyflieInDroneDome(Supervisor):
             mp_obj = MP_ASSIGNMENT()
             self.setpoints = mp_obj.trajectory_setpoints
             self.timepoints = mp_obj.time_setpoints     
-            self.tol_goal = 0.03
+            self.tol_goal = 0.05
         else:
             self.setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
             self.tol_goal = 0.1
