@@ -81,7 +81,7 @@ def path_planning(sensor_data, dt, setpoints, tol):
 
     return current_setpoint
 
-def trajectory_tracking(sensor_data, dt, timepoints, setpoints, tol):
+def trajectory_tracking(sensor_data, dt, timepoints, setpoints, tol, repeat = False):
     global on_ground, index_current_setpoint, timer, timer_done
 
     start_point = setpoints[0]
@@ -114,8 +114,9 @@ def trajectory_tracking(sensor_data, dt, timepoints, setpoints, tol):
             if timer_done is None: # and np.linalg.norm([sensor_data['x_global'] - end_point[0], sensor_data['y_global'] - end_point[1], sensor_data['z_global'] - end_point[2]]) < tol:
                 timer_done = True
                 print("Trajectory took " + str(np.round(timer,1)) + " [s]")
-                timer_done = None
-                timer = None
+                if repeat:
+                    timer_done = None
+                    timer = None
                 
     return current_setpoint
     
