@@ -18,12 +18,8 @@ import cv2
 
 def get_command(sensor_data, camera_data, dt):
 
-    # Open a window to display the camera image
-    # NOTE: Displaying the camera image will slow down the simulation, this is just for testing
-    # cv2.imshow('Camera Feed', camera_data)
-    # cv2.waitKey(1)
-    
-    time.sleep(0.5)
+    # NOTE: Displaying the camera image with cv2.imshow() will throw an error because GUI operations should be performed in the main thread.
+    # If you want to display the camera image you can call it main.py.
 
     # Take off
     if sensor_data['z_global'] < 0.49:
