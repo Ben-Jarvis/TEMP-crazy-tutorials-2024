@@ -18,7 +18,7 @@ class MotionPlanner3D():
             ast = AStar3D(start, goal, grid_size, obstacles, bounds)
             self.path = ast.find_path()
 
-        self.path = [(1.25, 4.52, 0.5), (2.12, 1.84, 1.24), (5.12, 2.3, 0.78), (7.2, 3.27, 1.29), (5.3, 6.74, 1.19), (2.52, 5.5, 1.04), (1.25, 4.52, 0.5)]
+        self.path = [(1.0, 4.0, 0.5), (2.12, 1.84, 1.24), (5.12, 2.3, 0.78), (7.2, 3.27, 1.29), (5.3, 6.74, 1.19), (2.52, 5.5, 1.04), (1.0, 4.0, 0.5)]
 
         self.trajectory_setpoints = None
 
@@ -48,7 +48,7 @@ class MotionPlanner3D():
         self.disc_steps = 50 #Integer number steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
         self.vel_lim = 10.0 #Velocity limit of the drone (m/s)
         self.acc_lim = 30.0 #Acceleration limit of the drone (m/s²)
-        t_f = 20.0 # Final time at the end of the path (s)
+        t_f = 30.0 # Final time at the end of the path (s)
         
         # YOUR SOLUTION HERE -------------------------------------------------------------------------------- ##
         

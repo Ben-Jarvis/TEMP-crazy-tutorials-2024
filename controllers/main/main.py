@@ -652,11 +652,6 @@ def path_planner_thread(drone):
             dt_planner = current_time - last_planner_time
             last_planner_time = current_time
 
-            print('time:', drone.getTime())
-            print('last_planner_time:', last_planner_time)
-            print('dt_planner:', dt_planner)
-            print(' ')
-
             new_setpoint = assignment.get_command(sensor_data_copy, None, dt_planner)
             new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy,drone.dt_ctrl,drone.timepoints,drone.setpoints, drone.tol_goal)
             
