@@ -21,6 +21,7 @@ rand_env = False                # Randomise the environment
 
 # Global variables for handling threads
 latest_sensor_data = None
+latest_camera_data = None
 sensor_lock = threading.Lock()
 
 current_setpoint = np.zeros(4)
@@ -627,25 +628,42 @@ class CrazyflieInDroneDome(Supervisor):
 
 # A thread that runs the path planner in parallel with the simulation
 def path_planner_thread(drone):
-    global latest_sensor_data, current_setpoint, running
-    
+    global latest_sensor_data, latest_camera_data, current_setpoint, running
+
+    # Set the initial last planner time
+    last_planner_time = drone.getTime()
+
     while running:
-        # Make a local copy of the sensor data
+        
+        # Make a local copy of the sensor data and camera data
         sensor_data_copy = None
-        dt_ctrl = 0.0
+        camera_data_copy = None
 
         # Lock the sensor data to prevent it from being updated while we are using it
         with sensor_lock:
+
             # Update sensor data if it is available
             if latest_sensor_data is not None:
                 sensor_data_copy = latest_sensor_data.copy()
-                dt_ctrl = drone.getTime() - drone.PID_update_last_time
+
+            # Update the camera data if it is available
+            if latest_camera_data is not None:
+                camera_data_copy = latest_camera_data.copy()
+
         # Call the path planner to get the new setpoint
-        if sensor_data_copy is not None:
-            #new_setpoint = mapping_and_planning_examples.path_planning(sensor_data_copy,dt_ctrl,drone.setpoints,drone.tol_goal)
-            new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy, drone.dt_ctrl, drone.timepoints, drone.setpoints, drone.tol_goal)
+        if sensor_data_copy is not None and camera_data_copy is not None:
+
+            # Update the time interval for the planner
+            current_time = drone.getTime()
+            dt_planner = current_time - last_planner_time
+            last_planner_time = current_time
+
+            new_setpoint = assignment.get_command(sensor_data_copy, camera_data_copy, dt_planner)
+            # new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy,dt_planner,drone.timepoints,drone.setpoints, drone.tol_goal)
+            
             with setpoint_lock:
                 current_setpoint = new_setpoint
+
         time.sleep(0.01)
     
 
@@ -706,12 +724,17 @@ if __name__ == '__main__':
 
                     else:
 
+                        # Read the camera feed
+                        camera_data = drone.read_camera()
+                        
                         # Update the sensor data in the thread
                         with sensor_lock:
                             latest_sensor_data = sensor_data
+                            latest_camera_data = camera_data
 
                         # Call the PID controller to get the motor commands
                         motorPower = drone.PID_CF.setpoint_to_pwm(drone.dt_ctrl, current_setpoint, latest_sensor_data)
+                        # motorPower = drone.PID_CF.setpoint_to_pwm(dt_ctrl, current_setpoint, latest_sensor_data)
 
                 if exp_num == 4:
                     # Track the progress of the drone through the assignment world
