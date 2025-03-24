@@ -5,7 +5,7 @@ On this page, you will see the performance ranking of your algorithm updated Mon
 For privacy, we will show your nickname here, which will be defined by the zip file name of your submission.
 Do not share your code with others, we are checking your code for similarities.
 
-Please ensure that the zip file you submit at least contains your **ex1_pid_control.py** and **ex3_motion_planner.py** file. We will only evaluate those files as the other files should be the same for all submissions to ensure fairness in the evaluation process.
+Please ensure that the zip file you submit at least contains your **my_assignment.py** and **ex1_pid_control.py** file. We will only evaluate those files as the other files should be the same for all submissions to ensure fairness in the evaluation process.
 
 **Note**:
 
@@ -16,5 +16,5 @@ Please ensure that the zip file you submit at least contains your **ex1_pid_cont
 ============== ========= ======== 
 Name           Avg Grade Avg Time 
 ============== ========= ======== 
-Name           ???       ???
+LIS            6.0       11.2 s
 ============== ========= ======== 
