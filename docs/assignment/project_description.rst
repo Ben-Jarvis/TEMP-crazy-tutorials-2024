@@ -9,12 +9,12 @@ Simulation Task overview (individual work)
 -------------------------
 
 .. image:: race_track.png
-  :width: 650
+  :width: 500
   :alt: objective figure
 
 The simulation arena is shown in the figure above. Your task is composed of multiple phases:
 
-- The drone takes off from a take-off pad placed within the starting region.
+- The drone takes off from a take-off pad.
 - In the first lap, the gate positions are unknown and have to be detected using computer vision.
 - In the second and third lap, you now know the gate positions and the drone has to fly through them as fast as possible.
 

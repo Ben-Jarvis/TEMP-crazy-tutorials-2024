@@ -21,8 +21,8 @@ Viewpoint {
 TexturedBackground {
 }
 Crazyflie {
-  translation 1.2549584682021548 4.516561303235797 0.12
-  rotation 0.0025470088434015764 0.0022454308422160704 -0.9999942353765267 1.756844792580032
+  translation 1.0 4.0 0.12
+  rotation 0.0 0.0 -1.0 1.57
   name "crazyflie"
   controller "main"
   supervisor TRUE
@@ -214,8 +214,8 @@ DEF CEILING Solid {
   boundingObject USE DOOR_WALL_SHAPE
 }
 DEF TAKE_OFF_PAD Solid {
-  translation 1.2549748407065628 4.516665582026551 0.05
-  rotation 0 0 1 -1.7568386588492402
+  translation 1.0 4.0 0.05
+  rotation 0 0 1 0
   children [
     DEF PAD_SHAPE Shape {
       appearance PBRAppearance {
