@@ -162,6 +162,7 @@ class CrazyflieInDroneDome(Supervisor):
             self.gate_progress = [[False] * self.num_gates for _ in range(self.num_laps)]
             self.lap = 0
             self.lap_times = [1000] * self.num_laps
+            self.start_time = 0
             
             # Get the angular segments of the gates
             self.angular_bounds = []
@@ -296,18 +297,23 @@ class CrazyflieInDroneDome(Supervisor):
         curr_segment = drone.check_segment(sensor_data)
 
         # Start timing when the drone leaves the first segment
-        if curr_segment > 0 and drone.segment == 0:
+        if curr_segment != 0 and drone.segment == 0 and drone.start_time == 0:
             drone.start_time = drone.getTime()
             print("Timing started...")
 
         # Stop timing when the drone returns to segment 0
-        if curr_segment == 0 and drone.segment > 0:
+        # print('curr_segment:', curr_segment, 'drone.segment:', drone.segment)
+        if curr_segment == 0 and drone.segment == 5:
             elapsed_time = drone.getTime() - drone.start_time
             drone.lap_times[drone.lap] = elapsed_time
             drone.lap += 1
             print(f"Lap completed. Total time elapsed: {elapsed_time:.2f} seconds") 
             drone.segment_progress = [False] * drone.num_segments
             drone.segment = 0
+        
+        # Update the current segment
+        if curr_segment != -1:
+            drone.segment = curr_segment
 
         # Mark the segment as completed
         if not drone.segment_progress[drone.segment]:
