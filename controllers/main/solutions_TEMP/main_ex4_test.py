@@ -7,6 +7,7 @@ from controller import Supervisor, Keyboard
 from exercises.ex1_pid_control import quadrotor_controller
 from exercises.ex2_kalman_filter import kalman_filter as KF
 from exercises.ex3_motion_planner import MotionPlanner3D as MP
+from solutions_TEMP.ex4_assignment_test import MotionPlanner3D as MP_ASSIGNMENT
 import assignment.my_assignment as assignment
 import exercises.ex0_rotations as ex0_rotations
 from scipy.spatial.transform import Rotation as R
@@ -657,7 +658,8 @@ def path_planner_thread(drone):
             dt_planner = current_time - last_planner_time
             last_planner_time = current_time
 
-            new_setpoint = assignment.get_command(sensor_data_copy, camera_data_copy, dt_planner)
+            #new_setpoint = assignment.get_command(sensor_data_copy, camera_data_copy, dt_planner)
+            new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy,dt_planner,drone.timepoints,drone.setpoints, drone.tol_goal, True)
             
             with setpoint_lock:
                 current_setpoint = new_setpoint
