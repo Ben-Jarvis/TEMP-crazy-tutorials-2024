@@ -15,7 +15,7 @@ import time, random
 import threading
 
 exp_num = 4                    # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
-control_style = 'path_planner'      # 'keyboard' or 'path_planner'
+control_style = 'keyboard'      # 'keyboard' or 'path_planner'
 rand_env = False                # Randomise the environment
 
 # Global variables for handling threads
@@ -137,11 +137,6 @@ class CrazyflieInDroneDome(Supervisor):
             self.timepoints = mp_obj.time_setpoints
             assert self.setpoints is not None, "No valid trajectory reference setpoints found"
             self.tol_goal = 0.25
-        elif exp_num == 4:
-            mp_obj = MP_ASSIGNMENT()
-            self.setpoints = mp_obj.trajectory_setpoints
-            self.timepoints = mp_obj.time_setpoints     
-            self.tol_goal = 0.03
         else:
             self.setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
             self.tol_goal = 0.1
@@ -313,10 +308,6 @@ class CrazyflieInDroneDome(Supervisor):
             print(f"Lap completed. Total time elapsed: {elapsed_time:.2f} seconds") 
             drone.segment_progress = [False] * drone.num_segments
             drone.segment = 0
-        
-        # Make sure that segment can only increase to avoid going back
-        if curr_segment > drone.segment:
-            drone.segment = curr_segment
 
         # Mark the segment as completed
         if not drone.segment_progress[drone.segment]:
