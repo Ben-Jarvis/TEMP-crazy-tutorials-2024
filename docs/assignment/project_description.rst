@@ -25,7 +25,7 @@ Please note the following:
 - The clock starts when you leave the take-off region and stops when you enter it again.
 - The origin and the coordinate system for your reference are indicated in the figure above. The Z coordinate is directed upwards (out of the page).
 - A maximum time limit for your run in simulation is set at 240 seconds in real-time speed. Only the phases which you have completed up to this cutoff time will determine your grade for this task according to the metrics defined below.
-- You may use the provided example function libarires under the *lib* subfolder and the code from previous exercises to assist your implementation.
+- You may use the provided example function libarires under the *lib* subfolder and the code from previous exercises to assist your implementation. You may also adapt and tune the PID controller within the function *setpoint_to_pwm* under *ex1_pid_control.py*. 
 - Grading will be done by evaluating your code on three random environments (but equal for all students) and according to the time you get when running the simulation in real-time.
 
 Here is an example:
