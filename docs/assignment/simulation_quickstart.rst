@@ -20,6 +20,6 @@ In **main.py**, **choose exp_num = 4** for this assignment.
 
 Switch **control_syle = 'keyboard'** to fly on your own. 
 
-Switch **control_syle = 'autonomous'** to choose automatic control. You can edit your own algorithm in **my_assignment.py** and **ex1_pid_control.py** (if you want to tune the PID gains).
+Switch **control_syle = 'path_planner'** to choose automatic control. You can edit your own algorithm in **my_assignment.py** and **ex1_pid_control.py** (if you want to tune the PID gains).
 
 For submission and grading, we only consider those two files. Details on how to submit can be found in the section “Leaderboard”.
