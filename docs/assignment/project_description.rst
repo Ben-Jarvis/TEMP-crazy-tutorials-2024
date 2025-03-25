@@ -21,7 +21,7 @@ The simulation arena is shown in the figure above. Your task is composed of mult
 Please note the following:
 
 - The position of the take-off pad is fixed.
-- The gate positions are randomly assigned. However, there will always be five gates arranged in a circle-like fashion which must be completed in counter clock-wise order.
+- The gate positions and sizes are randomly assigned. However, there will always be five gates arranged in a circle-like fashion which must be completed in counter clock-wise order. The gates are always squared.
 - The clock starts when you leave the take-off region and stops when you enter it again.
 - The origin and the coordinate system for your reference are indicated in the figure above. The Z coordinate is directed upwards (out of the page).
 - A maximum time limit for your run in simulation is set at 240 seconds in real-time speed. Only the phases which you have completed up to this cutoff time will determine your grade for this task according to the metrics defined below.
