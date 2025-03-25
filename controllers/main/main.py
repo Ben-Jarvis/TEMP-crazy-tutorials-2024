@@ -308,10 +308,6 @@ class CrazyflieInDroneDome(Supervisor):
             print(f"Lap completed. Total time elapsed: {elapsed_time:.2f} seconds") 
             drone.segment_progress = [False] * drone.num_segments
             drone.segment = 0
-        
-        # Make sure that segment can only increase to avoid going back
-        if curr_segment > drone.segment:
-            drone.segment = curr_segment
 
         # Mark the segment as completed
         if not drone.segment_progress[drone.segment]:
