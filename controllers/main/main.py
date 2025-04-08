@@ -7,6 +7,7 @@ from controller import Supervisor, Keyboard
 from exercises.ex1_pid_control import quadrotor_controller
 from exercises.ex2_kalman_filter import kalman_filter as KF
 from exercises.ex3_motion_planner import MotionPlanner3D as MP
+from solutions_TEMP.ex4_assignment_test import MotionPlanner3D as MP_ASSIGNMENT
 import assignment.my_assignment as assignment
 import exercises.ex0_rotations as ex0_rotations
 from scipy.spatial.transform import Rotation as R
@@ -137,6 +138,11 @@ class CrazyflieInDroneDome(Supervisor):
             self.timepoints = mp_obj.time_setpoints
             assert self.setpoints is not None, "No valid trajectory reference setpoints found"
             self.tol_goal = 0.25
+        elif exp_num == 4:
+            mp_obj = MP_ASSIGNMENT()
+            self.setpoints = mp_obj.trajectory_setpoints
+            self.timepoints = mp_obj.time_setpoints     
+            self.tol_goal = 0.03
         else:
             self.setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
             self.tol_goal = 0.1
@@ -655,7 +661,8 @@ def path_planner_thread(drone):
             dt_planner = current_time - last_planner_time
             last_planner_time = current_time
 
-            new_setpoint = assignment.get_command(sensor_data_copy, camera_data_copy, dt_planner)
+            #new_setpoint = assignment.get_command(sensor_data_copy, camera_data_copy, dt_planner)
+            new_setpoint = mapping_and_planning_examples.trajectory_tracking(sensor_data_copy,dt_planner,drone.timepoints,drone.setpoints, drone.tol_goal, True)
             
             with setpoint_lock:
                 current_setpoint = new_setpoint
