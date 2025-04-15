@@ -17,7 +17,7 @@ import threading
 
 exp_num = 4                    # 0: Coordinate Transformation, 1: PID Tuning, 2: Kalman Filter, 3: Motion Planning, 4: Project
 control_style = 'path_planner'      # 'keyboard' or 'path_planner'
-rand_env = False                # Randomise the environment
+rand_env = True                # Randomise the environment
 
 # Global variables for handling threads
 latest_sensor_data = None
@@ -117,36 +117,6 @@ class CrazyflieInDroneDome(Supervisor):
         # Simulation step update
         super().step(self.timestep)
 
-        # Handle global setpoints to system depending on exercise
-        if exp_num == 3:
-            start = (0.0, 0.0, 0.5)
-            goal = (5, 1, 1)
-            grid_size = 0.25
-            obstacles = [(0.75, 0.25, 0.0, 0.4, 0.4, 1.5),
-                        (1.25, 1.625, 0.0, 0.4, 0.4, 1.5),
-                        (3.25, 1.0, 0.0, 0.4, 0.4, 1.5),
-                        (4.0, 2.25, 0.0, 0.4, 0.4, 1.5),
-                        (4.0, 0.725, 0.0, 0.5, 0.25, 1.5),
-                        (2.5, 0.0, 0.0, 0.5, 1.875, 1.5),
-                        (2.5, 1.875, 0.0, 0.5, 1.125, 0.125),
-                        (2.5, 1.875, 1.0, 0.5, 1.125, 0.5),
-                        (2.5, 2.75, 0.125, 0.5, 0.25, 0.875)
-                        ]  # (x, y, z, width_x, width_y, width_z)
-            bounds = (0, 5, 0, 3, 0, 1.5)  # (x_min, x_max, y_min, y_max, z_min, z_max)
-            mp_obj = MP(start, obstacles, bounds, grid_size, goal)
-            self.setpoints = mp_obj.trajectory_setpoints
-            self.timepoints = mp_obj.time_setpoints
-            assert self.setpoints is not None, "No valid trajectory reference setpoints found"
-            self.tol_goal = 0.25
-        elif exp_num == 4:
-            mp_obj = MP_ASSIGNMENT()
-            self.setpoints = mp_obj.trajectory_setpoints
-            self.timepoints = mp_obj.time_setpoints     
-            self.tol_goal = 0.03
-        else:
-            self.setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
-            self.tol_goal = 0.1
-
         # For the assignment, randomise the positions of the drone, obstacles, goal, take-off pad and landing pad 
         if exp_num == 4:
 
@@ -189,6 +159,39 @@ class CrazyflieInDroneDome(Supervisor):
                 self.gate_positions.append(goal_node.getField('translation').getSFVec3f())
                 self.gate_sizes.append(goal_node.getField('goalSize').getSFVec3f())
                 self.gate_orientations.append(goal_node.getField('rotation').getSFRotation())
+
+
+             # Handle global setpoints to system depending on exercise
+            if exp_num == 3:
+                start = (0.0, 0.0, 0.5)
+                goal = (5, 1, 1)
+                grid_size = 0.25
+                obstacles = [(0.75, 0.25, 0.0, 0.4, 0.4, 1.5),
+                            (1.25, 1.625, 0.0, 0.4, 0.4, 1.5),
+                            (3.25, 1.0, 0.0, 0.4, 0.4, 1.5),
+                            (4.0, 2.25, 0.0, 0.4, 0.4, 1.5),
+                            (4.0, 0.725, 0.0, 0.5, 0.25, 1.5),
+                            (2.5, 0.0, 0.0, 0.5, 1.875, 1.5),
+                            (2.5, 1.875, 0.0, 0.5, 1.125, 0.125),
+                            (2.5, 1.875, 1.0, 0.5, 1.125, 0.5),
+                            (2.5, 2.75, 0.125, 0.5, 0.25, 0.875)
+                            ]  # (x, y, z, width_x, width_y, width_z)
+                bounds = (0, 5, 0, 3, 0, 1.5)  # (x_min, x_max, y_min, y_max, z_min, z_max)
+                mp_obj = MP(start, obstacles, bounds, grid_size, goal)
+                self.setpoints = mp_obj.trajectory_setpoints
+                self.timepoints = mp_obj.time_setpoints
+                assert self.setpoints is not None, "No valid trajectory reference setpoints found"
+                self.tol_goal = 0.25
+            elif exp_num == 4:
+                mp_obj = MP_ASSIGNMENT(gates=self.gate_positions)
+
+                self.setpoints = mp_obj.trajectory_setpoints
+                self.timepoints = mp_obj.time_setpoints     
+                self.tol_goal = 0.01
+            else:
+                self.setpoints = [[0.0, 0.0, 1.0, 0.0], [0.0, 3.0, 1.25, np.pi/2], [5.0, 3.0, 1.5, np.pi], [5.0, 0.0, 0.25, 1.5*np.pi], [0.0, 0.0, 1.0, 0.0]]
+                self.tol_goal = 0.1
+
 
     # Randomise the positions of the drone, obstacles, goal, take-off pad and landing pad
     def randomise_positions(self):
@@ -610,6 +613,16 @@ class CrazyflieInDroneDome(Supervisor):
                 goal_visibility = goal_node.getField('goalVisible')
                 goal_visibility.setSFFloat(1.0)
                 self.gate_progress[self.lap][gate_idx] = True
+
+        # Check if it's within half_dims*2 and if so print
+        if (abs(local_pos[0]) <= half_dims[0] * 2 and
+            abs(local_pos[1]) <= half_dims[1] * 2 and
+            abs(local_pos[2]) <= half_dims[2] * 2):
+            
+            print('rel_pos:', rel_pos)
+            print('rel_distance:', np.linalg.norm(rel_pos))
+            print('local_pos:', local_pos)
+            print('half_dims:', half_dims)
 
     def reset(self):
         # Reset the simulation

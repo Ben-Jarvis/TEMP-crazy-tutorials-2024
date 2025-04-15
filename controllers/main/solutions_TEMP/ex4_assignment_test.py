@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 class MotionPlanner3D():
     
     #Question: SIMON PID, what is vel_max set for PID? Check should be same here
-    def __init__(self, use_AStar = False, start = None, obstacles = None, bounds = None, grid_size = None, goal = None):
+    def __init__(self, use_AStar = False, start = None, obstacles = None, bounds = None, grid_size = None, goal = None, gates = None):
         # Inputs:
         # - path: The sequence of input path waypoints provided by the path-planner, including the start and final goal position: Vector of m waypoints, consisting of a tuple with three reference positions each as provided by AStar 
         # - time: The predefined vector of times corresponding to each path waypoint to traverse (Vector of size m) (must be 0 at start)
@@ -18,8 +18,13 @@ class MotionPlanner3D():
             ast = AStar3D(start, goal, grid_size, obstacles, bounds)
             self.path = ast.find_path()
 
-        self.path = [(1.0, 4.0, 0.5), (2.12, 1.84, 1.24), (5.12, 2.3, 0.78), (7.2, 3.27, 1.29), (5.3, 6.74, 1.19), (2.52, 5.5, 1.04), (1.0, 4.0, 0.5)]
+        if gates is None:
+            self.path = [(1.0, 4.0, 0.5), (2.12, 1.84, 1.24), (5.12, 2.3, 0.78), (7.2, 3.27, 1.29), (5.3, 6.74, 1.19), (2.52, 5.5, 1.04), (1.0, 4.0, 0.5)]
+        else:
+            self.path = [(1.0, 4.0, 0.5), gates[0], gates[1], gates[2], gates[3], gates[4], (1.0, 4.0, 0.5)]
 
+        print(self.path)
+        
         self.trajectory_setpoints = None
 
         self.init_params(self.path)
@@ -231,7 +236,7 @@ class MotionPlanner3D():
         yaw_ref = np.arctan2(np.diff(y_vals,axis=0),np.diff(x_vals,axis=0))
         yaw_vals[1:, :] = yaw_ref
         trajectory_setpoints = np.hstack((x_vals, y_vals, z_vals, yaw_vals))
-        self.plot(obs, path_waypoints, trajectory_setpoints)
+        # self.plot(obs, path_waypoints, trajectory_setpoints)
 
         # Find the maximum absolute velocity during the segment
         vel_max = np.max(np.sqrt(v_x_vals**2 + v_y_vals**2 + v_z_vals**2))
@@ -239,10 +244,10 @@ class MotionPlanner3D():
         acc_max = np.max(np.sqrt(a_x_vals**2 + a_y_vals**2 + a_z_vals**2))
         acc_mean = np.mean(np.sqrt(a_x_vals**2 + a_y_vals**2 + a_z_vals**2))
 
-        print("Maximum flight speed: " + str(vel_max))
-        print("Average flight speed: " + str(vel_mean))
-        print("Average flight acceleration: " + str(acc_mean))
-        print("Maximum flight acceleration: " + str(acc_max))
+        # print("Maximum flight speed: " + str(vel_max))
+        # print("Average flight speed: " + str(vel_mean))
+        # print("Average flight acceleration: " + str(acc_mean))
+        # print("Maximum flight acceleration: " + str(acc_max))
         
         # Check that it is less than an upper limit velocity v_lim
         assert vel_max <= self.vel_lim, "The drone velocity exceeds the limit velocity : " + str(vel_max) + " m/s"
