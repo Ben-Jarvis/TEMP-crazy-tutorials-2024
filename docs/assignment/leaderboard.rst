@@ -21,4 +21,4 @@ adv_trial      5.0       670.87 s
 USAIN_BOLD     0.0       N/A
 ============== ========= ========= 
 
-For detailed grading information, please refer to the `grading_full <https://github.com/Ben-Jarvis/TEMP-crazy-tutorials-2024/blob/main/docs/assignment/grading_full.xlsx?raw=true>`_>`_ file.
+For detailed grading information, please refer to the `grading_full <https://github.com/Ben-Jarvis/TEMP-crazy-tutorials-2024/blob/main/docs/assignment/grading_full.xlsx?raw=true>`_ file.
