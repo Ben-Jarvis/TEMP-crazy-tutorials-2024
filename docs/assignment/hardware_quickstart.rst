@@ -44,7 +44,7 @@ Note that there is **a small power button** located in front of the quadrotor th
 Look for the arrows on the drone arm near the motors.
 Arrows with a clockwise direction indicate Type A propellers, while arrows with a counterclockwise direction indicate Type B propellers.
 
-Onboaed LEDs indicate drone states such as low power, self-test fail, etc. Refer to `bitcraze page <https://www.bitcraze.io/documentation/tutorials/getting-started-with-crazyflie-2-x/#leds>`_.
+Onboard LEDs indicate drone states such as low power, self-test fail, etc. Refer to `bitcraze page <https://www.bitcraze.io/documentation/tutorials/getting-started-with-crazyflie-2-x/#leds>`_.
 
 If you believe that your motors do not work correctly or you believe that your electronics are damaged, consult the `console debugging tool <https://www.bitcraze.io/2022/05/debug-tools-in-the-client-console-tab/>`_ to obtain debugging information and show it to one of the assistants.
 
@@ -84,7 +84,7 @@ For example, 'uri = uri_helper.uri_from_env(default='radio://0/10/2M/E7E7E7E701'
 Lighthouse positioning system information
 ------------------------------------------------
 
-The Lighthouse positioning system is a motion capture system that uses infrared light to track the 3D position of the drone. The positining accuracy is typically lower than 1 cm.
+The Lighthouse positioning system is a motion capture system that uses infrared light to track the 3D position of the drone. The positioning accuracy is typically lower than 1 cm.
 
 To set it up and connect it with your Crazyflie for the first time, follow the `Lighthouse instructions <https://www.bitcraze.io/documentation/tutorials/getting-started-with-lighthouse/#preparing-the-crazyflie>`_ in the sections "Preparing the Crazyflie" and "Preparing the System".
 
@@ -94,7 +94,7 @@ Sensor information and readout
 ------------------------------------------------
 
 The Crazyflie drone performs sensor fusion from all the onboard sensors and the Lighthouse system to obtain the optimal state estimate using an Extended Kalman Filter (EKF).
-For background information on the measurement models and the state estimation pipeline, refer to this `link <https://www.bitcraze.io/documentation/repository/crazyflie-firmware/master/functional-areas/sensor-to-control/state_estimators/#extended-kalman-filter>`_
+For background information on the measurement models and the state estimation pipeline, refer to this `link <https://www.bitcraze.io/documentation/repository/crazyflie-firmware/master/functional-areas/sensor-to-control/state_estimators/#extended-kalman-filter>`_.
 
 In the Crazyflie software you may access the state estimates from these `logging variables <https://www.bitcraze.io/documentation/repository/crazyflie-firmware/master/api/logs/#stateestimate>`_.
 
@@ -107,8 +107,9 @@ Now you can test the communication with the drone by downloading and running thi
 
    <a href="_static/log.py" download>Download the logging example file</a>
 
+
 For this example you can put the drone on desk as there is no control.
-If the library and radio driver is configured correctly, you should see sensor data printed in your ternimal when running this example (remember changing the uri).
+If the library and radio driver is configured correctly, you should see sensor data printed in your terminal when running this example (remember changing the uri).
 Try moving your hand closer and farther away from the multi-ranger sensors and observe the sensor data change.
 
  .. `log.py <https://github.com/dronecourse-epfl/crazy-practical-tutorial/tree/main/docs/log.py>`_.
@@ -120,6 +121,7 @@ This example code will control the drone to fly a figure-eight trajectory, while
 .. raw:: html
 
    <a href="_static/log_and_control.py" download>Download the logging and control example file</a>
+
 
 Please ensure that you place the drone on the ground before testing this example, as the drone is programmed to take off and fly.
 Additionally, it is recommended to take off from a white part of the ground for best performance.
