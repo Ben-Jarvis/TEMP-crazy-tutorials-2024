@@ -34,7 +34,8 @@ from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.log import LogConfig
 from cflib.utils import uri_helper
 
-uri = uri_helper.uri_from_env(default='radio://0/80/2M/E7E7E7E7E7')
+# TODO: CHANGE THIS URI TO YOUR CRAZYFLIE & YOUR RADIO CHANNEL
+uri = uri_helper.uri_from_env(default='radio://0/100/2M/E7E7E7E720')
 
 # Only output errors from the logging framework
 logging.basicConfig(level=logging.ERROR)
@@ -76,10 +77,7 @@ class LoggingExample:
         self._lg_stab.add_variable('stateEstimate.y', 'float')
         self._lg_stab.add_variable('stateEstimate.z', 'float')
         self._lg_stab.add_variable('stabilizer.yaw', 'float')
-        self._lg_stab.add_variable('range.front')
-        self._lg_stab.add_variable('range.back')
-        self._lg_stab.add_variable('range.left')
-        self._lg_stab.add_variable('range.right')
+
         # The fetch-as argument can be set to FP16 to save space in the log packet
         # self._lg_stab.add_variable('pm.vbat', 'FP16')
 
@@ -101,7 +99,7 @@ class LoggingExample:
             print('Could not add Stabilizer log config, bad configuration.')
 
         # Start a timer to disconnect in 10s
-        t = Timer(50, self._cf.close_link)
+        t = Timer(10, self._cf.close_link)
         t.start()
 
     def _stab_log_error(self, logconf, msg):

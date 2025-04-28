@@ -3,7 +3,8 @@ Hardware instructions
 
 You should already be familiar with the project task through your work in simulation.
 As a group, you will now fine-tune the best solution to fly a real quadrotor through gates. 
-You should keep in mind that the sensor signals on the actual drone are noisy and less accurate than in simulation, we recommend starting slow.
+You should keep in mind that the sensor signals on the actual drone are noisy and less accurate than in simulation, we recommend starting slow. 
+You may furthermore tune your PID control gains in the Crazyflie framework to achieve better performance.
 
 Learning objectives
 -------------------
@@ -18,7 +19,8 @@ Tasks
 The final deliverables which you will be graded on for this hardware practical are the following:
 
 - Short presentation (4 slides maximum)
-- Video recording of your most successfull trials (up to 2 minutes)
+- Video recording of your most successful trials (up to 2 minutes)
+- Task video, code and presentation files submitted on Moodle by May 26th 23:59
 - Demonstration on May 27th: 3 trials (**best grade counts**), and each trial must be completed with only one battery
 
 Presentation
@@ -27,7 +29,7 @@ Length: up to 4 slides
 
 Duration: up to 7 minutes
 
-- 1 slide on the experimental setup (Environment layout)
+- 1 slide on the gate setup for your experiment (Show environment layout(s) tested on)
 - 1 slide on the strategy (Algorithm, what you spend most time on)
 - 1 slide on the results (Statistics on mission time/success/...)
 - 1 optional slide (with anything relevant to add)
@@ -45,16 +47,24 @@ You will prepare and submit a video of one of your trials with your own obsatcle
 Demonstrations
 --------------
 
-The demonstrations will take place at assigned timeslots on May 27th, between 15:15 and 2ß:00 (see :ref:`Demonstration schedule on May 27th`).
+The demonstrations and presentations will take place at assigned timeslots on May 27th, between 15:15 and 20:00 (slot assignment will be provided later).
 
-To test your algorithms in a setup as in the final demonstrations, we will offer 30 minute testing slots in prior weeks.
-We will provide a booking method for you soon where you can select a timeslot.
+Experiments and development
+----------------------------
+
+To develop and test your algorithms, you will use our pre-built setup with the Lighthouse positioning system in the MED-1 1422 drone arena as shown in the figure below.
+
+The setup consists of 5 gates, which are 0.5 x 0.5 meters wide. The drone must take-off and land from a landing pad.
+You may reposition the gates to your liking, whilst please maintaining a good working order and placing them back neatly within the testing space.
+Each group will be able to book slots for use of the setup for a maximum of 3 hours per day, which you can split up as you like.
+
+A representative group captain must provide their name, surname, SCIPER and group number by e-mail to charbel.toumieh@epfl.ch to obtain drone arena access.
 
 Complementary information
 -------------------------
 
 - **Submit by Monday 26th May, 23:59** (your code with comments, the video as MP4, presentation as PPTX) in a zip file named GROUPNUMBER_LASTNAME1_LASTNAME2_LASTNAME3_LASTNAME4_LASTNAME5.zip on Moodle
-- The initial position of the drone will be given one day before the final demonstration
+- The initial position of the drone and the location of the five gates will be given one day before the final demonstration
 - Each group will present the PPTX from our computer before the demonstration
 - Return the drone directly after the demonstration
 - Check that the returned material is complete, according to the lists in :ref:`Hardware unpacking`
@@ -68,7 +78,7 @@ We will evaluate you as a group and determine your grade for this hardware task 
 - Presentation and video showcasing the algorithm on one of your trials (Grade 1-6, Weighting: 50%) 
 - Demonstration (Grade 1-6, Weighting: 50%)
 
-The assistants will judge your presentation right before your hardware demonstration. Your video submission to moodle will be judged separatly in the same week.
+The assistants will judge your presentation right before your hardware demonstration. Your video submission to moodle will be judged separately in the same week.
 
 The demonstration performance will be graded according to the performance metrics defined under :ref:`Hardware Task overview` and are the same as in simulation:
 
