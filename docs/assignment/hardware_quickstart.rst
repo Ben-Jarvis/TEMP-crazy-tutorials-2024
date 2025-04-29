@@ -103,12 +103,14 @@ Example - log
 -------------
 Now you can test the communication with the drone by downloading and running this log example:
 
-`Download the script <_static/log.py>`_
+.. `Download the script <_static/log.py>`_
+
+.. literalinclude:: _static/log.py
+   :language: python
 
 .. .. raw:: html
 
    .. <a href="_static/log.py" download>Download the logging example file</a>
-
 
 For this example you can put the drone on desk as there is no control.
 If the library and radio driver is configured correctly, you should see sensor data printed in your terminal when running this example (remember changing the uri).
@@ -124,8 +126,10 @@ This example code will control the drone to fly a figure-eight trajectory, while
 
    .. <a href="_static/log_and_control.py" download>Download the logging and control example file</a>
 
-`Download the script <_static/log_and_control.py>`_
+.. `Download the script <_static/log_and_control.py>`_
 
+.. literalinclude:: _static/log_and_control.py
+   :language: python
 
 Please ensure that you place the drone on the ground before testing this example, as the drone is programmed to take off and fly.
 Additionally, it is recommended to take off from a white part of the ground for best performance.
