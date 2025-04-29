@@ -17,7 +17,7 @@ On Windows, it is also recommended to disable the Python app alias that opens th
 numpy / matplotlib not found
 -------------
 Usually a problem with conflicting Python installations. 
-Go to **Tools/Preferences** in the Python tab, replace “python3” by: “/path/to/your/project/.venv/bin/python3” if you created your environment for this project or “/path/to/your/python/bin/python3” if you have not used a virtual environment.
+Install a self-contained Python virtual environment, that has its own clean Python runtime and pip packages, and point Webots directly to that executable (something like python path: /path/to/.venv/bin/python3, using .venv/bin/pip3 to install packages, maybe chmod +x is also required on macOS). 
 
 cf_camera is not showing
 -------------
@@ -39,7 +39,11 @@ Webots is super slow
 -------------
 Remove shadows to make it quicker. Tools / preferences / OpenGL / disable shadows, disable anti-aliasing.
 
+Crazyflie does not power on
+----------------------------
+Check if the battery connector cables are good and that all decks are properly connected. If the battery cables are broken, please directly contact a TA and DO NOT attempt to fix it yourself.
+
 
 ====================================================================================
 
-If your question still persist, rise your hand and ask a TA.
+If your question still persists, raise your hand and ask a TA.

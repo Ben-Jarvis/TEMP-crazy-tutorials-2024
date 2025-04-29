@@ -1,5 +1,5 @@
-Hardware quickstart
-===================
+Hardware quickstart and Crazyflie software information
+======================================================
 
 Hardware unpacking
 ------------------
@@ -86,9 +86,11 @@ Lighthouse positioning system information
 
 The Lighthouse positioning system is a motion capture system that uses infrared light to track the 3D position of the drone. The positioning accuracy is typically lower than 1 cm.
 
-To set it up and connect it with your Crazyflie for the first time, follow the `Lighthouse instructions <https://www.bitcraze.io/documentation/tutorials/getting-started-with-lighthouse/#preparing-the-crazyflie>`_ in the sections "Preparing the Crazyflie" and "Preparing the System".
+To set it up and connect it with your Crazyflie, follow the `Lighthouse instructions <https://www.bitcraze.io/documentation/tutorials/getting-started-with-lighthouse/#preparing-the-system>`_ in the section "Preparing the System".
+It is sensible to perform the calibration steps given in this section at the start of every new session that that you have booked, as the stations might still slightly move after another group has used the setup.
 
-Please DO NOT MOVE the base stations in any way and DO NOT MODIFY the Base station software settings. You must not perform any of the steps under "Preparing the base stations", this is already done for you.
+Please DO NOT INTENTIONALLY MOVE the base stations and DO NOT MODIFY the Base station software settings. You must not perform any of the steps under "Preparing the base stations", this is already done for you.
+
 
 Sensor information and readout
 ------------------------------------------------

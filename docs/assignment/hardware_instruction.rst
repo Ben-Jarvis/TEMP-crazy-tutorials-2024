@@ -54,9 +54,20 @@ Experiments and development
 
 To develop and test your algorithms, you will use our pre-built setup with the Lighthouse positioning system in the MED-1 1422 drone arena as shown in the figure below.
 
-The setup consists of 5 gates, which are 0.5 x 0.5 meters wide. The drone must take-off and land from a landing pad.
-You may reposition the gates to your liking, whilst please maintaining a good working order and placing them back neatly within the testing space.
-Each group will be able to book slots for use of the setup for a maximum of 3 hours per day, which you can split up as you like.
+.. image:: hardware_setup.png
+  :width: 650
+  :alt: hardware course
+
+Below is an example "safe" (so unoptimized) one-lap test-run of the course, which has to be conducted counter-clockwise. 
+
+.. image:: hardware_testrun.gif
+  :width: 650
+  :alt: hardware course run
+
+The setup consists of 4 gates. The drone must take-off from and land from on the indicated landing pad after your three laps.
+You may reposition the gates to your liking during your own testing, whilst please maintaining a good working order and placing them back neatly within the testing space.
+
+In this `form <https://docs.google.com/spreadsheets/d/1jxJD-PnUoYsJz4ouRZlyiNg_vVRUKn35aWl69dxFwjU/edit?gid=1016483530#gid=1016483530>`_, each group will be able to book slots for use of the setup for a maximum of 3 hours per day up to the deadline, which you can split up as you like. Bookings can be made at maximum two workday weeks in advance.
 
 A representative group captain must provide their name, surname, SCIPER and group number by e-mail to charbel.toumieh@epfl.ch to obtain drone arena access.
 
@@ -64,7 +75,7 @@ Complementary information
 -------------------------
 
 - **Submit by Monday 26th May, 23:59** (your code with comments, the video as MP4, presentation as PPTX) in a zip file named GROUPNUMBER_LASTNAME1_LASTNAME2_LASTNAME3_LASTNAME4_LASTNAME5.zip on Moodle
-- The initial position of the drone and the location of the five gates will be given one day before the final demonstration
+- The initial position of the landing pad and the location of the gates will be given one day before the final demonstration
 - Each group will present the PPTX from our computer before the demonstration
 - Return the drone directly after the demonstration
 - Check that the returned material is complete, according to the lists in :ref:`Hardware unpacking`
