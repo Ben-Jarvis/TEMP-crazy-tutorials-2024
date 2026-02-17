@@ -17,7 +17,7 @@ Your task is to implement a cascaded PID controller and tune it to make your dro
 
 Exercise
 ---------
-1. Start by opening **ex_1_pid_control.py** and go to the function **setpoint_to_pwm**. You will see that the function is empty. This is where you will implement your cascaded PID controller.
+1. Start by opening **ex_1pid_control.py** and go to the function **setpoint_to_pwm**. You will see that the function is empty. This is where you will implement your cascaded PID controller.
 2. Now you can run it: In **main.py**, switch **control_style = "path_planner"**. This will let the drone fly the path autonomously (a message in the command line will let you know how long the drone took to complete the lap). This should look like this and since the gains are untuned, will take a bit over half a minute:
 
 .. image:: square_before.gif
@@ -43,7 +43,7 @@ As a general rule of thumb, we propose the following strategy:
 - Increase D until the overshoot vanishes (D is usually smaller than P).
 - Repeat last two steps until increasing D does no longer stabilize your system and leads to oscillatory behaviour.
 - Reduce P by 20% and adapt D accordingly. This ensures robust behaviour when operating in unforseen cases (e.g. roll and pitch at the same time). If this is not respected, you might end up with unexpected behaviour (e.g. oscillations) when tuning higher levels.
-- If nescessary, increase I to counteract steady state error: e.g. on "vel_z" to counteract gravity, or on "vel_xy" to counteract drag.
+- If necessary, increase I to counteract steady state error: e.g. on "vel_z" to counteract gravity, or on "vel_xy" to counteract drag.
 
 This should lead you to similar performance:
 
