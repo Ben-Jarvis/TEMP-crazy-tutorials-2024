@@ -178,7 +178,7 @@ class quadrotor_controller():
         # keys = acc_x, acc_y, altitude, yaw
         vel_z_setpoint = keys[2]
         self.pid_vel_z.set_setpoint(vel_z_setpoint)
-        acc_z_setpoint = self.pid_vel_z(sensor_data["v_z"],dt=dt)
+        acc_z_setpoint = self.pid_vel_z.call(sensor_data["v_z"],dt=dt)
         yaw = sensor_data["yaw"] + keys[3]
         
         return self.acceleration_and_yaw_to_pwm(dt, [keys[0], keys[1], acc_z_setpoint], yaw, sensor_data)
