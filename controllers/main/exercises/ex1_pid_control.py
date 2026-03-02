@@ -63,7 +63,6 @@ class quadrotor_controller():
                         "L_vel_z": 0.75,
                         "L_vel_xy": 2.0
                         }
-            
             ### END EXERCISE 1 SOLUTION ###
                 
         self.global_time = 0
@@ -120,8 +119,9 @@ class quadrotor_controller():
         if self.tuning_level != "off":
             if self.init_pos is None:
                 self.init_pos = [sensor_data['x_global'], sensor_data['y_global'], sensor_data['z_global'], 0]
-            setpoint = self.init_pos + np.array([0,0,0.75,0]) #Hover above initial position\
-        
+            setpoint = self.init_pos + np.array([0,0,0.75,0]) #Hover above initial position
+
+        ### START EXERCISE 1 SOLUTION ###
         ### Position control loop ###
         # For tuning
         if self.tuning_level == "pos_xy":
