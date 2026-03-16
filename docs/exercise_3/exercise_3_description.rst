@@ -44,27 +44,26 @@ It is suggested to take the lecture slides as a reference for the motion planner
 
   b) From your solution, implement the variable *A_m* as a 2D 5 x 6 np.array in function of *t* such that it fulfills the system :math:`x_m(t) = A_m(t)c_m`.
 
-2. Go to the function *compute_poly_coefficients*. This function takes in the A* waypoints *path_waypoints* and creates and solves the entire system of constraint equations :math:`A_{tot}c = b_{tot}` to yield the polynomial coefficients :math:`c` for all of the *m* path segments between the start and goal position.
+2. Go to the function *compute_poly_coefficients*. This function takes in the A* waypoints *path_waypoints* in an array of dimension *m*. It solves the entire system of constraint equations :math:`A_{tot}c = b_{tot}` to yield the polynomial coefficients :math:`c` for all of the *(m-1)* path segments between the start and goal position.
    
-   Here, your taks is to fill the *6(m-1)* rows of the matrix :math:`A_{tot}` and vector :math:`b_{tot}` to contain all initial and final position, velocity and acceleration constraints as well as the continuity constraints for position, velocity, acceleration, snap and jerk between two consecutive path segments.
+   Here, your task is to fill the *6(m-1)* rows of the matrix :math:`A_{tot}` and vector :math:`b_{tot}` to contain all initial and final position, velocity and acceleration constraints as well as the continuity constraints for position, velocity, acceleration, jerk and snap between two consecutive path segments.
    
-   To help your implementation, you are given the vector *seg_times*, which contains the relative duration of each path segment as derived from *self.times*. The variable *m* contains the total number of path segments.
+   To help your implementation, you are given the vector *seg_times*, which contains the relative duration of each path segment as derived from *self.times*.
    
    For each dimension in x,y and z direction, the matrix :math:`A_{tot}` and vector :math:`b_{tot}` and an array *pos* containing *m* waypoint positions for the respective dimension are already initialized. 
    
-   Before you begin, check the uses of the function *compute_poly_matrix* provided in the function. The matrix *A_0* is calculated as :math:`A_m(t=0)` and remains constant for every path segment. You can use this matrix to fill the the rows of **A** with the initial constraints for velocity, acceleration and position.
-   Similarly, *A_f* is calculated as :math:`A_m(t=\text{seg_times[i]})` to describe the constraint matrix entries at the end of the i-th path segment. You can use this matrix to define your final constraints for velocity, acceleration and position.
-   To define the continuity constraints for position, velocity, acceleration, snap and jerk between two consecutive path segments, you can use the matrices *A_f* and *A_0* for the respective i-th and i+1-th path segment, filling the rows of :math:`A_{tot}` such that :math:`x_{m,i}(t=\text{seg_times[i}])` = :math:`x_{m,i+1}(t=0)`.
-
-  a) For every dimension x, y, and z, iterate through the path segments to fill all 6*(m-1) rows of the matrix :math:`A_{tot}` and the vector :math:`b_{tot}` using the matrices *A_0* and *A_f* as described above.
-
+  a) For every dimension x, y, and z, iterate through the path segments to fill all 6*(m-1) rows of the matrix :math:`A_{tot}` and the vector :math:`b_{tot}` using the ion *compute_poly_matrix* to define initial, final and continuity constraints for each path segment (see the hint below for more)
   b) Solve the system :math:`A_{tot}c = b_{tot}` for every x,y and z dimension. The coefficent vector :math:`c` for each dimension is then added to a 2D np.array *poly_coeffs* of dimensions (6(m-1) x 3).
+
+   **Hints**: Before you begin, check the uses of the function *compute_poly_matrix* provided in the function. The matrix **A_0** is calculated as :math:`A_m(t=0)` and is applicable for the initial conditions at every path segment. You can use this matrix to fill the the rows of :math:`A_{tot}` with the initial constraints for velocity, acceleration and position.
+   Similarly, **A_f** is calculated as :math:`A_m(t=\text{seg_times[i]})` to describe the constraint matrix entries at the end of the i-th path segment. You can use this matrix to define your final constraints for velocity, acceleration and position.
+   To define the continuity constraints for position, velocity, acceleration, snap and jerk between two consecutive path segments, you can use the matrices *A_f* and *A_0* for the respective i-th and i+1-th path segment, filling the rows of :math:`A_{tot}` such that :math:`x_{m,i}(t=\text{seg_times[i}])` = :math:`x_{m,i+1}(t=0)`.
 
 3. When all functions are implemented, run the simulation in Webots. You should see a trajectory plotted in blue at the start of the simulation (as per the figure below).
 
-  To validate your implementation, check the following: Does the trajectory pass through all of the red waypoints? Does the trajectory intersect any of the grey obstacles? Does the trajectory appear continouous about the waypoints?
+  To validate your implementation, check the following: Does the trajectory pass through all of the red waypoints? Does the trajectory intersect any of the grey obstacles? Does the trajectory, on the whole, look continuous about the red waypoints?
 
-  When you are happy with your trajectory, close the plot and watch the simulation run. The drone should smoothly follow the trajectory and avoid the obstacles.
+  When you are happy with your trajectory, close the plot and watch the simulation run. The drone should follow the trajectory and avoid the obstacles.
 
   *Note:* If you receive an assertion error regarding the exceeding of the original velocity and acceleration limits, there are errors in your implementation.
 
@@ -81,7 +80,7 @@ It is suggested to take the lecture slides as a reference for the motion planner
 Part 2 - Trajectory finetuning
 -------------------------------------------
 
-1. Turn on the crazyflie camera overlay. It is possible that you see your drone moving in a rather jagged fashion between certain waypoints or. This means that the polynomial trajectory should be discretized at smaller intervals to be used as a reference by the drone controller.
+1. Turn on the crazyflie camera overlay. It is possible that you see your drone moving in a rather jagged fashion between certain waypoints. This means that the polynomial trajectory should be discretized at smaller intervals to be used as a reference by the drone controller.
 
   a) In the function *init_params*, the variable *self.disc_steps* can be used to tune this. Increase this value in small increments until you see smoother motion.
 
@@ -96,7 +95,7 @@ Part 2 - Trajectory finetuning
      
      Can you modify the vector *self.times* to yield a better distribution of times, such that the indicated average velocity and peak acceleration are lower? Can you achieve an even faster time to complete the run without crashing with your implementation?
      
-    *Extra note:* When flying aggresively, your drone may have some close calls with obstacles. This may be as the trajectory intersects the inflation zone about the obstacles. Can you think about how you would implement a trajectory replanning step, as introdcued in the lecture, to ensure that this does not happen?
+  c) (EXTRA BONUS) When flying aggresively, your drone may have some close calls with obstacles. This may be as the trajectory intersects the inflation zone about the obstacles. Can you implement a collision check and decoupled trajectory replanning step, as introdcued in the lecture, to ensure that this does not happen? You may use the attribute *self.obstacles* containing obstacle vertices and widths for each obstacle and modify the *run_planner* function to assist you.
 
 .. Part 3 - Collision replanning (BONUS)
 .. --------------------------------------------
