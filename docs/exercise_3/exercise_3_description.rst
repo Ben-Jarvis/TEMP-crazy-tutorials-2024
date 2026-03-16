@@ -27,7 +27,7 @@ With **exp_num = 3** in **main.py**, launch the simulation. You will see a waypo
 The red waypoints are sampled from a 3D A* path planner, giving you the shortest path with the fewest number of waypoints to reach the final goal while avoiding all obstacles which have been inflated by an additional 0.25 meters.
 However, A* assumes separate straight-line connections between the waypoints, such that your drone movements will not be smooth while following this path.
 
-To improve smoothness and plan a feasible trajectory for the drone to follow, you will calculate polynomial trajectories that are continouous in velocity, acceleration, snap and jerk about every waypoint.
+To improve smoothness and plan a feasible trajectory for the drone to follow, you will calculate polynomial trajectories that are continouous in velocity, acceleration, jerk and snap about every waypoint.
 
 Exercise
 ---------
