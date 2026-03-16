@@ -40,10 +40,10 @@ class MotionPlanner3D():
         # - path_waypoints: The sequence of input path waypoints provided by the path-planner, including the start and final goal position: Vector of m waypoints, consisting of a tuple with three reference positions each as provided by AStar
 
         # TUNE THE FOLLOWING PARAMETERS (PART 2) ----------------------------------------------------------------- ##
-        self.disc_steps = 3 #Integer number steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
-        self.vel_lim = 2 #Velocity limit of the drone (m/s)
-        self.acc_lim = 10.0 #Acceleration limit of the drone (m/s²)
-        t_f = 10.0 # Final time at the end of the path (s)
+        self.disc_steps = 20 #Integer number steps to divide every path segment into to provide the reference positions for PID control # IDEAL: Between 10 and 20
+        self.vel_lim = 20 #Velocity limit of the drone (m/s)
+        self.acc_lim = 100.0 #Acceleration limit of the drone (m/s²)
+        t_f = 3.5 # Final time at the end of the path (s)
 
         # Determine the number of segments of the path
         self.times = np.linspace(0, t_f, len(path_waypoints)) # The time vector at each path waypoint to traverse (Vector of size m) (must be 0 at start)
@@ -70,11 +70,11 @@ class MotionPlanner3D():
         # SOLUTION ---------------------------------------------------------------------------------- ## 
         
         A_m = np.array([
-            [t**5, t**4, t**3, t**2, t, 1], #pos
-            [5*(t**4), 4*(t**3), 3*(t**2), 2*t, 1, 0], #vel
-            [20*(t**3), 12*(t**2), 6*t, 2, 0, 0], #acc  
-            [60*(t**2), 24*t, 6, 0, 0, 0], #jerk
-            [120*t, 24, 0, 0, 0, 0] #snap
+            [1, t, t**2, t**3, t**4, t**5], #pos
+            [0, 1, 2*t, 3*(t**2), 4*(t**3), 5*(t**4)], #vel
+            [0, 0, 2, 6*t, 12*(t**2), 20*(t**3)], #acc  
+            [0, 0, 0, 6, 24*t, 60*(t**2)], #jerk
+            [0, 0, 0, 0, 24, 120*t] #snap
         ])
 
         return A_m
