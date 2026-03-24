@@ -96,6 +96,7 @@ The demonstration performance will be graded according to the performance metric
 - **Grade 3.5**: Take off
 - **Grade 3.5 - 4.75**: For each gate passed through in the first lap you get + 0.25
 - **Grade 4.75 - 6.0**: Average time over the second and third lap compared to the rest of the class
+- Solutions that go against the spirit of the exercise will not be accepted (e.g. finding bugs and exploiting them).
 
 .. Demonstration schedule on May 28th
 .. ----------------------------------
