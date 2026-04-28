@@ -17,12 +17,11 @@ Every team will receive a box with the necessary hardware. This includes:
 
   * 1 x spare motor
   * 2 x spare motor mounts
-  * 5 x spare propellers CW
-  * 5 x spare propellers CCW
+  * 4 x spare propellers CW
+  * 4 x spare propellers CCW
 
 * One flow deck v2
-* One multi-ranger deck
-* One lighthouse deck
+* One AI deck
 
 Change battery and broken parts
 -------------------------------
