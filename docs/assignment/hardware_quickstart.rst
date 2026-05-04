@@ -91,14 +91,15 @@ To connect to the AI deck, connect your computer to the WiFi network "crazyflie_
 
 To familiarise yourself with the AI deck, you can run an example script that provides an FPV video stream from the drone and allows you to control the drone using the keyboard. The script runs on your computer and communicates with the drone over WiFi:
 
-Arrow keys: forward, backward, left, right  
-W / S: increase / decrease altitude  
-A / D: rotate left / right  
-Space: emergency stop  
+- Arrow keys: forward, backward, left, right  
+- W / S: increase / decrease altitude  
+- A / D: rotate left / right  
+- Space: emergency stop  
 
 You can find this example in `crazyflie_fpv_example <https://github.com/lis-epfl/micro-502/blob/main/docs/assignment/crazyflie_fpv_example.py?raw=true>`_ file.
 
-**Note:**  
+**Note:**
+
 - You will need to install the Crazyflie Python Library first.  
 - Make sure you are connected to the drone’s WiFi network before running the script.
 
